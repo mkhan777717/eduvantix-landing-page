@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, MapPin, Users, Loader2, ArrowLeft, Clock, Share2, Ticket, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
@@ -65,6 +65,28 @@ export default function EventDetails() {
       }
     } catch (error) {
       console.error("Failed to RSVP", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const cancelRSVP = async () => {
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`${API_BASE || process.env.NEXT_PUBLIC_API_URL || ''}/api/events/${params.id}/rsvp`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setRsvpStatus(null);
+        // Refresh to update spots filled
+        fetchEventDetails();
+      }
+    } catch (error) {
+      console.error("Failed to cancel RSVP", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -195,42 +217,96 @@ export default function EventDetails() {
                 </div>
               </div>
 
-              {rsvpStatus === 'GOING' ? (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-center gap-2 p-4 bg-green-500/10 text-green-500 rounded-2xl font-bold border border-green-500/20">
-                    <CheckCircle2 size={20} />
-                    You're registered!
+              {event.maxCapacity && (
+                <div className="mb-6 space-y-2">
+                  <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
+                    <span>{event._count?.registrations || 0} / {event.maxCapacity} Spots Filled</span>
+                    <span>{Math.min(((event._count?.registrations || 0) / event.maxCapacity) * 100, 100).toFixed(0)}%</span>
                   </div>
-                  <Link 
-                    href={`/events/${params.id}/ticket`}
-                    className="w-full py-4 bg-[var(--accent-primary)] text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-lg shadow-[var(--accent-primary)]/25"
-                  >
-                    <Ticket size={20} />
-                    View Ticket
-                  </Link>
-                </div>
-              ) : rsvpStatus === 'WAITLISTED' ? (
-                 <div className="p-4 bg-orange-500/10 text-orange-500 rounded-2xl font-bold text-center border border-orange-500/20">
-                    You're on the waitlist
-                 </div>
-              ) : (
-                <div className="space-y-3">
-                  <button 
-                    onClick={() => handleRSVP('GOING')}
-                    disabled={isSubmitting}
-                    className="w-full py-4 bg-[var(--accent-primary)] text-white rounded-2xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-[var(--accent-primary)]/25 disabled:opacity-50"
-                  >
-                    {isSubmitting ? 'Processing...' : 'Register for Event'}
-                  </button>
-                  <button 
-                    onClick={() => handleRSVP('INTERESTED')}
-                    disabled={isSubmitting}
-                    className="w-full py-3 bg-[var(--bg-hover)] text-[var(--text-primary)] rounded-2xl font-semibold hover:bg-[var(--border-primary)] transition-colors disabled:opacity-50"
-                  >
-                    I'm Interested
-                  </button>
+                  <div className="w-full h-2 bg-[var(--bg-hover)] rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-1000 ${
+                        ((event._count?.registrations || 0) / event.maxCapacity) >= 0.9 ? 'bg-red-500' 
+                        : ((event._count?.registrations || 0) / event.maxCapacity) >= 0.75 ? 'bg-orange-500' 
+                        : 'bg-[var(--accent-primary)]'
+                      }`}
+                      style={{ width: `${Math.min(((event._count?.registrations || 0) / event.maxCapacity) * 100, 100)}%` }}
+                    />
+                  </div>
                 </div>
               )}
+
+              <AnimatePresence mode="wait">
+                {rsvpStatus === 'GOING' ? (
+                  <motion.div key="going" initial={{opacity:0, scale:0.95}} animate={{opacity:1, scale:1}} exit={{opacity:0, scale:0.95}} transition={{duration:0.2}} className="space-y-4">
+                    <div className="flex items-center justify-center gap-2 p-4 bg-green-500/10 text-green-500 rounded-2xl font-bold border border-green-500/20">
+                      <CheckCircle2 size={20} />
+                      You're registered!
+                    </div>
+                    <Link 
+                      href={`/events/${params.id}/ticket`}
+                      className="w-full py-4 bg-[var(--accent-primary)] text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-lg shadow-[var(--accent-primary)]/25"
+                    >
+                      <Ticket size={20} />
+                      View Ticket
+                    </Link>
+                    <button onClick={cancelRSVP} disabled={isSubmitting} className="w-full py-3 bg-red-500/10 text-red-500 rounded-2xl font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                      {isSubmitting && <Loader2 size={16} className="animate-spin" />}
+                      Cancel Registration
+                    </button>
+                  </motion.div>
+                ) : rsvpStatus === 'WAITLISTED' ? (
+                  <motion.div key="waitlisted" initial={{opacity:0, scale:0.95}} animate={{opacity:1, scale:1}} exit={{opacity:0, scale:0.95}} transition={{duration:0.2}} className="space-y-4">
+                    <div className="p-4 bg-orange-500/10 text-orange-500 rounded-2xl font-bold text-center border border-orange-500/20">
+                        You're on the waitlist
+                    </div>
+                    <button onClick={cancelRSVP} disabled={isSubmitting} className="w-full py-3 bg-[var(--bg-hover)] text-[var(--text-secondary)] rounded-2xl font-semibold hover:bg-[var(--border-primary)] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                      {isSubmitting && <Loader2 size={16} className="animate-spin" />}
+                      Leave Waitlist
+                    </button>
+                  </motion.div>
+                ) : rsvpStatus === 'INTERESTED' ? (
+                  <motion.div key="interested" initial={{opacity:0, scale:0.95}} animate={{opacity:1, scale:1}} exit={{opacity:0, scale:0.95}} transition={{duration:0.2}} className="space-y-3">
+                    <div className="p-4 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] rounded-2xl font-bold text-center border border-[var(--accent-primary)]/20">
+                      You've marked yourself as interested!
+                    </div>
+                    <button 
+                      onClick={() => handleRSVP('GOING')}
+                      disabled={isSubmitting}
+                      className="w-full py-4 bg-[var(--accent-primary)] text-white rounded-2xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-[var(--accent-primary)]/25 disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        <><Loader2 size={16} className="animate-spin" /> Processing...</>
+                      ) : 'Register Now Instead'}
+                    </button>
+                    <button onClick={cancelRSVP} disabled={isSubmitting} className="w-full py-3 bg-[var(--bg-hover)] text-[var(--text-secondary)] rounded-2xl font-semibold hover:bg-[var(--border-primary)] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                      {isSubmitting && <Loader2 size={16} className="animate-spin" />}
+                      Remove Interest
+                    </button>
+                  </motion.div>
+                ) : (
+                  <motion.div key="none" initial={{opacity:0, scale:0.95}} animate={{opacity:1, scale:1}} exit={{opacity:0, scale:0.95}} transition={{duration:0.2}} className="space-y-3">
+                    <button 
+                      onClick={() => handleRSVP('GOING')}
+                      disabled={isSubmitting}
+                      className="w-full py-4 bg-[var(--accent-primary)] text-white rounded-2xl font-bold hover:opacity-90 transition-opacity shadow-lg shadow-[var(--accent-primary)]/25 disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        <><Loader2 size={16} className="animate-spin" /> Processing...</>
+                      ) : 'Register for Event'}
+                    </button>
+                    <button 
+                      onClick={() => handleRSVP('INTERESTED')}
+                      disabled={isSubmitting}
+                      className="w-full py-3 bg-[var(--bg-hover)] text-[var(--text-primary)] rounded-2xl font-semibold hover:bg-[var(--border-primary)] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        <><Loader2 size={16} className="animate-spin" /> Processing...</>
+                      ) : "I'm Interested"}
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           </div>
         </div>

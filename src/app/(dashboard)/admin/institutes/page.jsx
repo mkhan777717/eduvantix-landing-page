@@ -8,6 +8,7 @@ import {
   X, CheckCircle2, AlertCircle, Calendar, ShieldCheck, Ban, Eye, EyeOff, Edit, Trash2, RefreshCw
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { createPortal } from "react-dom";
 
 export default function InstitutesPage() {
   const router = useRouter();
@@ -61,10 +62,14 @@ export default function InstitutesPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Delete modal states
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [adminToDelete, setAdminToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Redirect if not super admin
   useEffect(() => {
@@ -479,8 +484,11 @@ export default function InstitutesPage() {
       </div>
     </div>
 
-      {/* Creation Modal */}
-      <AnimatePresence>
+      {/* Modals using Portal */}
+      {mounted && createPortal(
+        <>
+          {/* Creation Modal */}
+          <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
             <motion.div
@@ -929,7 +937,10 @@ export default function InstitutesPage() {
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
+          </AnimatePresence>
+        </>,
+        document.body
+      )}
     </>
   );
 }
