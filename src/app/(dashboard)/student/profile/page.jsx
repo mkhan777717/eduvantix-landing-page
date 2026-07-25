@@ -5,7 +5,28 @@ import { useAuth } from "@/context/AuthContext";
 import { Activity, Award, Zap, User, X, Save, RefreshCw, CheckCircle2, Crown, Clock, CalendarDays, Target } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import { createPortal } from "react-dom";
 
+const GithubIcon = ({ size = 24, className = "" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3-.3 6-1.5 6-6.5a5.4 5.4 0 0 0-1.5-3.8 5.3 5.3 0 0 0-.1-3.8s-1.3-.4-4 1.5a13.3 13.3 0 0 0-7 0C6.2 2.7 4.9 3.1 4.9 3.1a5.3 5.3 0 0 0-.1 3.8A5.4 5.4 0 0 0 3 10.7c0 5 3 6.2 6 6.5a4.8 4.8 0 0 0-1 3.2v4"></path>
+  </svg>
+);
+
+const LinkedinIcon = ({ size = 24, className = "" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+    <rect x="2" y="9" width="4" height="12"></rect>
+    <circle cx="4" cy="4" r="2"></circle>
+  </svg>
+);
+
+const TwitterIcon = ({ size = 24, className = "" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M4 4l11.733 16h4.267l-11.733 -16z"></path>
+    <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"></path>
+  </svg>
+);
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
@@ -183,6 +204,11 @@ export default function StudentProfile() {
 
   // Profile Edit State
   const [isEditing, setIsEditing] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [editForm, setEditForm] = useState({
     username: "",
     fullName: "",
@@ -372,6 +398,23 @@ export default function StudentProfile() {
               <div>
                 <h2 className="text-2xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>{user?.fullName || user?.username}</h2>
                 <p className="text-[11px] font-bold tracking-widest mt-1" style={{ color: "var(--text-muted)" }}>@{user?.username}</p>
+                <div className="flex items-center gap-3 mt-4">
+                  {user?.githubUrl && (
+                    <a href={user.githubUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-8 h-8 rounded-full border border-[var(--border-primary)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-all transform hover:-translate-y-1 shadow-sm">
+                      <GithubIcon size={16} />
+                    </a>
+                  )}
+                  {user?.linkedinUrl && (
+                    <a href={user.linkedinUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-8 h-8 rounded-full border border-[var(--border-primary)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-all transform hover:-translate-y-1 shadow-sm">
+                      <LinkedinIcon size={16} />
+                    </a>
+                  )}
+                  {user?.twitterUrl && (
+                    <a href={user.twitterUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-8 h-8 rounded-full border border-[var(--border-primary)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--text-primary)] hover:bg-[var(--bg-hover)] transition-all transform hover:-translate-y-1 shadow-sm">
+                      <TwitterIcon size={16} />
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
             <div className="pt-6 border-t" style={{ borderColor: "var(--border-primary)" }}>
@@ -649,9 +692,10 @@ export default function StudentProfile() {
       </div>
 
       {/* Edit Profile Modal */}
-      <AnimatePresence>
-        {isEditing && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      {mounted && createPortal(
+        <AnimatePresence>
+          {isEditing && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -811,7 +855,9 @@ export default function StudentProfile() {
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 }
