@@ -224,13 +224,13 @@ export function AuthProvider({ children }) {
   }, []);
 
   // ---------------------------------------------------------------------------
-  const login = async (email, password) => {
+  const login = async (email, password, captchaToken = "") => {
     //1. Try real backend
     try {
       const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, captchaToken }),
         signal: AbortSignal.timeout(30000),
       });
 
@@ -316,13 +316,13 @@ export function AuthProvider({ children }) {
   };
 
   // ---------------------------------------------------------------------------
-  const register = async (username, email, password, role = "USER", referralCode = "", otp = "") => {
+  const register = async (username, email, password, role = "USER", referralCode = "", otp = "", captchaToken = "") => {
     // 1. Try real backend
     try {
       const res = await fetch(`${API_BASE}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password, role, referralCode, otp }),
+        body: JSON.stringify({ username, email, password, role, referralCode, otp, captchaToken }),
         signal: AbortSignal.timeout(30000),
       });
 

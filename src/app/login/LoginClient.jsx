@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Lock, User, ShieldAlert, ArrowRight, RefreshCw, AlertCircle, GraduationCap, Sparkles, Eye, EyeOff, Ban, Award, CheckCircle2, KeyRound } from "lucide-react";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
+import { Turnstile } from "@marsidev/react-turnstile";
 import useThemeStore from "@/store/useThemeStore";
 import { getApiBase } from "@/utils/api";
 
@@ -127,6 +128,9 @@ function LoginForm() {
   const [otpVerifying, setOtpVerifying] = useState(false);
   const [otpSuccessMsg, setOtpSuccessMsg] = useState("");
   const [resendTimer, setResendTimer] = useState(0);
+
+  // Cloudflare Turnstile state
+  const [captchaToken, setCaptchaToken] = useState("");
 
   useEffect(() => {
     let timer;
@@ -417,8 +421,8 @@ function LoginForm() {
     try {
       let result;
       if (isRegistering)
-        result = await register(username, email, password, submitRole, referralCode, otp);
-      else result = await login(email, password);
+        result = await register(username, email, password, submitRole, referralCode, otp, captchaToken);
+      else result = await login(email, password, captchaToken);
       if (result.success) {
         // Always prefer freeCoursePath if available
         let targetRoute;
@@ -679,6 +683,19 @@ function LoginForm() {
                 <p className="text-[11px] leading-relaxed opacity-90">
                   {isOtpVerified ? "Your email has been successfully verified. Click Register as Student to complete your account setup." : "Please check your Inbox or Spam/Junk folder for your 6-digit code."}
                 </p>
+              </div>
+            )}
+
+            {/* Cloudflare Turnstile CAPTCHA Protection */}
+            {!isForgot && (
+              <div className="flex justify-center my-3 overflow-hidden rounded-xl">
+                <Turnstile
+                  siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "0x4AAAAAAD9bxs6BjH3k3YlU"}
+                  onSuccess={(token) => setCaptchaToken(token)}
+                  onExpire={() => setCaptchaToken("")}
+                  onError={() => setCaptchaToken("")}
+                  options={{ theme: "dark" }}
+                />
               </div>
             )}
 
