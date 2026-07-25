@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Trophy, LogOut,
   Menu, X, ChevronLeft, ChevronRight, BookOpen, ArrowLeftRight,
   Code, Brain, Radio, AlertTriangle, FileText, Gamepad2, FileCheck, Activity, Settings, Paintbrush,
-  ShieldAlert, Layers, Users, PlusCircle, List, Bell, CheckCircle2, Check, MessageSquare, Crown, HeartHandshake, ClipboardList, Target, Briefcase, CalendarDays
+  ShieldAlert, Layers, Users, PlusCircle, List, Bell, BellDot, CheckCircle2, Check, MessageSquare, Crown, HeartHandshake, ClipboardList, Target, Briefcase, CalendarDays
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/context/AuthContext";
@@ -78,6 +78,7 @@ export default function DashboardLayout({ children }) {
   // Role & Session States
   const [roleName, setRoleName] = useState("Scholar");
   const [showEndConfirmModal, setShowEndConfirmModal] = useState(false);
+  const [pendingNavAction, setPendingNavAction] = useState(null);
   const { isDark, initTheme } = useThemeStore();
   const [isMounted, setIsMounted] = useState(false);
 
@@ -98,7 +99,6 @@ export default function DashboardLayout({ children }) {
   const isMentorSession = isMounted ? (localStorage.getItem("synapse_mentor_session") === "true" || isMentor) : isMentor;
   const isLoginRoute = pathname === "/student" || pathname === "/admin" || pathname === "/mentor";
   const [premiumRequests, setPremiumRequests] = useState([]);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [dismissedRequests, setDismissedRequests] = useState(() => {
     if (typeof window !== "undefined") {
       try {
@@ -175,6 +175,104 @@ export default function DashboardLayout({ children }) {
       return () => clearInterval(interval);
     }
   }, [isSuperAdmin]);
+
+  // ── In-app Notifications ────────────────────────────────────────────────────
+  const [notifications, setNotifications] = useState([]);
+  const [isNotiOpen, setIsNotiOpen] = useState(false);
+  const [dismissedNotiIds, setDismissedNotiIds] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("eduvantix_dismissed_noti_ids");
+        return stored ? JSON.parse(stored) : [];
+      } catch { return []; }
+    }
+    return [];
+  });
+
+  const visibleNotifications = notifications.filter(
+    (n) => !dismissedNotiIds.includes(n.id) && !n.isRead
+  );
+
+  const NOTI_ICONS = {
+    JOB_APPLICATION: "💼",
+    JOB_STATUS: "📋",
+    FEEDBACK: "📝",
+    LIVE_CLASS: "📺",
+    STUDY_MATERIAL: "📚",
+    AI_VIVA: "🧠",
+    EXAM: "📝",
+    CONTEST: "🏆",
+  };
+
+  const fetchNotifications = async () => {
+    if (!user) return;
+    try {
+      const hasRealToken = token && !token.startsWith("demo-") && !token.startsWith("local-");
+      const headers = {
+        "Content-Type": "application/json",
+        ...(hasRealToken
+          ? { Authorization: `Bearer ${token}` }
+          : { "x-bypass-auth": "true", "x-bypass-role": user?.role || "USER" }),
+      };
+      const res = await fetch(`${API_BASE}/api/notifications`, { headers });
+      const data = await res.json();
+      if (data.success) {
+        setNotifications(data.notifications || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch notifications", err);
+    }
+  };
+
+  const handleDismissNoti = async (id) => {
+    // Optimistically hide it
+    setDismissedNotiIds(prev => {
+      const updated = [...prev, id];
+      localStorage.setItem("eduvantix_dismissed_noti_ids", JSON.stringify(updated));
+      return updated;
+    });
+    // Call API to mark read
+    try {
+      const hasRealToken = token && !token.startsWith("demo-") && !token.startsWith("local-");
+      await fetch(`${API_BASE}/api/notifications/${id}/dismiss`, {
+        method: "PATCH",
+        headers: hasRealToken
+          ? { Authorization: `Bearer ${token}` }
+          : { "x-bypass-auth": "true", "x-bypass-role": user?.role || "USER" },
+      });
+    } catch (err) {
+      console.error("Failed to dismiss notification", err);
+    }
+  };
+
+  const handleDismissAllNoti = async () => {
+    const ids = visibleNotifications.map(n => n.id);
+    setDismissedNotiIds(prev => {
+      const updated = [...prev, ...ids];
+      localStorage.setItem("eduvantix_dismissed_noti_ids", JSON.stringify(updated));
+      return updated;
+    });
+    try {
+      const hasRealToken = token && !token.startsWith("demo-") && !token.startsWith("local-");
+      await fetch(`${API_BASE}/api/notifications/dismiss-all`, {
+        method: "PATCH",
+        headers: hasRealToken
+          ? { Authorization: `Bearer ${token}` }
+          : { "x-bypass-auth": "true", "x-bypass-role": user?.role || "USER" },
+      });
+    } catch (err) {
+      console.error("Failed to dismiss all notifications", err);
+    }
+    setIsNotiOpen(false);
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [user, token]);
 
 
 
@@ -619,67 +717,139 @@ export default function DashboardLayout({ children }) {
             
             <div className="flex items-center gap-3 ml-auto">
 
-            {isSuperAdmin && (
+            {isStudentSession && <GiftCoupon />}
+
+
+            {/* ── Universal Notification Bell (all roles) ── */}
+            {dashboardUser && (
               <div className="relative">
                 <button
-                  onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                  onClick={() => { setIsNotiOpen(!isNotiOpen); if (!isNotiOpen) fetchNotifications(); }}
                   className="p-2 rounded-xl transition-all relative cursor-pointer"
                   style={{ color: "var(--text-secondary)" }}
                   onMouseEnter={e => e.currentTarget.style.backgroundColor = "var(--bg-hover)"}
                   onMouseLeave={e => e.currentTarget.style.backgroundColor = "transparent"}
+                  title="Notifications"
                 >
-                  <Bell size={16} />
-                  {visibleRequests.length > 0 && (
-                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                  {visibleNotifications.length > 0 ? <BellDot size={16} style={{ color: "var(--accent-primary)" }} /> : <Bell size={16} />}
+                  {visibleNotifications.length > 0 && (
+                    <span className="absolute top-1 right-1 min-w-[14px] h-[14px] flex items-center justify-center rounded-full text-[8px] font-bold text-white bg-rose-500 px-0.5 animate-pulse">
+                      {visibleNotifications.length > 9 ? "9+" : visibleNotifications.length}
+                    </span>
                   )}
                 </button>
 
-                {isNotificationOpen && (
+                {isNotiOpen && (
                   <>
-                    <div className="fixed inset-0 z-40" onClick={() => setIsNotificationOpen(false)} />
-                    <div className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-[var(--border-primary)] shadow-xl z-50 overflow-hidden"
+                    <div className="fixed inset-0 z-40" onClick={() => setIsNotiOpen(false)} />
+                    <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border border-[var(--border-primary)] shadow-2xl z-50 overflow-hidden"
                       style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
+                      {/* Header */}
                       <div className="p-3 border-b flex items-center justify-between" style={{ borderColor: "var(--border-primary)" }}>
-                        <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-primary)" }}>Upgrade Requests</span>
-                        {visibleRequests.length > 0 && (
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500">
-                            {visibleRequests.length} pending
-                          </span>
+                        <div className="flex items-center gap-2">
+                          <Bell size={12} style={{ color: "var(--accent-primary)" }} />
+                          <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-primary)" }}>Notifications</span>
+                          {visibleNotifications.length > 0 && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500/10 text-rose-500 border border-rose-500/20">
+                              {visibleNotifications.length} new
+                            </span>
+                          )}
+                        </div>
+                        {visibleNotifications.length > 0 && (
+                          <button
+                            onClick={handleDismissAllNoti}
+                            className="text-[9px] font-semibold px-2 py-1 rounded-lg transition-colors cursor-pointer"
+                            style={{ color: "var(--text-muted)" }}
+                            onMouseEnter={e => { e.currentTarget.style.backgroundColor = "var(--bg-hover)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
+                            onMouseLeave={e => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = "var(--text-muted)"; }}
+                          >
+                            Dismiss all
+                          </button>
                         )}
                       </div>
-                      <div className="max-h-60 overflow-y-auto divide-y" style={{ divideColor: "var(--border-primary)" }}>
-                        {visibleRequests.length === 0 ? (
-                          <div className="p-4 text-center text-xs" style={{ color: "var(--text-muted)" }}>
-                            No pending upgrade requests.
+
+                      {/* Super Admin: Upgrade Requests section */}
+                      {isSuperAdmin && visibleRequests.length > 0 && (
+                        <div className="border-b" style={{ borderColor: "var(--border-primary)" }}>
+                          <div className="px-3 pt-2 pb-1">
+                            <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>Upgrade Requests</span>
                           </div>
-                        ) : (
-                          visibleRequests.map((req, i) => (
-                            <div key={req.id || i} className="p-3 flex items-start justify-between gap-2 hover:bg-[var(--bg-hover)] transition-colors group/noti">
-                              <div className="flex items-start gap-2.5">
-                                <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-500 shrink-0 mt-0.5">
-                                  <ShieldAlert size={12} />
-                                </div>
-                                <div className="text-left space-y-0.5">
-                                  <div className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>
-                                    {req.instituteName}
+                          <div className="max-h-32 overflow-y-auto">
+                            {visibleRequests.map((req, i) => (
+                              <div key={req.id || i} className="px-3 py-2 flex items-start justify-between gap-2 hover:bg-[var(--bg-hover)] transition-colors">
+                                <div className="flex items-start gap-2">
+                                  <div className="w-5 h-5 rounded-md bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-500 shrink-0 mt-0.5">
+                                    <ShieldAlert size={10} />
                                   </div>
-                                  <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-                                    Requested {req.featureLabel} access.
-                                  </p>
+                                  <div>
+                                    <div className="text-[11px] font-semibold" style={{ color: "var(--text-primary)" }}>{req.instituteName}</div>
+                                    <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>Requested {req.featureLabel} access</p>
+                                  </div>
                                 </div>
+                                <button
+                                  onClick={e => { e.stopPropagation(); handleDismiss(req.id); }}
+                                  className="p-1 rounded-md border border-transparent hover:border-emerald-500/20 hover:bg-emerald-500/10 text-[var(--text-muted)] hover:text-emerald-400 transition-all cursor-pointer shrink-0 self-center"
+                                  title="Dismiss"
+                                >
+                                  <Check size={11} strokeWidth={3} />
+                                </button>
                               </div>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDismiss(req.id);
-                                }}
-                                className="p-1.5 rounded-lg border border-transparent hover:border-emerald-500/20 hover:bg-emerald-500/10 text-[var(--text-muted)] hover:text-emerald-400 transition-all duration-200 hover:scale-[1.08] active:scale-95 cursor-pointer self-center shadow-sm"
-                                title="Dismiss notification"
-                              >
-                                <Check size={12} strokeWidth={3} />
-                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* General notifications */}
+                      <div className="max-h-72 overflow-y-auto">
+                        {visibleNotifications.length === 0 && (!isSuperAdmin || visibleRequests.length === 0) ? (
+                          <div className="p-6 text-center space-y-2">
+                            <div className="w-8 h-8 rounded-full bg-[var(--bg-hover)] flex items-center justify-center mx-auto">
+                              <Bell size={14} style={{ color: "var(--text-muted)" }} />
                             </div>
-                          ))
+                            <p className="text-xs" style={{ color: "var(--text-muted)" }}>You&apos;re all caught up!</p>
+                          </div>
+                        ) : visibleNotifications.length === 0 && isSuperAdmin && visibleRequests.length > 0 ? null : (
+                          <>
+                            {isSuperAdmin && visibleRequests.length > 0 && (
+                              <div className="px-3 pt-2 pb-1">
+                                <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>Activity</span>
+                              </div>
+                            )}
+                            {visibleNotifications.map((noti) => (
+                              <div
+                                key={noti.id}
+                                className="px-3 py-2.5 flex items-start justify-between gap-2 hover:bg-[var(--bg-hover)] transition-colors border-b last:border-0"
+                                style={{ borderColor: "var(--border-primary)" }}
+                              >
+                                <div className="flex items-start gap-2.5 min-w-0">
+                                  <div
+                                    className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 text-sm border"
+                                    style={{ backgroundColor: "var(--bg-hover)", borderColor: "var(--border-primary)" }}
+                                  >
+                                    {NOTI_ICONS[noti.type] || "🔔"}
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="text-[11px] font-semibold leading-tight truncate" style={{ color: "var(--text-primary)" }}>
+                                      {noti.title}
+                                    </div>
+                                    <p className="text-[10px] leading-snug mt-0.5 line-clamp-2" style={{ color: "var(--text-muted)" }}>
+                                      {noti.body}
+                                    </p>
+                                    <p className="text-[9px] mt-1" style={{ color: "var(--text-muted)" }}>
+                                      {new Date(noti.createdAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                                    </p>
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={e => { e.stopPropagation(); handleDismissNoti(noti.id); }}
+                                  className="p-1 rounded-md border border-transparent hover:border-emerald-500/20 hover:bg-emerald-500/10 text-[var(--text-muted)] hover:text-emerald-400 transition-all cursor-pointer shrink-0 self-center"
+                                  title="Dismiss"
+                                >
+                                  <Check size={11} strokeWidth={3} />
+                                </button>
+                              </div>
+                            ))}
+                          </>
                         )}
                       </div>
                     </div>
@@ -687,8 +857,6 @@ export default function DashboardLayout({ children }) {
                 )}
               </div>
             )}
-
-            {isStudentSession && <GiftCoupon />}
 
             {dashboardUser && (
               <div className="relative">
