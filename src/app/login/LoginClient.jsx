@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Lock, User, ShieldAlert, ArrowRight, RefreshCw, AlertCircle, GraduationCap, Sparkles, Eye, EyeOff, Ban, Award, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, User, ShieldAlert, ArrowRight, RefreshCw, AlertCircle, GraduationCap, Sparkles, Eye, EyeOff, Ban, Award, CheckCircle2, KeyRound } from "lucide-react";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 import useThemeStore from "@/store/useThemeStore";
 import { getApiBase } from "@/utils/api";
@@ -93,7 +93,7 @@ function GoogleLoginSection({ onSuccess, onError, loading, setErrorMsg }) {
 }
 
 function LoginForm() {
-  const { login, register, user, logout, forgotPassword, loginWithGoogle } = useAuth();
+  const { login, register, sendRegistrationOtp, verifyRegistrationOtp, user, logout, forgotPassword, loginWithGoogle } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/";
@@ -118,6 +118,25 @@ function LoginForm() {
   const [referralMessage, setReferralMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Registration Email OTP states
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpSending, setOtpSending] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  const [otpSuccessMsg, setOtpSuccessMsg] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
+
+  useEffect(() => {
+    let timer;
+    if (resendTimer > 0) {
+      timer = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [resendTimer]);
 
   const [activeTab, setActiveTab] = useState("STUDENT");
   const [hasExplicitRole, setHasExplicitRole] = useState(false);
@@ -283,6 +302,72 @@ function LoginForm() {
 
   const theme = getRoleTheme();
 
+  const handleSendOtp = async (e) => {
+    if (e) e.preventDefault();
+    setErrorMsg("");
+    setOtpSuccessMsg("");
+
+    if (!username.trim()) {
+      setErrorMsg("Please enter your username.");
+      return;
+    }
+    if (!email || !email.includes("@")) {
+      setErrorMsg("Please enter a valid email address.");
+      return;
+    }
+    if (!password) {
+      setErrorMsg("Please enter a password.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setErrorMsg("Passwords do not match.");
+      return;
+    }
+
+    setOtpSending(true);
+    try {
+      const res = await sendRegistrationOtp(email);
+      if (res.success) {
+        setOtpSent(true);
+        setIsOtpVerified(false);
+        setOtpSuccessMsg(res.message || "Verification code sent! Please check your Inbox and Spam folder.");
+        setResendTimer(60);
+      } else {
+        setErrorMsg(res.message || "Failed to send verification OTP.");
+      }
+    } catch {
+      setErrorMsg("Network error. Unable to send verification code.");
+    } finally {
+      setOtpSending(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    if (e) e.preventDefault();
+    setErrorMsg("");
+    setOtpSuccessMsg("");
+
+    if (!otp || otp.length !== 6) {
+      setErrorMsg("Please enter the complete 6-digit OTP code.");
+      return;
+    }
+
+    setOtpVerifying(true);
+    try {
+      const res = await verifyRegistrationOtp(email, otp);
+      if (res.success) {
+        setIsOtpVerified(true);
+        setOtpSuccessMsg("✅ Email verified successfully! You can now click Register to complete your account creation.");
+      } else {
+        setErrorMsg(res.message || "Invalid or expired OTP code.");
+      }
+    } catch {
+      setErrorMsg("Network error. Unable to verify OTP code.");
+    } finally {
+      setOtpVerifying(false);
+    }
+  };
+
   // Handle form submit (login/register/forgot)
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -321,11 +406,18 @@ function LoginForm() {
       setLoading(false);
       return;
     }
+
+    if (isRegistering && !isOtpVerified) {
+      setErrorMsg("Please verify your email OTP before registering.");
+      setLoading(false);
+      return;
+    }
+
     const submitRole = activeTab === "ADMIN" ? "ADMIN" : activeTab === "MENTOR" ? "MENTOR" : "USER";
     try {
       let result;
       if (isRegistering)
-        result = await register(username, email, password, submitRole, referralCode);
+        result = await register(username, email, password, submitRole, referralCode, otp);
       else result = await login(email, password);
       if (result.success) {
         // Always prefer freeCoursePath if available
@@ -515,9 +607,84 @@ function LoginForm() {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Registration Email OTP Field & Inline Action */}
+            {isRegistering && (
+              <motion.div key="otpField" className="space-y-1.5" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>
+                    Email Verification OTP *
+                  </label>
+                  {otpSent && !isOtpVerified && (
+                    <button
+                      type="button"
+                      onClick={handleSendOtp}
+                      disabled={resendTimer > 0 || otpSending}
+                      className="text-[10px] font-bold text-indigo-500 hover:underline disabled:opacity-50 cursor-pointer"
+                    >
+                      {resendTimer > 0 ? `Resend in ${resendTimer}s` : otpSending ? "Sending..." : "Resend OTP"}
+                    </button>
+                  )}
+                </div>
+                <div className="relative flex items-center">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }}>
+                    <KeyRound size={14} />
+                  </span>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    disabled={isOtpVerified}
+                    placeholder={isOtpVerified ? "✓ Verified" : "Enter 6-digit OTP"}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                    className={`w-full rounded-xl py-2.5 pl-9 pr-28 text-sm font-mono tracking-wider outline-none border transition-all ${isOtpVerified ? "border-emerald-500/50 bg-emerald-500/5 text-emerald-600 font-bold" : "border-[var(--border-primary)]"}`}
+                    style={isOtpVerified ? {} : { backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
+                    required={otpSent}
+                  />
+                  {isOtpVerified ? (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs font-extrabold text-emerald-500 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                      <CheckCircle2 size={13} /> Verified
+                    </span>
+                  ) : !otpSent ? (
+                    <button
+                      type="button"
+                      onClick={handleSendOtp}
+                      disabled={otpSending || !email}
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition-all cursor-pointer disabled:opacity-50"
+                      style={{ background: theme.accentGradient }}
+                    >
+                      {otpSending ? "Sending..." : "Send OTP"}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      disabled={otpVerifying || otp.length !== 6}
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition-all cursor-pointer disabled:opacity-50"
+                      style={{ background: theme.accentGradient }}
+                    >
+                      {otpVerifying ? "Verifying..." : "Verify OTP"}
+                    </button>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {isRegistering && otpSuccessMsg && (
+              <div className={`p-3 rounded-xl border text-xs font-medium space-y-1 ${isOtpVerified ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600" : "bg-indigo-500/10 border-indigo-500/20 text-indigo-500"}`}>
+                <div className="font-bold flex items-center gap-1.5">
+                  <CheckCircle2 size={14} />
+                  <span>{isOtpVerified ? "Email Address Verified!" : "Verification Code Sent!"}</span>
+                </div>
+                <p className="text-[11px] leading-relaxed opacity-90">
+                  {isOtpVerified ? "Your email has been successfully verified. Click Register as Student to complete your account setup." : "Please check your Inbox or Spam/Junk folder for your 6-digit code."}
+                </p>
+              </div>
+            )}
+
             <SubmitButton 
               loading={loading} 
-              disabled={(isRegistering && referralStatus === 'invalid') || (isRegistering && confirmPassword && confirmPassword !== password)}
+              disabled={(isRegistering && !isOtpVerified) || (isRegistering && referralStatus === 'invalid') || (isRegistering && confirmPassword && confirmPassword !== password)}
               gradient={theme.accentGradient} 
               label={isRegistering ? `Register as Student` : `Sign In`} 
             />

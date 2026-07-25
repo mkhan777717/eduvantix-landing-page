@@ -279,14 +279,50 @@ export function AuthProvider({ children }) {
     };
   };
 
+  const sendRegistrationOtp = async (email) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/send-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+        signal: AbortSignal.timeout(30000),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        return { success: true, message: data.message };
+      }
+      return { success: false, message: data.message || formatBackendError(data) };
+    } catch (e) {
+      return { success: false, message: "Network error. Please check your connection." };
+    }
+  };
+
+  const verifyRegistrationOtp = async (email, otp) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+        signal: AbortSignal.timeout(30000),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        return { success: true, message: data.message };
+      }
+      return { success: false, message: data.message || formatBackendError(data) };
+    } catch (e) {
+      return { success: false, message: "Network error. Please check your connection." };
+    }
+  };
+
   // ---------------------------------------------------------------------------
-  const register = async (username, email, password, role = "USER", referralCode = "") => {
+  const register = async (username, email, password, role = "USER", referralCode = "", otp = "") => {
     // 1. Try real backend
     try {
       const res = await fetch(`${API_BASE}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password, role, referralCode }),
+        body: JSON.stringify({ username, email, password, role, referralCode, otp }),
         signal: AbortSignal.timeout(30000),
       });
 
@@ -401,7 +437,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, API_BASE, activeSession, setActiveSession, isInstituteBlocked, setIsInstituteBlocked, forgotPassword, resetPassword, loginWithGoogle }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, sendRegistrationOtp, verifyRegistrationOtp, logout, API_BASE, activeSession, setActiveSession, isInstituteBlocked, setIsInstituteBlocked, forgotPassword, resetPassword, loginWithGoogle }}>
       {children}
 
       {/* Cross-Device Single Session Countdown Overlay */}
