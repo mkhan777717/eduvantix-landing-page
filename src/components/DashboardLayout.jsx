@@ -455,6 +455,8 @@ export default function DashboardLayout({ children }) {
       { label: "Live Sessions", href: "/live-classes", icon: Radio },
       { label: "Learn with Games", href: "/student/games", icon: Gamepad2 },
       { label: "Events", href: "/events", icon: CalendarDays },
+      { label: "My Schedule", href: "/timetable/student", icon: CalendarDays },
+      { label: "My Attendance", href: "/attendance/student", icon: CheckCircle2 },
       { label: "Study Materials", href: "/student/materials", icon: FileText },
       { label: "Resume Builder", href: "/student/resume", icon: FileCheck },
       { label: "Job Assistance", href: "/student/job-assistance", icon: Briefcase },
@@ -483,6 +485,10 @@ export default function DashboardLayout({ children }) {
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedGoLive") && { label: "Go Live", href: "/admin/live", icon: Radio, featureFlag: "allowedGoLive" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedArcade") && { label: "Arcade Questions", href: "/admin/arcade", icon: Gamepad2, featureFlag: "allowedArcade" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && { label: "Events", href: "/events/organizer", icon: CalendarDays },
+      (isSuperAdmin || isInstAdmin || isBatchMgr) && { label: "Timetable Management", href: "/timetable", icon: CalendarDays },
+      isMentor && { label: "My Schedule", href: "/timetable/faculty", icon: CalendarDays },
+      (isSuperAdmin || isInstAdmin) && { label: "Attendance Analytics", href: "/attendance/admin", icon: CheckCircle2 },
+      (isMentor || isBatchMgr) && { label: "Take Attendance", href: "/attendance/faculty", icon: CheckCircle2 },
       !isSuperAdmin && { label: "Share Feedback", href: "/feedback", icon: HeartHandshake },
     ].filter(Boolean);
   }
