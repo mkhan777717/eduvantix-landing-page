@@ -246,8 +246,15 @@ export function AuthProvider({ children }) {
         return { success: true, user: data.user };
       }
 
-      // If it's a 4xx (bad credentials, wrong password, etc.) — report immediately
+      // If it's a 4xx (bad credentials, wrong password, account blocked, etc.) — report immediately
       if (res.status >= 400 && res.status < 500) {
+        if (data.isBlocked || res.status === 403) {
+          return {
+            success: false,
+            message: data.message || "Your account has been blocked by the administrator. Please contact us on hello@eduvantix.com",
+            blocked: true,
+          };
+        }
         if (data.code === 'INSTITUTE_BLOCKED') {
           setIsInstituteBlocked(true);
           return { success: false, message: 'Your institute has been blocked. Please contact the Super Administrator.', blocked: true };
@@ -424,6 +431,14 @@ export function AuthProvider({ children }) {
         localStorage.setItem("eduvantix_auth_token", data.token);
         localStorage.setItem("eduvantix_auth_user", JSON.stringify(data.user));
         return { success: true, user: data.user };
+      }
+
+      if (data.isBlocked || res.status === 403) {
+        return {
+          success: false,
+          message: data.message || "Your account has been blocked by the administrator. Please contact us on hello@eduvantix.com",
+          blocked: true,
+        };
       }
 
       if (data.code === 'INSTITUTE_BLOCKED') {
