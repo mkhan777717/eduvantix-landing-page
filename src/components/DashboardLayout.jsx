@@ -428,6 +428,11 @@ export default function DashboardLayout({ children }) {
   const isCoursePage = pathname.startsWith("/courses");
   if (isCoursePage) return <>{children}</>;
 
+  // Hide sidebar + header for the LMS step player (full-height immersive mode).
+  // URL pattern: /learn/course/[slug]/[chapterId]/[stepId]
+  const isLearningStepPlayer = /^\/learn\/course\/[^/]+\/[^/]+\/[^/]+/.test(pathname);
+  if (isLearningStepPlayer) return <>{children}</>;
+
 
 
   let sidebarLinks = [];
@@ -442,6 +447,7 @@ export default function DashboardLayout({ children }) {
   if (isStudentSession) {
     sidebarLinks = [
       { label: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
+      // { label: "Learn", href: "/learn", icon: BookOpen }, // Hidden for students during dev phase
       { label: "Practice Arena", href: "/practice", icon: Code },
       { label: "Contest Arena", href: "/contest", icon: Trophy },
       { label: "Exam Center", href: "/exams", icon: FileText },
@@ -474,6 +480,7 @@ export default function DashboardLayout({ children }) {
       (isBatchMgr || isInstAdmin || isMentor) && canShowFeature("allowedAiViva") && { label: "AI Viva", href: "/mentor/viva/questions", icon: Brain, featureFlag: "allowedAiViva" },
       (isBatchMgr || isInstAdmin || isMentor) && canShowFeature("allowedStudyMaterial") && { label: "Study Materials", href: "/mentor/viva/materials", icon: FileText, featureFlag: "allowedStudyMaterial" },
       isSuperAdmin && { label: "AI Viva", href: "/admin/viva/ai-settings", icon: Brain },
+      (isSuperAdmin || isInstAdmin) && { label: "Courses (LMS)", href: "/admin/courses", icon: BookOpen },
       isSuperAdmin && { label: "User Feedbacks", href: "/admin/feedback", icon: ClipboardList },
       isSuperAdmin && { label: "Job Assistance", href: "/admin/job-assistance", icon: Briefcase },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedContest") && { label: "Contests", href: "/admin/contests", icon: Trophy, featureFlag: "allowedContest" },
