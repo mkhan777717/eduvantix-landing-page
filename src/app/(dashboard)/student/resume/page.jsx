@@ -494,7 +494,7 @@ export default function ResumeBuilderPage() {
                 <LayoutTemplate size={14} style={{ color: "var(--text-accent)" }} />
                 Templates
               </div>
-              <div className="flex items-center gap-1.5 overflow-x-auto flex-nowrap pl-3 pr-2 scrollbar-hide py-1">
+              <div className="flex items-center gap-1.5 overflow-x-auto flex-nowrap pl-3 pr-2 py-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {TEMPLATES.map(t => {
                   const isActive = selectedTemplate === t;
                   const [c1, c2] = TEMPLATE_SWATCH[t];
@@ -528,7 +528,7 @@ export default function ResumeBuilderPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
-              className="w-full overflow-x-auto custom-scrollbar pb-4"
+              className="w-full overflow-x-auto pb-4 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[var(--border-primary)] [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-[var(--text-muted)] [scrollbar-width:thin]"
             >
               <AnimatePresence mode="wait">
                 <motion.div

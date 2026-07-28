@@ -346,11 +346,9 @@ export default function DashboardLayout({ children }) {
     if (typeof window !== "undefined") {
       const hasSession = isStudentSession || isAdminSession || isMentorSession;
 
-      if (!hasSession && !pathname.startsWith('/practice') && !pathname.startsWith('/contest') && !pathname.startsWith('/courses') && !pathname.startsWith('/live-classes')) {
-        if (pathname.startsWith('/admin') || pathname.startsWith('/mentor') || pathname.startsWith('/student')) {
-          router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
-          return;
-        }
+      if (!hasSession) {
+        router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+        return;
       }
 
       if (hasSession && isLoginRoute) {
@@ -429,11 +427,7 @@ export default function DashboardLayout({ children }) {
   const isCoursePage = pathname.startsWith("/courses");
   if (isCoursePage) return <>{children}</>;
 
-  const isPublicRoute = !dashboardUser && (pathname.startsWith('/practice') || pathname.startsWith('/contest') || pathname.startsWith('/courses') || pathname.startsWith('/live-classes'));
 
-  if (isPublicRoute) {
-    return <>{children}</>;
-  }
 
   let sidebarLinks = [];
 
@@ -455,9 +449,9 @@ export default function DashboardLayout({ children }) {
       { label: "Live Sessions", href: "/live-classes", icon: Radio },
       { label: "Learn with Games", href: "/student/games", icon: Gamepad2 },
       { label: "Events", href: "/events", icon: CalendarDays },
-      { label: "My Schedule", href: "/timetable/student", icon: CalendarDays },
-      { label: "My Attendance", href: "/attendance/student", icon: CheckCircle2 },
-      { label: "Study Materials", href: "/student/materials", icon: FileText },
+      user?.instituteId ? { label: "My Schedule", href: "/timetable/student", icon: CalendarDays } : null,
+      user?.instituteId ? { label: "My Attendance", href: "/attendance/student", icon: CheckCircle2 } : null,
+      user?.instituteId ? { label: "Study Materials", href: "/student/materials", icon: FileText } : null,
       { label: "Resume Builder", href: "/student/resume", icon: FileCheck },
       { label: "Job Assistance", href: "/student/job-assistance", icon: Briefcase },
       { label: "Share Feedback", href: "/feedback", icon: HeartHandshake },

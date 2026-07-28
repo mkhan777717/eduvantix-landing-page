@@ -16,9 +16,10 @@ export default function EventsDashboard() {
   const [hasMore, setHasMore] = useState(false);
 
   useEffect(() => {
+    if (!token) return;
     setPage(1);
     fetchEvents(1, false);
-  }, []);
+  }, [token]);
 
   const fetchEvents = async (pageNum = 1, append = false) => {
     try {
