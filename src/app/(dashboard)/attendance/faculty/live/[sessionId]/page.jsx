@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, use } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, AlertTriangle, ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
+import { Users, AlertTriangle, ArrowLeft, Loader2, RefreshCw, Clock } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useAttendanceStore } from '@/store/useAttendanceStore';
 import Link from 'next/link';

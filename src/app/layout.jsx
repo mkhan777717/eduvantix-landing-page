@@ -116,11 +116,8 @@ export const metadata = {
 
   /* ── App & Theme ────────────────────────── */
   applicationName: "Eduvantix",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
-  colorScheme: "light dark",
+  // Note: themeColor and colorScheme are now exported in the viewport object below
+
 
   /* ── PWA Manifest ───────────────────────── */
   manifest: "/manifest.json",
@@ -145,6 +142,14 @@ export const metadata = {
     address: false,
     telephone: false,
   },
+};
+
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+  colorScheme: "light dark",
 };
 
 /* ─────────────────────────────────────────────

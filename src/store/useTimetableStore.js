@@ -6,11 +6,12 @@ export const useTimetableStore = create((set, get) => ({
   isLoading: false,
   error: null,
 
-  fetchTodayClasses: async (role, token, API_BASE) => {
+  fetchTodayClasses: async (role, token, API_BASE, day = null) => {
     set({ isLoading: true, error: null });
     try {
       const endpoint = role === 'USER' ? '/api/timetables/student/today' : '/api/timetables/faculty/today';
-      const res = await fetch(`${API_BASE}${endpoint}`, {
+      const url = day !== null ? `${endpoint}?day=${day}` : endpoint;
+      const res = await fetch(`${API_BASE}${url}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();

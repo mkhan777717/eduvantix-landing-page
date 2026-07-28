@@ -1,18 +1,29 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, MapPin, User, CalendarDays, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTimetableStore } from '@/store/useTimetableStore';
 
+const DAYS = [
+  { label: 'Sun', value: 0 },
+  { label: 'Mon', value: 1 },
+  { label: 'Tue', value: 2 },
+  { label: 'Wed', value: 3 },
+  { label: 'Thu', value: 4 },
+  { label: 'Fri', value: 5 },
+  { label: 'Sat', value: 6 },
+];
+
 export default function StudentTimetable() {
   const { token, API_BASE } = useAuth();
   const { todayClasses, isLoading, fetchTodayClasses } = useTimetableStore();
+  const [selectedDay, setSelectedDay] = useState(new Date().getDay());
 
   useEffect(() => {
-    fetchTodayClasses('USER', token, API_BASE || process.env.NEXT_PUBLIC_API_URL || '');
-  }, []);
+    fetchTodayClasses('USER', token, API_BASE || process.env.NEXT_PUBLIC_API_URL || '', selectedDay);
+  }, [selectedDay]);
 
   const today = new Date();
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -27,6 +38,23 @@ export default function StudentTimetable() {
           <CalendarDays size={18} className="text-[var(--accent-primary)]" />
           {today.toLocaleDateString(undefined, options)}
         </p>
+      </div>
+
+      {/* Day Selector */}
+      <div className="flex flex-wrap gap-2 mb-6 border-b border-[var(--border-primary)] pb-4">
+        {DAYS.map((day) => (
+          <button
+            key={day.value}
+            onClick={() => setSelectedDay(day.value)}
+            className={`px-4 py-2 rounded-xl font-bold transition-all ${
+              selectedDay === day.value 
+                ? 'bg-[var(--accent-primary)] text-white shadow-md' 
+                : 'bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:bg-[var(--border-primary)]'
+            }`}
+          >
+            {day.label}
+          </button>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -67,7 +95,9 @@ export default function StudentTimetable() {
                 <div className="mt-auto space-y-3">
                   <div className="flex items-center gap-3 text-sm text-[var(--text-secondary)] bg-[var(--bg-hover)] p-3 rounded-xl border border-[var(--border-primary)]">
                     <User size={16} className="text-[var(--text-muted)]" />
-                    <span className="font-medium">{entry.faculty.fullName}</span>
+                    <span className="font-medium">
+                      {entry.faculty?.fullName || entry.faculty?.username || 'Unknown Faculty'}
+                    </span>
                   </div>
                   
                   {entry.classroom && (
