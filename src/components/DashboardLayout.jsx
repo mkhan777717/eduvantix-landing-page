@@ -464,6 +464,7 @@ export default function DashboardLayout({ children }) {
         icon: LayoutDashboard
       },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && { label: "Exam Center", href: "/exams", icon: FileText },
+      isSuperAdmin && { label: "Live Users", href: "/admin/live-users", icon: Users },
       isSuperAdmin && { label: "Institutes & Admins", href: "/admin/institutes", icon: ShieldAlert },
       isInstAdmin && { label: "Manage Batches", href: "/admin/batches", icon: Layers, featureFlag: "allowedManageBatches" },
       isInstAdmin && { label: "Manage People", href: "/admin/people", icon: Users, featureFlag: "allowedManagePeople" },

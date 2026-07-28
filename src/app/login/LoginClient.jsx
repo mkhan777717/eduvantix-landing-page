@@ -492,17 +492,34 @@ function LoginForm() {
     );
   }
 
-  /* ─── Institute blocked screen ────── */
+  /* ─── Account / Institute blocked screen ────── */
   if (isBlocked) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen text-center space-y-6 p-8" style={{ backgroundColor: "var(--bg-primary)" }}>
-        <div className="w-20 h-20 rounded-3xl bg-rose-500/10 flex items-center justify-center mx-auto"><Ban size={36} className="text-rose-500" /></div>
-        <div className="space-y-2">
-          <h1 className="text-2xl font-black" style={{ color: "var(--text-primary)" }}>Institute Blocked</h1>
-          <p className="text-sm max-w-md mx-auto" style={{ color: "var(--text-secondary)" }}>Your institute account has been suspended by the Super Administrator.</p>
-          <p className="text-xs font-bold text-rose-500">Please contact your Super Administrator to restore access.</p>
+      <div className="flex flex-col items-center justify-center p-8 rounded-2xl border border-rose-500/20 bg-rose-500/5 text-center space-y-4 my-8">
+        <div className="w-16 h-16 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto border border-rose-500/20">
+          <Ban size={32} />
         </div>
-        <button onClick={() => { setIsBlocked(false); router.push("/"); }} className="px-5 py-2.5 rounded-2xl border border-[var(--border-primary)] text-xs font-bold transition-all cursor-pointer" style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}>← Back to Homepage</button>
+        <div className="space-y-2">
+          <h1 className="text-xl font-black text-rose-500">Account Access Suspended</h1>
+          <p className="text-xs font-semibold max-w-md mx-auto" style={{ color: "var(--text-secondary)" }}>
+            {errorMsg || "Your account has been blocked by the administrator. Access to the platform is currently restricted."}
+          </p>
+        </div>
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2">
+          <a
+            href="mailto:hello@eduvantix.com"
+            className="px-4 py-2.5 rounded-xl bg-rose-500 text-white text-xs font-bold hover:bg-rose-600 transition-all shadow-sm"
+          >
+            Contact Support (hello@eduvantix.com)
+          </a>
+          <button
+            onClick={() => { setIsBlocked(false); setErrorMsg(""); router.push("/"); }}
+            className="px-4 py-2.5 rounded-xl border border-[var(--border-primary)] text-xs font-bold transition-all cursor-pointer"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            ← Back to Home
+          </button>
+        </div>
       </div>
     );
   }
@@ -528,9 +545,21 @@ function LoginForm() {
         <AnimatePresence mode="wait">
           {errorMsg && (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
-              className={`flex items-start gap-2 p-3 rounded-xl border border-[var(--border-primary)] text-xs font-medium ${errorMsg.startsWith("⚠️") ? "bg-amber-500/10 border-amber-500/20 text-amber-600" : "bg-rose-500/10 border-rose-500/20 text-rose-600"}`}>
-              <AlertCircle size={14} className="shrink-0 mt-0.5" />
-              <span>{errorMsg}</span>
+              className={`flex items-start gap-2 p-3.5 rounded-xl border text-xs font-medium ${errorMsg.startsWith("⚠️") ? "bg-amber-500/10 border-amber-500/20 text-amber-600" : "bg-rose-500/10 border-rose-500/20 text-rose-600"}`}>
+              <AlertCircle size={15} className="shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <span>{errorMsg}</span>
+                {errorMsg.toLowerCase().includes("hello@eduvantix.com") && (
+                  <div className="pt-1">
+                    <a
+                      href="mailto:hello@eduvantix.com"
+                      className="inline-flex items-center gap-1 font-bold underline text-rose-600 hover:text-rose-700"
+                    >
+                      Email hello@eduvantix.com
+                    </a>
+                  </div>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
