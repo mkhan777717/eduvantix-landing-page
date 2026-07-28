@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 export const useTimetableStore = create((set, get) => ({
   todayClasses: [],
-  batchTimetable: null,
+  batchTimetables: [],
   isLoading: false,
   error: null,
 
@@ -32,7 +32,7 @@ export const useTimetableStore = create((set, get) => ({
       });
       const data = await res.json();
       if (data.success) {
-        set({ batchTimetable: data.data, isLoading: false });
+        set({ batchTimetables: data.data || [], isLoading: false });
       } else {
         set({ error: data.message, isLoading: false });
       }

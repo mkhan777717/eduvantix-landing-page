@@ -20,7 +20,8 @@ export default function CreateEventPage() {
     startTime: '',
     endTime: '',
     maxCapacity: '',
-    bannerUrl: ''
+    bannerUrl: '',
+    googleMapsUrl: ''
   });
 
   const handleChange = (e) => {
@@ -214,6 +215,22 @@ export default function CreateEventPage() {
               className="w-full bg-[var(--bg-hover)] border border-[var(--border-primary)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-primary)] transition-colors"
             />
           </div>
+
+          {!formData.isOnline && (
+            <div className="space-y-3 md:col-span-2">
+              <label className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                Google Maps Location URL (Optional)
+              </label>
+              <input 
+                type="url" 
+                name="googleMapsUrl"
+                value={formData.googleMapsUrl}
+                onChange={handleChange}
+                placeholder="https://goo.gl/maps/..."
+                className="w-full bg-[var(--bg-hover)] border border-[var(--border-primary)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-primary)] transition-colors"
+              />
+            </div>
+          )}
         </div>
 
         <div className="pt-6 border-t border-[var(--border-primary)] flex justify-end">

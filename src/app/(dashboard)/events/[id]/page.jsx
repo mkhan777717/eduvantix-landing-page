@@ -17,8 +17,9 @@ export default function EventDetails() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    if (!token) return;
     fetchEventDetails();
-  }, [params.id]);
+  }, [params.id, token]);
 
   const fetchEventDetails = async () => {
     try {

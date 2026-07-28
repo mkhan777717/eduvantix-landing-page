@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from '@/store/useToastStore';
 import {
   Users, UserPlus, Trash2, Mail, Shield, GraduationCap, X,
   CheckCircle2, AlertCircle, Calendar, Briefcase, Award, Layers, Edit, RefreshCw, Eye, EyeOff
@@ -201,9 +203,13 @@ export default function ManagePeoplePage() {
           // Try to parse json error if possible
           try {
             const errData = JSON.parse(text);
-            setFormError(errData.message || "Failed to register member (server error).");
+            const msg = errData.message || "Failed to register member (server error).";
+            setFormError(msg);
+            toast.error(msg);
           } catch (parseErr) {
-            setFormError(text || "Failed to register member (unknown error).");
+            const msg = text || "Failed to register member (unknown error).";
+            setFormError(msg);
+            toast.error(msg);
           }
           setSubmitting(false);
           return;
@@ -226,9 +232,17 @@ export default function ManagePeoplePage() {
             assignedBatch: assignedBatchNames
           };
           setPeople(prev => [...prev, newMember]);
-          setFormSuccess("Member registered successfully!");
+          toast.success("Member registered successfully!");
+          
+          // Close modal after short delay
+          setTimeout(() => {
+            setIsAddModalOpen(false);
+            setFormSuccess("");
+            setFormError("");
+          }, 1500);
         } else {
           setFormError(data.message || "Failed to register member.");
+          toast.error(data.message || "Failed to register member.");
           setSubmitting(false);
           return;
         }
@@ -289,16 +303,22 @@ export default function ManagePeoplePage() {
           }
         });
         const data = await res.json();
-        if (!data.success) {
-          console.warn("Delete API returned failure, fallback to UI delete:", data.message);
+        if (data.success) {
+          setPeople(prev => prev.filter(p => p.id !== itemToDelete.id));
+          setIsDeleteModalOpen(false);
+          setItemToDelete(null);
+          toast.success("Member deleted successfully");
+        } else {
+          toast.error(data.message || "Failed to delete member");
         }
       }
     } catch (err) {
       console.error("Failed to call delete API, fallback to UI delete:", err);
+      toast.error("Failed to delete member");
+    } finally {
+      setIsDeleteModalOpen(false);
+      setItemToDelete(null);
     }
-    setPeople(prev => prev.filter(p => p.id !== itemToDelete.id));
-    setIsDeleteModalOpen(false);
-    setItemToDelete(null);
   };
 
   const triggerEdit = (member) => {
@@ -615,9 +635,10 @@ export default function ManagePeoplePage() {
       </div>
 
       {/* Add Member Modal */}
-      <AnimatePresence>
-        {isAddModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {isAddModalOpen && (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -825,8 +846,10 @@ export default function ManagePeoplePage() {
               </form>
             </motion.div>
           </div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
       {/* Delete Confirmation Modal */}
       <AnimatePresence>

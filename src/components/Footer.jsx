@@ -109,7 +109,15 @@ export default function Footer() {
             <p className="text-sm leading-relaxed max-w-[200px]" style={{ color: "var(--text-muted)" }}>
               Engineering precision meets high-end creative design.
             </p>
-            <div className="flex items-center gap-2">
+            <div className="space-y-1.5 pt-1">
+              <a href="tel:9205454717" className="block text-sm transition-colors hover:text-[var(--text-primary)]" style={{ color: "var(--text-secondary)" }}>
+                +91 9205454717
+              </a>
+              <a href="mailto:hello@eduvantix.com" className="block text-sm transition-colors hover:text-[var(--text-primary)]" style={{ color: "var(--text-secondary)" }}>
+                hello@eduvantix.com
+              </a>
+            </div>
+            <div className="flex items-center gap-2 pt-2">
               {[
                 { icon: <TwitterIcon />, href: "#", label: "Twitter" },
                 { icon: <YoutubeIcon />, href: "#", label: "YouTube" },

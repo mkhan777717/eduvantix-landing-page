@@ -184,15 +184,9 @@ export default function AdminDashboard() {
 
 
   // Base dynamic stats calculations
-  const registeredUsersBase = 0;
-  const registeredUsersCount = systemStats?.totalUsers !== undefined
-    ? registeredUsersBase + systemStats.totalUsers
-    : registeredUsersBase;
+  const registeredUsersCount = systemStats?.totalUsers || 0;
 
-  const submissionsBase = 0;
-  const submissionsCount = systemStats?.totalSubmissions !== undefined
-    ? submissionsBase + systemStats.totalSubmissions
-    : submissionsBase;
+  const submissionsCount = systemStats?.totalSubmissions || 0;
 
   const stats = [
     {

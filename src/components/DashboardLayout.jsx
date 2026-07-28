@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/context/AuthContext";
+import ToastContainer from "@/components/ToastContainer";
 import useThemeStore from "@/store/useThemeStore";
 import GiftCoupon from "@/components/GiftCoupon";
 
@@ -346,11 +347,9 @@ export default function DashboardLayout({ children }) {
     if (typeof window !== "undefined") {
       const hasSession = isStudentSession || isAdminSession || isMentorSession;
 
-      if (!hasSession && !pathname.startsWith('/practice') && !pathname.startsWith('/contest') && !pathname.startsWith('/courses') && !pathname.startsWith('/live-classes')) {
-        if (pathname.startsWith('/admin') || pathname.startsWith('/mentor') || pathname.startsWith('/student')) {
-          router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
-          return;
-        }
+      if (!hasSession) {
+        router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+        return;
       }
 
       if (hasSession && isLoginRoute) {
@@ -429,11 +428,7 @@ export default function DashboardLayout({ children }) {
   const isCoursePage = pathname.startsWith("/courses");
   if (isCoursePage) return <>{children}</>;
 
-  const isPublicRoute = !dashboardUser && (pathname.startsWith('/practice') || pathname.startsWith('/contest') || pathname.startsWith('/courses') || pathname.startsWith('/live-classes'));
 
-  if (isPublicRoute) {
-    return <>{children}</>;
-  }
 
   let sidebarLinks = [];
 
@@ -455,9 +450,9 @@ export default function DashboardLayout({ children }) {
       { label: "Live Sessions", href: "/live-classes", icon: Radio },
       { label: "Learn with Games", href: "/student/games", icon: Gamepad2 },
       { label: "Events", href: "/events", icon: CalendarDays },
-      { label: "My Schedule", href: "/timetable/student", icon: CalendarDays },
-      { label: "My Attendance", href: "/attendance/student", icon: CheckCircle2 },
-      { label: "Study Materials", href: "/student/materials", icon: FileText },
+      user?.instituteId ? { label: "My Schedule", href: "/timetable/student", icon: CalendarDays } : null,
+      user?.instituteId ? { label: "My Attendance", href: "/attendance/student", icon: CheckCircle2 } : null,
+      user?.instituteId ? { label: "Study Materials", href: "/student/materials", icon: FileText } : null,
       { label: "Resume Builder", href: "/student/resume", icon: FileCheck },
       { label: "Job Assistance", href: "/student/job-assistance", icon: Briefcase },
       { label: "Share Feedback", href: "/feedback", icon: HeartHandshake },
@@ -486,9 +481,10 @@ export default function DashboardLayout({ children }) {
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedGoLive") && { label: "Go Live", href: "/admin/live", icon: Radio, featureFlag: "allowedGoLive" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedArcade") && { label: "Arcade Questions", href: "/admin/arcade", icon: Gamepad2, featureFlag: "allowedArcade" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && { label: "Events", href: "/events/organizer", icon: CalendarDays },
-      (isSuperAdmin || isInstAdmin || isBatchMgr) && { label: "Timetable Management", href: "/timetable", icon: CalendarDays },
+      isInstAdmin && { label: "Academic Setup", href: "/academic-setup", icon: BookOpen },
+      (isInstAdmin || isBatchMgr) && { label: "Timetable", href: "/timetable", icon: CalendarDays },
       isMentor && { label: "My Schedule", href: "/timetable/faculty", icon: CalendarDays },
-      (isSuperAdmin || isInstAdmin) && { label: "Attendance Analytics", href: "/attendance/admin", icon: CheckCircle2 },
+      isInstAdmin && { label: "Attendance", href: "/attendance/admin", icon: CheckCircle2 },
       (isMentor || isBatchMgr) && { label: "Take Attendance", href: "/attendance/faculty", icon: CheckCircle2 },
       !isSuperAdmin && { label: "Share Feedback", href: "/feedback", icon: HeartHandshake },
     ].filter(Boolean);
@@ -1028,6 +1024,8 @@ export default function DashboardLayout({ children }) {
         </div>
       )}
 
+      {/* Add Toast Container here */}
+      <ToastContainer />
     </div>
   );
 }
