@@ -18,7 +18,7 @@ import GiftCoupon from "@/components/GiftCoupon";
 export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { logout, user, token, API_BASE, activeSession, setActiveSession } = useAuth();
+  const { logout, user, token, API_BASE, activeSession, setActiveSession, loading } = useAuth();
 
   const inst = user?.institute;
   const isInstituteAffiliated = !!user?.instituteId;
@@ -88,16 +88,16 @@ export default function DashboardLayout({ children }) {
     initTheme();
   }, [initTheme]);
 
-  const effectiveRole = user?.role || (isMounted ? JSON.parse(localStorage.getItem("eduvantix_auth_user") || "{}")?.role : null);
+  const effectiveRole = user?.role;
   const isSuperAdmin = effectiveRole === "ADMIN";
   const isInstAdmin = effectiveRole === "INSTITUTE_ADMIN";
   const isBatchMgr = effectiveRole === "BATCH_MANAGER";
   const isMentor = effectiveRole === "MENTOR";
   const isStudent = effectiveRole === "USER";
 
-  const isStudentSession = isMounted ? (localStorage.getItem("synapse_student_session") === "true" || isStudent) : isStudent;
-  const isAdminSession = isMounted ? (localStorage.getItem("synapse_admin_session") === "true" || isSuperAdmin || isInstAdmin || isBatchMgr) : (isSuperAdmin || isInstAdmin || isBatchMgr);
-  const isMentorSession = isMounted ? (localStorage.getItem("synapse_mentor_session") === "true" || isMentor) : isMentor;
+  const isStudentSession = isStudent;
+  const isAdminSession = isSuperAdmin || isInstAdmin || isBatchMgr;
+  const isMentorSession = isMentor;
   const isLoginRoute = pathname === "/student" || pathname === "/admin" || pathname === "/mentor";
   const [premiumRequests, setPremiumRequests] = useState([]);
   const [dismissedRequests, setDismissedRequests] = useState(() => {
@@ -345,6 +345,8 @@ export default function DashboardLayout({ children }) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      if (loading) return; // Wait for AuthContext to finish checking
+
       const hasSession = isStudentSession || isAdminSession || isMentorSession;
 
       if (!hasSession) {
@@ -572,6 +574,14 @@ export default function DashboardLayout({ children }) {
 
   const pageTitle = pathname.split("/").filter(Boolean).slice(1).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" / ") || "Dashboard";
   const isLiveStudioMode = (activeSession && pathname === "/admin/live") || pathname === "/live";
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: "var(--bg-primary)" }}>
+        <div className="w-12 h-12 border-4 border-[var(--accent-primary)] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "var(--bg-primary)" }}>
