@@ -40,5 +40,34 @@ export const useTimetableStore = create((set, get) => ({
     } catch (err) {
       set({ error: err.message, isLoading: false });
     }
+  },
+
+  cancelSession: async (entryId, date, token, API_BASE) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/timetables/entry/${entryId}/cancel`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}` 
+        },
+        body: JSON.stringify({ date })
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Update local state so it immediately disappears or shows as canceled
+        set((state) => ({
+          todayClasses: state.todayClasses.map(c => 
+            c.id === entryId 
+              ? { ...c, canceledDates: data.entry.canceledDates } 
+              : c
+          )
+        }));
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
   }
 }));
