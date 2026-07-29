@@ -53,14 +53,27 @@ import {
   CalendarDays,
   Trash2,
   Film,
+  MapPin,
+  ArrowRight,
+  BookOpen,
 } from "lucide-react";
 import { ReactionOverlay, ReactionPicker } from "@/components/LiveReactions";
 import { useDuplicateTabGuard } from "@/hooks/useDuplicateTabGuard";
 
 import { getApiBase } from "@/utils/api";
+import { useTimetableStore } from "@/store/useTimetableStore";
 
 const LIVEKIT_URL = process.env.NEXT_PUBLIC_LIVEKIT_URL;
 const API_BASE_URL = getApiBase();
+
+const formatTimeAMPM = (timeStr) => {
+  if (!timeStr) return "";
+  const [h, m] = timeStr.split(":");
+  const date = new Date();
+  date.setHours(parseInt(h, 10));
+  date.setMinutes(parseInt(m, 10));
+  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+};
 
 const playRaiseHandSound = () => {
   try {
@@ -1032,6 +1045,48 @@ export default function AdminLivePage() {
   const [showRecordPrompt, setShowRecordPrompt] = useState(false);
   const [shouldRecord, setShouldRecord] = useState(false);
 
+  // Today's assigned classes (from timetable)
+  const { todayClasses, isLoading: isTimetableLoading, fetchTodayClasses, cancelSession } = useTimetableStore();
+  useEffect(() => {
+    if (authToken && (user?.role === "MENTOR" || user?.role === "BATCH_MANAGER")) {
+      fetchTodayClasses("FACULTY", authToken, API_BASE || API_BASE_URL);
+    }
+  }, [authToken, user?.role]);
+
+  // Mentor unified view state
+  const [selectedClassId, setSelectedClassId] = useState(null); // which class card has Go Live form open
+  const [showUnplannedForm, setShowUnplannedForm] = useState(false);
+
+  const handleClassGoLive = (entry) => {
+    if (selectedClassId === entry.id) {
+      // toggle off
+      setSelectedClassId(null);
+      return;
+    }
+    setSelectedClassId(entry.id);
+    setShowUnplannedForm(false);
+    // Pre-fill the form with class details
+    const batchId = entry.timetable?.batch?.id;
+    setFormState({
+      title: `${entry.subject?.name || "Class"} — ${entry.timetable?.batch?.name || ""}`,
+      description: "",
+      thumbnailPreview: null,
+      thumbnailUrl: "",
+    });
+    setScheduledAtDate("");
+    setSelectedBatchIds(batchId ? [batchId] : []);
+    setError(null);
+  };
+
+  const handleUnplannedToggle = () => {
+    setShowUnplannedForm(v => !v);
+    setSelectedClassId(null);
+    setFormState({ title: "", description: "", thumbnailPreview: null, thumbnailUrl: "" });
+    setScheduledAtDate("");
+    setSelectedBatchIds([]);
+    setError(null);
+  };
+
   useEffect(() => {
     const fetchBatches = async () => {
       try {
@@ -1590,7 +1645,7 @@ export default function AdminLivePage() {
     setShowEndConfirm(true);
   };
 
-  // ─── Checking for active session (loading state) ───────────────────
+  // ─── Checking for active session (loading state) ─────────────────────
   if (checkingSession) {
     return (
       <div className="flex items-center justify-center h-48">
@@ -1602,7 +1657,421 @@ export default function AdminLivePage() {
     );
   }
 
-  // ─── Pre-Session Form (Setup) ──────────────────────────────────────
+  // ─── MENTOR ─ Unified Class-Centric Live Sessions View ────────────
+  if (!session && !livekitToken && (user?.role === "MENTOR" || user?.role === "BATCH_MANAGER")) {
+
+    const InlineSessionForm = ({ classEntry = null }) => (
+      <div className="rounded-2xl border p-5 space-y-4 mt-3 shadow-sm"
+        style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--accent-primary)" }}>
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-extrabold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>Session Title *</label>
+          <input type="text" value={formState.title}
+            onChange={(e) => setFormState((p) => ({ ...p, title: e.target.value }))}
+            placeholder="e.g. DSA Masterclass — Trees & Graphs"
+            className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-medium outline-none transition-colors focus:border-[var(--accent-primary)]"
+            style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }} />
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-extrabold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>Description</label>
+          <textarea value={formState.description}
+            onChange={(e) => setFormState((p) => ({ ...p, description: e.target.value }))}
+            placeholder="Brief description of what you'll cover..." rows={2}
+            className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-medium outline-none transition-colors resize-none focus:border-[var(--accent-primary)]"
+            style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }} />
+        </div>
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label className="text-[10px] font-extrabold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>Thumbnail (Optional)</label>
+            <span className="text-[8px] font-black text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded uppercase">16:9 · Max 10MB</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <label htmlFor={`thumb-${classEntry?.id || "free"}`}
+              className="flex flex-col items-center justify-center w-28 h-16 rounded-xl border-2 border-dashed cursor-pointer hover:border-zinc-400/60 transition-all"
+              style={{ borderColor: "var(--border-primary)" }}>
+              {formState.thumbnailPreview
+                ? <img src={formState.thumbnailPreview} alt="Thumb" className="w-full h-full object-cover rounded-xl" />
+                : <div className="text-center"><ImagePlus size={16} className="mx-auto" style={{ color: "var(--text-muted)" }} /><span className="text-[9px] font-bold block" style={{ color: "var(--text-muted)" }}>Upload</span></div>}
+              <input type="file" id={`thumb-${classEntry?.id || "free"}`} accept="image/*" onChange={handleThumbnailUpload} className="hidden" />
+            </label>
+            <p className="text-[10px] leading-relaxed" style={{ color: "var(--text-muted)" }}>Cover image shown to students before joining.</p>
+          </div>
+        </div>
+        {!classEntry && batches.length > 0 && (
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-extrabold uppercase tracking-wider block" style={{ color: "var(--text-secondary)" }}>Target Cohorts</label>
+            <div className="rounded-xl p-3 border grid grid-cols-2 gap-1.5" style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-primary)" }}>
+              {batches.map(b => (
+                <label key={b.id} className="flex items-center gap-2 cursor-pointer text-xs font-semibold py-0.5 hover:text-[var(--accent-primary)] transition-colors" style={{ color: "var(--text-primary)" }}>
+                  <input type="checkbox" checked={selectedBatchIds.includes(b.id)}
+                    onChange={() => setSelectedBatchIds(prev => prev.includes(b.id) ? prev.filter(id => id !== b.id) : [...prev, b.id])}
+                    className="rounded cursor-pointer" />
+                  <span>{b.name}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+        <div className="flex items-center justify-between p-3 rounded-xl border" style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-primary)" }}>
+          <div><p className="text-xs font-extrabold" style={{ color: "var(--text-primary)" }}>Record Session</p><p className="text-[10px]" style={{ color: "var(--text-muted)" }}>Auto-record for playback later</p></div>
+          <label className="relative inline-flex items-center cursor-pointer select-none">
+            <input type="checkbox" checked={shouldRecord} onChange={(e) => setShouldRecord(e.target.checked)} className="sr-only peer" />
+            <div className="w-9 h-5 bg-slate-700/60 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-600"></div>
+          </label>
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-extrabold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>Schedule for Later (Optional)</label>
+          <input type="datetime-local" value={scheduledAtDate} onChange={(e) => setScheduledAtDate(e.target.value)}
+            className="w-full px-3.5 py-2.5 rounded-xl border text-sm font-medium outline-none transition-colors"
+            style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }} />
+        </div>
+        {error && <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 text-red-500 text-xs font-bold"><AlertTriangle size={13} />{error}</div>}
+        <div className="grid grid-cols-2 gap-3">
+          <button onClick={handleStartSession} disabled={isStarting || isScheduling || !formState.title.trim()}
+            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white text-xs font-extrabold uppercase tracking-wide shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all hover:-translate-y-0.5"
+            style={{ background: "var(--accent-primary)" }}>
+            {isStarting ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Starting...</> : <><Radio size={14} />Go Live Now</>}
+          </button>
+          <button onClick={handleScheduleSession} disabled={isStarting || isScheduling || !formState.title.trim() || !scheduledAtDate}
+            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-xs font-extrabold uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all hover:bg-[var(--bg-hover)]"
+            style={{ color: "var(--text-primary)", backgroundColor: "var(--bg-primary)", borderColor: "var(--border-primary)" }}>
+            {isScheduling ? <><div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin border-amber-500" />Scheduling...</> : <><CalendarDays size={14} className="text-amber-500" />Schedule</>}
+          </button>
+        </div>
+      </div>
+    );
+
+    const now = new Date();
+    const todayDateStr = now.toISOString().split("T")[0];
+    const sortedClasses = [...todayClasses].map(c => ({
+      ...c,
+      isCanceled: c.canceledDates && c.canceledDates.includes(todayDateStr)
+    })).sort((a, b) => (a.startTime || "").localeCompare(b.startTime || ""));
+    const nowPlus5 = new Date(now.getTime() + 5 * 60000);
+    const nowStr = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+    const nowPlus5Str = nowPlus5.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+    
+    const nowMinus20 = new Date(now.getTime() - 20 * 60000);
+    const nowMinus20Str = nowMinus20.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+
+    let currentClassIndex = -1;
+    currentClassIndex = sortedClasses.findIndex(c => nowPlus5Str >= c.startTime && nowStr <= c.endTime);
+    if (currentClassIndex === -1) {
+      currentClassIndex = sortedClasses.findIndex(c => nowStr < c.startTime);
+    }
+    if (currentClassIndex === -1 && sortedClasses.length > 0) {
+      const lastClass = sortedClasses[sortedClasses.length - 1];
+      if (nowMinus20Str <= lastClass.endTime) {
+        currentClassIndex = sortedClasses.length - 1;
+      }
+    }
+
+    const currentClass = sortedClasses[currentClassIndex] || null;
+    const otherClasses = sortedClasses.filter((_, idx) => idx !== currentClassIndex);
+    const upcomingClasses = otherClasses.filter(c => nowMinus20Str <= c.endTime);
+    const missedClasses = otherClasses.filter(c => nowMinus20Str > c.endTime);
+    
+    const missedAsPast = missedClasses.map(entry => {
+      const todayDateStr = now.toISOString().split("T")[0];
+      return {
+        id: "missed_" + entry.id,
+        title: entry.subject?.name + " (Missed)",
+        host: entry.faculty,
+        startedAt: new Date(`${todayDateStr}T${entry.startTime}:00`).toISOString(),
+        endedAt: null,
+        recordingUrl: null,
+        isRecording: false,
+        isMissed: true
+      };
+    });
+    const allPast = [...pastSessions, ...missedAsPast].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
+    const isActiveClass = currentClass && !currentClass.isCanceled && (nowPlus5Str >= currentClass.startTime && nowMinus20Str <= currentClass.endTime);
+
+    return (
+      <>
+        <div className="flex-1 overflow-y-auto w-full custom-scrollbar pb-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+              <div>
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
+                  style={{ color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+                  <Radio size={11} className="text-rose-500 animate-pulse" />Live Sessions
+                </div>
+                <h1 className="text-3xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>Today&apos;s Classes</h1>
+                <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+                  {new Date().toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+                </p>
+              </div>
+              {successMsg && (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 text-emerald-600 text-xs font-bold border border-emerald-500/20">
+                  <Check size={14} />{successMsg}
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-8 items-start">
+              <div className="space-y-8">
+
+            {/* Assigned Class Cards */}
+            {isTimetableLoading ? (
+              <div className="flex flex-col items-center justify-center py-16 gap-3">
+                <div className="w-8 h-8 rounded-full animate-spin" style={{ border: "3px solid var(--accent-primary)", borderTopColor: "transparent" }} />
+                <p className="text-xs font-semibold" style={{ color: "var(--text-muted)" }}>Loading your classes...</p>
+              </div>
+            ) : todayClasses.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 rounded-3xl border-2 border-dashed border-[var(--border-primary)] text-center space-y-3 bg-[var(--bg-card)]">
+                <CalendarDays size={36} style={{ color: "var(--accent-primary)", opacity: 0.5 }} />
+                <div>
+                  <h3 className="text-lg font-black" style={{ color: "var(--text-primary)" }}>No classes today</h3>
+                  <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>Start an unplanned session below.</p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {(currentClass ? [currentClass] : []).map((entry) => {
+                  const isOpen = selectedClassId === entry.id;
+                  const palettes = [
+                    { bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.3)", text: "#8b5cf6" },
+                    { bg: "rgba(14,165,233,0.08)", border: "rgba(14,165,233,0.3)", text: "#0ea5e9" },
+                    { bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.3)", text: "#10b981" },
+                    { bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.3)", text: "#ef4444" },
+                    { bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.3)", text: "#f59e0b" },
+                  ];
+                  const p = palettes[(entry.subject?.name?.charCodeAt(0) || 0) % palettes.length];
+                  return (
+                    <div key={entry.id} className="rounded-2xl border overflow-hidden shadow-sm transition-all duration-200"
+                      style={{ backgroundColor: "var(--bg-card)", borderColor: isOpen ? "var(--accent-primary)" : "var(--border-primary)" }}>
+                      <div className="p-5">
+                        <div className="flex items-start gap-4">
+                          <div className="flex flex-col items-center justify-center w-16 h-16 rounded-2xl shrink-0 border text-center"
+                            style={{ backgroundColor: p.bg, borderColor: p.border }}>
+                            <span className="text-[11px] font-black leading-tight" style={{ color: p.text }}>{formatTimeAMPM(entry.startTime)}</span>
+                            <div className="w-3 h-px my-0.5" style={{ backgroundColor: p.text, opacity: 0.4 }} />
+                            <span className="text-[10px] font-bold leading-tight" style={{ color: "var(--text-secondary)" }}>{formatTimeAMPM(entry.endTime)}</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="text-lg font-black" style={{ color: "var(--text-primary)" }}>{entry.subject?.name}</h3>
+                              <span className="px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase border"
+                                style={{ backgroundColor: p.bg, borderColor: p.border, color: p.text }}>
+                                {entry.timetable?.batch?.name}
+                              </span>
+                            </div>
+                            <div className="flex items-center flex-wrap gap-4 mt-1.5">
+                              {entry.classroom && (
+                                <span className="flex items-center gap-1 text-[11px]" style={{ color: "var(--text-muted)" }}><MapPin size={11} />{entry.classroom.name}</span>
+                              )}
+                              <span className="flex items-center gap-1 text-[11px]" style={{ color: "var(--text-muted)" }}><Clock size={11} />{formatTimeAMPM(entry.startTime)} — {formatTimeAMPM(entry.endTime)}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t" style={{ borderColor: "var(--border-primary)" }}>
+                          {entry.isCanceled ? (
+                            <span className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide border border-rose-500/30 text-rose-500 bg-rose-500/10">
+                              <XCircle size={14} /> Cancelled
+                            </span>
+                          ) : (
+                            <>
+                              <button onClick={() => {
+                                  if (confirm('Cancel this session for today?')) {
+                                    cancelSession(entry.id, todayDateStr, authToken, API_BASE || API_BASE_URL);
+                                  }
+                                }}
+                                className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all cursor-pointer hover:bg-rose-500/10 hover:text-rose-500 text-[var(--text-muted)] border border-transparent hover:border-rose-500/20">
+                                <X size={14} /> Cancel
+                              </button>
+                              <button onClick={() => handleClassGoLive(entry)}
+                                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all cursor-pointer shadow-sm hover:-translate-y-0.5`}
+                                style={{ 
+                                  background: isOpen ? "var(--bg-secondary)" : "var(--accent-primary)", 
+                                  color: isOpen ? "var(--text-primary)" : "white", 
+                                  border: isOpen ? "1px solid var(--border-primary)" : "1px solid var(--accent-primary)" 
+                                }}>
+                                <Radio size={14} className={isOpen ? "text-rose-500" : "animate-pulse"} />
+                                {isOpen ? "Close Form" : "Start Session"}
+                              </button>
+                              <a href="/attendance/faculty"
+                                className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide transition-all hover:-translate-y-0.5 cursor-pointer border"
+                                style={{ color: "var(--text-primary)", backgroundColor: "var(--bg-hover)", borderColor: "var(--border-primary)" }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Take Attendance
+                              </a>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      {isOpen && (
+                        <div className="border-t px-5 pb-5" style={{ borderColor: "var(--border-primary)" }}>
+                          <InlineSessionForm classEntry={entry} />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Unplanned Session */}
+            <div className={`rounded-2xl border border-dashed border-[var(--border-primary)] overflow-hidden ${isActiveClass ? 'opacity-50 pointer-events-none' : ''}`}>
+              <button onClick={handleUnplannedToggle} disabled={!!isActiveClass}
+                className="w-full flex items-center justify-between p-4 text-left transition-colors hover:bg-[var(--bg-secondary)] cursor-pointer disabled:cursor-not-allowed">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: "var(--bg-secondary)" }}>
+                    <Sparkles size={16} style={{ color: "var(--accent-primary)" }} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-extrabold" style={{ color: "var(--text-primary)" }}>Start an Unplanned Session</p>
+                    <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>Go live outside your regular timetable</p>
+                  </div>
+                </div>
+                <ArrowRight size={16} className={`transition-transform duration-200 ${showUnplannedForm ? "rotate-90" : ""}`} style={{ color: "var(--text-muted)" }} />
+              </button>
+              {showUnplannedForm && (
+                <div className="border-t px-4 pb-4" style={{ borderColor: "var(--border-primary)" }}>
+                  <InlineSessionForm classEntry={null} />
+                </div>
+              )}
+            </div>
+            </div>
+
+            {/* Right Column: Broadcasts */}
+            <div className="space-y-6 lg:sticky lg:top-8 h-max">
+            {/* Broadcasts & Upcoming Section */}
+            <div className="space-y-4">
+              <h2 className="text-sm font-extrabold uppercase tracking-wider flex items-center gap-2" style={{ color: "var(--text-secondary)" }}>Broadcasts & Upcoming</h2>
+              <div className="flex items-center gap-2 p-1 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] shadow-sm">
+                <button type="button" onClick={() => setRightColumnTab("upcoming")}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all outline-none cursor-pointer border ${rightColumnTab === "upcoming" ? "bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm border-[var(--border-primary)]" : "border-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]"}`}>
+                  Upcoming
+                  {upcomingClasses.length > 0 && <span className="px-1.5 rounded text-[9px] font-black bg-amber-500/10 text-amber-500 border border-amber-500/20">{upcomingClasses.length}</span>}
+                </button>
+                <button type="button" onClick={() => setRightColumnTab("past")}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all outline-none cursor-pointer border ${rightColumnTab === "past" ? "bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm border-[var(--border-primary)]" : "border-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]"}`}>
+                  Past
+                  {allPast.length > 0 && <span className="px-1.5 rounded text-[9px] font-black bg-violet-500/10 text-violet-500 border border-violet-500/20">{allPast.length}</span>}
+                </button>
+              </div>
+
+              {rightColumnTab === "upcoming" ? (
+                <div className="space-y-3">
+                  {upcomingClasses.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center p-8 border border-dashed border-[var(--border-primary)] rounded-2xl text-center space-y-1 bg-[var(--bg-card)]">
+                      <p className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>No other classes today</p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-3">
+                      {upcomingClasses.map((entry) => (
+                        <div key={entry.id} className="flex flex-col p-4 rounded-2xl border bg-[var(--bg-card)] gap-3 opacity-60 grayscale-[0.3]" style={{ borderColor: "var(--border-primary)" }}>
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 shrink-0">
+                               <span className="text-[9px] font-black leading-tight text-amber-500">{formatTimeAMPM(entry.startTime)}</span>
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2"><h4 className="text-xs font-extrabold truncate" style={{ color: "var(--text-primary)" }}>{entry.subject?.name}</h4></div>
+                              <p className="text-[10px] text-amber-500 font-semibold mt-0.5 flex items-center gap-1"><CalendarDays size={9} />{entry.timetable?.batch?.name}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 mt-2 pt-2 border-t" style={{ borderColor: "var(--border-primary)" }}>
+                            {entry.isCanceled ? (
+                              <span className="px-3 py-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-500 text-[10px] font-extrabold uppercase flex items-center gap-1.5 flex-1 justify-center">
+                                <XCircle size={11} /> Cancelled
+                              </span>
+                            ) : (
+                              <>
+                                <button type="button" onClick={() => {
+                                    if (confirm('Cancel this upcoming session?')) {
+                                      cancelSession(entry.id, todayDateStr, authToken, API_BASE || API_BASE_URL);
+                                    }
+                                  }}
+                                  className="px-3 py-1.5 rounded-lg border border-transparent hover:border-rose-500/30 hover:bg-rose-500/10 hover:text-rose-500 text-[var(--text-muted)] text-[10px] font-extrabold uppercase flex items-center gap-1.5 transition-all">
+                                  <X size={11} /> Cancel
+                                </button>
+                                <button type="button" disabled
+                                  className="px-3 py-1.5 rounded-lg bg-emerald-600/30 text-white text-[10px] font-extrabold uppercase flex items-center gap-1.5 cursor-not-allowed flex-1 justify-center">
+                                  <Radio size={11} />Start
+                                </button>
+                                <button type="button" disabled
+                                  className="px-3 py-1.5 rounded-lg border bg-slate-500/10 text-slate-400 text-[10px] font-extrabold uppercase flex items-center gap-1.5 cursor-not-allowed flex-1 justify-center" style={{ borderColor: "var(--border-primary)" }}>
+                                  Attendance
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {loadingPast ? (
+                  <div className="flex justify-center p-6 border border-dashed border-[var(--border-primary)] rounded-2xl"><div className="w-5 h-5 rounded-full animate-spin" style={{ border: "2px solid var(--accent-primary)", borderTopColor: "transparent" }} /></div>
+                ) : allPast.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center p-8 border border-dashed border-[var(--border-primary)] rounded-2xl text-center space-y-1 bg-[var(--bg-card)]">
+                    <p className="text-xs font-bold" style={{ color: "var(--text-muted)" }}>No past recordings found</p>
+                    <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>Your recorded sessions will appear here.</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-3">
+                    {allPast.map((past) => (
+                      <div key={past.id} className="flex items-center justify-between p-4 rounded-2xl border hover:bg-[var(--bg-secondary)] gap-4" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
+                        <div className="flex items-center gap-3 min-w-0">
+                          {past.thumbnailUrl ? <img src={past.thumbnailUrl} alt="" className="w-14 h-9 rounded-lg object-cover shrink-0" /> : <div className="w-14 h-9 rounded-lg bg-[var(--bg-hover)] flex items-center justify-center shrink-0 border" style={{ borderColor: "var(--border-primary)" }}><Radio size={13} style={{ color: "var(--text-muted)" }} /></div>}
+                          <div className="min-w-0">
+                            <h4 className="text-xs font-black truncate" style={{ color: "var(--text-primary)" }}>{past.title} <span className="text-[9px] font-normal text-[var(--text-muted)]">by {past.host?.fullName || past.host?.username || "Unknown"}</span></h4>
+                            <p className="text-[10px] text-[var(--text-muted)]">{new Date(past.startedAt).toLocaleDateString()} at {new Date(past.startedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
+                            {past.endedAt && <p className="text-[9px] text-[var(--text-muted)] opacity-70">Duration: {Math.round((new Date(past.endedAt) - new Date(past.startedAt)) / 60000)} mins</p>}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {past.recordingUrl ? (
+                            <button type="button" onClick={() => { const url = past.recordingUrl.startsWith("/") ? `${API_BASE}${past.recordingUrl}` : past.recordingUrl; setSelectedVideoUrl(url); setSelectedVideoSession(past); }}
+                              className="px-3 py-1.5 rounded-xl bg-zinc-500/10 hover:bg-zinc-500/20 text-zinc-500 text-[10px] font-extrabold uppercase border border-zinc-500/20 cursor-pointer">Watch</button>
+                          ) : (past.isRecording && (past.egressSegments || (past.endedAt && (new Date() - new Date(past.endedAt)) < 180000))) ? (
+                            <span className="text-[9px] font-extrabold text-neutral-500 bg-neutral-500/10 px-2 py-1.5 rounded border border-neutral-500/20 animate-pulse">Processing...</span>
+                          ) : <span className="text-[9px] font-bold text-slate-500 bg-slate-500/5 px-2 py-1.5 rounded border border-dashed border-slate-500/10">No Recording</span>}
+                          <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteSession(past); }}
+                            className="p-1.5 rounded-lg border hover:bg-red-500/10 hover:text-red-500 text-slate-400 cursor-pointer" style={{ borderColor: "var(--border-primary)" }}><Trash2 size={12} /></button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              )}
+            </div>
+            </div>
+            </div>
+
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {showRecordPrompt && (
+            <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+              <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+                className="w-full max-w-sm rounded-3xl border shadow-2xl p-6 text-center space-y-4"
+                style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
+                <div className="w-12 h-12 rounded-2xl bg-[var(--bg-badge)] flex items-center justify-center mx-auto"><Radio size={24} className="animate-pulse" style={{ color: "var(--text-accent)" }} /></div>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-black uppercase tracking-wider" style={{ color: "var(--text-primary)" }}>Record Session</h3>
+                  <p className="text-xs" style={{ color: "var(--text-secondary)" }}>Do you want to record this live stream?</p>
+                </div>
+                <div className="flex items-center justify-center gap-3 pt-2">
+                  <button onClick={() => { setShouldRecord(false); setShowRecordPrompt(false); startActualSession(); }}
+                    className="px-5 py-2.5 rounded-2xl border text-xs font-bold cursor-pointer" style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}>No, Skip</button>
+                  <button onClick={() => { setShouldRecord(true); setShowRecordPrompt(false); startActualSession(); }}
+                    className="px-6 py-2.5 rounded-2xl text-white text-xs font-black uppercase shadow-lg hover:scale-[1.02] cursor-pointer" style={{ background: "var(--accent-gradient)" }}>Yes, Record</button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+      </>
+    );
+  }
+
   if (!session || !livekitToken) {
     return (
       <>
@@ -1930,6 +2399,8 @@ export default function AdminLivePage() {
 
           {/* Right Column: Scheduled & Past Broadcasts */}
           <div className="w-full lg:sticky lg:top-0 lg:h-max space-y-6">
+
+
 
         {/* Tab Switcher for Right Column */}
         <div className="flex items-center gap-2 p-1 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] shadow-sm">

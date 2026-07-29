@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { QrCode, Clock, Loader2, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { QrCode, Clock, Loader2, ArrowRight, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useTimetableStore } from '@/store/useTimetableStore';
 import { useAttendanceStore } from '@/store/useAttendanceStore';
@@ -37,6 +37,13 @@ export default function FacultyAttendanceDashboard() {
   return (
     <div className="p-6 md:p-10 max-w-7xl mx-auto min-h-screen space-y-8">
       <div>
+        <button 
+          onClick={() => router.back()} 
+          className="flex items-center gap-2 mb-6 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors w-fit"
+        >
+          <ArrowLeft size={16} />
+          Back
+        </button>
         <h1 className="text-3xl font-black tracking-tight mb-2 text-[var(--text-primary)]">
           Generate Attendance
         </h1>
@@ -65,7 +72,11 @@ export default function FacultyAttendanceDashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className="bg-[var(--bg-card)] rounded-3xl p-6 border border-[var(--border-primary)] flex flex-col hover:border-[var(--accent-primary)] hover:shadow-lg transition-all"
+              className={`bg-[var(--bg-card)] rounded-3xl p-6 border flex flex-col transition-all ${
+                entry.attendanceSessions?.length > 0 
+                  ? 'opacity-60 grayscale-[0.3] border-[var(--border-primary)]' 
+                  : 'border-[var(--border-primary)] hover:border-[var(--accent-primary)] hover:shadow-lg'
+              }`}
             >
               <div className="flex items-center gap-2 mb-4 text-sm font-bold text-[var(--accent-primary)] bg-[var(--accent-primary)]/10 w-fit px-3 py-1 rounded-full">
                 <Clock size={16} /> {entry.startTime} - {entry.endTime}
@@ -80,11 +91,20 @@ export default function FacultyAttendanceDashboard() {
 
               <button
                 onClick={() => handleGenerateQR(entry.id)}
-                disabled={generating}
-                className="mt-auto w-full py-4 bg-[var(--bg-hover)] text-[var(--text-primary)] font-bold rounded-2xl border border-[var(--border-primary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/5 transition-all flex items-center justify-center gap-2 disabled:opacity-50 group"
+                disabled={generating || entry.attendanceSessions?.length > 0}
+                className={`mt-auto w-full py-4 font-bold rounded-2xl border transition-all flex items-center justify-center gap-2 group ${
+                  entry.attendanceSessions?.length > 0
+                    ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                    : 'bg-[var(--bg-hover)] text-[var(--text-primary)] border-[var(--border-primary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/5 disabled:opacity-50'
+                }`}
               >
                 {generatingFor === entry.id ? (
                   <Loader2 className="animate-spin" size={20} />
+                ) : entry.attendanceSessions?.length > 0 ? (
+                  <>
+                    <CheckCircle2 size={20} />
+                    Completed
+                  </>
                 ) : (
                   <>
                     <QrCode size={20} />
