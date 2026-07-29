@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -103,20 +103,16 @@ export default function CreateCoursePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [tagInput, setTagInput] = useState("");
+  const [institutes, setInstitutes] = useState([]);
 
   const [form, setForm] = useState({
     title: "", description: "", category: "Programming", difficulty: "BEGINNER",
     estimatedHours: 0, tags: [], price: 0, offerPrice: 0, isFree: true,
     iconUrl: "", visibility: "DRAFT", hasCertificate: false, isSequential: false,
+    isInstituteCourse: false, instituteId: "",
   });
 
   const set = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
-
-  const addTag = () => {
-    const t = tagInput.trim();
-    if (t && !form.tags.includes(t)) set("tags", [...form.tags, t]);
-    setTagInput("");
-  };
 
   const hasRealToken = token && !token.startsWith("demo-") && !token.startsWith("local-");
   const authHeaders = {
@@ -126,16 +122,51 @@ export default function CreateCoursePage() {
       : { "x-bypass-auth": "true", "x-bypass-role": "ADMIN" }),
   };
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const isInstScope = params.get("scope") === "institute";
+      const instId = params.get("instituteId") || "";
+      if (isInstScope || instId) {
+        setForm(prev => ({
+          ...prev,
+          isInstituteCourse: true,
+          instituteId: instId
+        }));
+      }
+    }
+    fetch(`${API_BASE}/api/institutes`, { headers: authHeaders })
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) setInstitutes(d.data || d.institutes || []);
+      })
+      .catch(() => {});
+  }, [API_BASE]);
+
+  const addTag = () => {
+    const t = tagInput.trim();
+    if (t && !form.tags.includes(t)) set("tags", [...form.tags, t]);
+    setTagInput("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (!form.title.trim()) { setError("Course title is required."); return; }
+    if (form.isInstituteCourse && !form.instituteId) {
+      setError("Please select an institute for this course.");
+      return;
+    }
     setSaving(true);
     try {
+      const payload = {
+        ...form,
+        instituteId: form.isInstituteCourse ? (form.instituteId ? parseInt(form.instituteId) : null) : null
+      };
       const res = await fetch(`${API_BASE}/api/learn/admin/courses`, {
         method: "POST",
         headers: authHeaders,
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.success) {
@@ -173,6 +204,40 @@ export default function CreateCoursePage() {
         {/* Section: Basic Info */}
         <div className="p-6 rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] space-y-5">
           <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-accent)" }}>Basic Information</h2>
+
+          <FormField label="Course Scope" sublabel="Select whether this course is platform-wide or for a specific institute">
+            <div className="flex items-center gap-3">
+              <button type="button" onClick={() => set("isInstituteCourse", false)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${!form.isInstituteCourse ? "border-[var(--border-accent)] bg-[var(--accent-glow)] text-[var(--text-accent)]" : "border-[var(--border-primary)] hover:bg-[var(--bg-hover)]"}`}>
+                <Globe size={14} /> Global Course
+              </button>
+              <button type="button" onClick={() => set("isInstituteCourse", true)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${form.isInstituteCourse ? "border-blue-500/50 bg-blue-500/10 text-blue-400" : "border-[var(--border-primary)] hover:bg-[var(--bg-hover)]"}`}>
+                <Building2 size={14} /> Institute Specific Course
+              </button>
+            </div>
+          </FormField>
+
+          {form.isInstituteCourse && (
+            <FormField label="Target Institute" sublabel="Select the educational institution this course belongs to">
+              <div className="flex items-center gap-2">
+                <Building2 size={16} className="text-blue-400 shrink-0" />
+                <select
+                  value={form.instituteId}
+                  onChange={e => set("instituteId", e.target.value)}
+                  required
+                  className="w-full px-4 py-2.5 rounded-xl text-sm outline-none border border-[var(--border-primary)] cursor-pointer"
+                  style={{ backgroundColor: "var(--bg-input)", color: "var(--text-primary)" }}>
+                  <option value="">-- Select an Institute --</option>
+                  {institutes.map(inst => (
+                    <option key={inst.id} value={inst.id}>
+                      {inst.name || inst.title || `Institute #${inst.id}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </FormField>
+          )}
 
           <FormField label="Course Title" sublabel="A clear, descriptive name (e.g. 'Python Fundamentals', 'Dynamic Programming Mastery')">
             <Input value={form.title} onChange={e => set("title", e.target.value)} placeholder="e.g. Python for Beginners" required />

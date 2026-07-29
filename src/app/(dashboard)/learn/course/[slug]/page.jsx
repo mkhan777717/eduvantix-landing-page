@@ -83,8 +83,21 @@ export default function CourseOverviewPage() {
     router.push(`/learn/course/${slug}/${firstChapter.id}/${firstStep.id}`);
   };
 
-  const navigateToContinue = () => {
+  const navigateToContinue = useCallback(() => {
     if (!course?.chapters?.length) return;
+
+    // 1. If enrollment has a recorded lastStepId, resume exact last-accessed step
+    if (enrollment?.lastStepId) {
+      for (const ch of course.chapters) {
+        const found = ch.steps?.find(s => String(s.id) === String(enrollment.lastStepId));
+        if (found) {
+          router.push(`/learn/course/${slug}/${ch.id}/${found.id}`);
+          return;
+        }
+      }
+    }
+
+    // 2. Otherwise redirect to the first uncompleted step
     for (const ch of course.chapters) {
       for (const step of ch.steps) {
         if (!step.progress?.isCompleted) {
@@ -94,7 +107,16 @@ export default function CourseOverviewPage() {
       }
     }
     navigateToFirstStep();
-  };
+  }, [course, enrollment, slug, router]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("auto") === "true" && course && isEnrolled) {
+        navigateToContinue();
+      }
+    }
+  }, [course, isEnrolled, navigateToContinue]);
 
   if (loading) {
     return (

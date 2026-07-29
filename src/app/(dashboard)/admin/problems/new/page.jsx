@@ -12,21 +12,7 @@ import {
   AlertCircle, CheckCircle2, Info, X
 } from "lucide-react";
 import { convertHtmlToMarkdown } from "@/utils/htmlToMarkdown";
-
-function renderMarkdown(md) {
-  if (!md) return "";
-  let html = md.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  html = html.replace(/```([\w]*)\n([\s\S]*?)```/g, (_, _lang, code) =>
-    `<div class="bg-[#0d1117] border border-[var(--border-primary)] border-[var(--border-primary)]/80 text-slate-200 p-4 rounded-xl font-mono text-[11px] my-3 overflow-x-auto leading-relaxed"><pre class="whitespace-pre"><code>${code}</code></pre></div>`
-  );
-  html = html.replace(/`([^`]+)`/g, '<code class="bg-zinc-500/10 border border-[var(--border-primary)] border-zinc-500/20 text-zinc-400 text-[11px] px-1.5 py-0.5 rounded font-mono font-semibold mx-0.5">$1</code>');
-  html = html.replace(/^### (.*$)/gim, '<h4 class="text-[11px] font-extrabold uppercase tracking-wider mt-4 mb-2 text-zinc-400">$1</h4>');
-  html = html.replace(/^## (.*$)/gim, '<h3 class="text-sm font-black mt-5 mb-2 text-white">$1</h3>');
-  html = html.replace(/^# (.*$)/gim, '<h2 class="text-base font-black mt-6 mb-3 pb-1 border-b border-white/10 text-white">$1</h2>');
-  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-bold text-white">$1</strong>');
-  html = html.replace(/^[*-] (.*$)/gim, '<li class="flex items-start gap-2 my-1 text-xs text-slate-300"><span class="text-zinc-400">◆</span><span>$1</span></li>');
-  return `<div class="space-y-1 text-xs leading-relaxed text-slate-300 whitespace-pre-wrap">${html}</div>`;
-}
+import { renderMarkdown } from "@/lib/renderMarkdown";
 
 
 function insertMd(taRef, setValue, type) {
