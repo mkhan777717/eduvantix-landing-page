@@ -480,14 +480,13 @@ export default function DashboardLayout({ children }) {
       isSuperAdmin && { label: "Job Assistance", href: "/admin/job-assistance", icon: Briefcase },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedContest") && { label: "Contests", href: "/admin/contests", icon: Trophy, featureFlag: "allowedContest" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedProblems") && { label: "Problems", href: "/admin/problems", icon: Code, featureFlag: "allowedProblems" },
-      (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedGoLive") && { label: "Go Live", href: "/admin/live", icon: Radio, featureFlag: "allowedGoLive" },
+      (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedGoLive") && { label: "Live Sessions", href: "/admin/live", icon: Radio, featureFlag: "allowedGoLive" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedArcade") && { label: "Arcade Questions", href: "/admin/arcade", icon: Gamepad2, featureFlag: "allowedArcade" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && { label: "Events", href: "/events/organizer", icon: CalendarDays },
       isInstAdmin && { label: "Academic Setup", href: "/academic-setup", icon: BookOpen },
       (isInstAdmin || isBatchMgr) && { label: "Timetable", href: "/timetable", icon: CalendarDays },
-      isMentor && { label: "My Schedule", href: "/timetable/faculty", icon: CalendarDays },
       isInstAdmin && { label: "Attendance", href: "/attendance/admin", icon: CheckCircle2 },
-      (isMentor || isBatchMgr) && { label: "Take Attendance", href: "/attendance/faculty", icon: CheckCircle2 },
+
       !isSuperAdmin && { label: "Share Feedback", href: "/feedback", icon: HeartHandshake },
     ].filter(Boolean);
   }

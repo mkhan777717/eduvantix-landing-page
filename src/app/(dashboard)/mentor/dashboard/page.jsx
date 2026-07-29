@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { useTimetableStore } from "@/store/useTimetableStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Users, CheckSquare, Calendar, Star,
@@ -12,6 +14,14 @@ import {
 
 export default function MentorDashboard() {
   const router = useRouter();
+  const { token, API_BASE } = useAuth();
+  const { todayClasses, isLoading: loadingClasses, fetchTodayClasses } = useTimetableStore();
+
+  React.useEffect(() => {
+    if (token) {
+      fetchTodayClasses('FACULTY', token, API_BASE || process.env.NEXT_PUBLIC_API_URL || '');
+    }
+  }, [token, fetchTodayClasses, API_BASE]);
   
   // Interactive Code Review States
   const [selectedReview, setSelectedReview] = useState(null);
@@ -296,6 +306,48 @@ export default function MentorDashboard() {
         {/* Right column: Mentoring Cohorts & Office Hours Planner (Col 4) */}
         <section className="lg:col-span-4 space-y-10">
           
+          {/* Today's Scheduled Classes */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-2 border-b" style={{ borderColor: "var(--border-primary)" }}>
+              <h2 className="text-xl font-serif" style={{ color: "var(--text-primary)" }}>
+                Today's Scheduled Classes
+              </h2>
+              <button onClick={() => router.push("/admin/live")}
+                className="text-[10px] font-bold uppercase tracking-wider hover:underline"
+                style={{ color: "var(--accent-primary)" }}>
+                View All
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              {loadingClasses ? (
+                <div className="flex justify-center py-6">
+                  <div className="w-5 h-5 rounded-full animate-spin border-2 border-t-transparent" style={{ borderColor: "var(--accent-primary)", borderTopColor: "transparent" }} />
+                </div>
+              ) : todayClasses.length === 0 ? (
+                <div className="text-center py-6 border border-dashed rounded-2xl" style={{ borderColor: "var(--border-primary)", color: "var(--text-muted)" }}>
+                  <p className="text-xs">No classes scheduled for today.</p>
+                </div>
+              ) : (
+                todayClasses.map((entry) => (
+                  <div key={entry.id} className="p-4 rounded-2xl border flex flex-col gap-2 transition-colors hover:border-[var(--accent-primary)] cursor-pointer"
+                    style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-primary)" }}
+                    onClick={() => router.push("/admin/live")}>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-bold truncate" style={{ color: "var(--text-primary)" }}>{entry.subject?.name}</h4>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[var(--bg-secondary)]" style={{ color: "var(--text-secondary)" }}>
+                        {entry.timetable?.batch?.name}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs font-medium" style={{ color: "var(--text-muted)" }}>
+                      <span className="flex items-center gap-1.5"><Clock size={12} /> {entry.startTime} - {entry.endTime}</span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
           {/* Cohorts Progress */}
           <div className="space-y-6">
             <h2 className="text-xl font-serif pb-2 border-b" style={{ color: "var(--text-primary)", borderColor: "var(--border-primary)" }}>
