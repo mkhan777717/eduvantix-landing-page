@@ -1141,16 +1141,14 @@ export default function AIAllInOneVivaPage({ children }) {
 
   // --- MAIN ALL-IN-ONE VIEW (FOLDERS CLOSED VIEW) ---
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] p-6 md:p-10 font-sans">
-      <div className="max-w-7xl mx-auto space-y-8">
-        
+    <div className="w-full animate-fade-in space-y-8 pb-12">
         {/* Page Title / Header */}
-        <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 border-b pb-6 shrink-0 mb-8" style={{ borderColor: "var(--border-primary)" }}>
+        <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8 relative" style={{ borderColor: "var(--border-primary)" }}>
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
               style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-              <Brain size={12} className="text-violet-500" />
-              AI Viva
+              <Brain size={12} className="text-violet-500 animate-pulse" />
+              AI VIVA
             </div>
             <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
               Viva Management Dashboard
@@ -1411,8 +1409,6 @@ export default function AIAllInOneVivaPage({ children }) {
             )}
           </div>
         )}
-
-      </div>
 
       {renderModals()}
     </div>

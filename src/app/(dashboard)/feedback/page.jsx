@@ -76,20 +76,27 @@ export default function FeedbackPage() {
   }
 
   return (
-    <div className="max-w-xl mx-auto space-y-6 pt-4">
-      {/* Title block */}
-      <div className="space-y-1">
-        <h1 className="text-2xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
-          Share Your Feedback
-        </h1>
-        <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-          Help us shape the future of Eduvantix. Tell us what you like or how we can improve.
-        </p>
-      </div>
+    <div className="space-y-6 min-h-0 flex flex-col flex-1 animate-in fade-in duration-500" style={{ color: "var(--text-primary)" }}>
+      {/* Header section */}
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3"
+            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+            <HeartHandshake size={12} className="text-violet-500" />
+            Feedback Portal
+          </div>
+          <h1 className="text-4xl font-serif tracking-tight">
+            Share Your Feedback
+          </h1>
+          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+            Help us shape the future of Eduvantix. Tell us what you like or how we can improve.
+          </p>
+        </div>
+      </section>
 
-      {/* Main glassmorphism card */}
-      <div className="p-6 md:p-8 rounded-3xl border border-[var(--border-primary)] shadow-xl relative overflow-hidden"
-        style={{ backgroundColor: "var(--bg-card)" }}>
+      <div className="flex-1 min-h-0 overflow-y-auto pb-12 flex justify-center">
+        <div className="w-full max-w-2xl p-6 md:p-8 rounded-3xl border border-[var(--border-primary)] shadow-xl relative overflow-hidden h-fit"
+          style={{ backgroundColor: "var(--bg-card)" }}>
         {/* Glow accent */}
         <div className="absolute -top-12 -right-12 w-24 h-24 rounded-full bg-[var(--accent-primary)]/5 blur-2xl pointer-events-none" />
 
@@ -141,10 +148,11 @@ export default function FeedbackPage() {
         </form>
       </div>
 
-      <div className="flex justify-center items-center gap-2.5 text-[11px] font-semibold" style={{ color: "var(--text-muted)" }}>
+      <div className="flex justify-center items-center gap-2.5 text-[11px] font-semibold pb-8" style={{ color: "var(--text-muted)" }}>
         <HeartHandshake size={14} style={{ color: "var(--accent-primary)" }} />
         <span>Thank you for making Eduvantix better!</span>
       </div>
+    </div>
     </div>
   );
 }

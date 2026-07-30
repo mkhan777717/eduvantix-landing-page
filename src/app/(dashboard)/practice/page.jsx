@@ -188,29 +188,31 @@ export default function PracticeCatalogPage() {
       {!user && <Navbar />}
 
       <main className={`flex-grow relative z-10 ${!user ? 'pt-32 pb-24' : ''}`}>
-        <div className="mx-auto max-w-7xl px-4 md:px-8 space-y-8">
+        <div className="mx-auto max-w-7xl p-6 md:p-8 space-y-8">
           
           {/* Header Description */}
           <motion.section 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex flex-col gap-2 border-b pb-6 shrink-0 mb-8"
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8"
             style={{ borderColor: "var(--border-primary)" }}
           >
-            <div className="flex items-center justify-between flex-wrap gap-4 mb-3">
-              <div 
-                className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] w-fit"
-                style={{
-                  borderColor: "var(--border-primary)",
-                  color: "var(--text-secondary)",
-                  backgroundColor: "var(--bg-secondary)"
-                }}
-              >
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
+                style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
                 <Zap size={12} className="text-violet-500 animate-pulse" />
-                <span>Interactive Practice Sandbox</span>
+                INTERACTIVE PRACTICE SANDBOX
               </div>
+              <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+                Interactive Code Zone
+              </h1>
+              <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+                Solve system design scenarios, coding algorithms, and security reviews. Test solutions against live assertions and ask our voice-enabled AI developer assistant for guidance.
+              </p>
+            </div>
 
+            <div className="flex items-center gap-3 shrink-0">
               <a
                 href="/discuss?category=PROBLEM"
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[var(--bg-card)] border border-[var(--border-primary)] text-[var(--text-primary)] hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-all shadow-sm"
@@ -219,12 +221,6 @@ export default function PracticeCatalogPage() {
                 Problem Discussions
               </a>
             </div>
-            <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
-              Interactive Code Zone
-            </h1>
-            <p className="text-sm max-w-xl leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-              Solve system design scenarios, coding algorithms, and security reviews. Test solutions against live assertions and ask our voice-enabled AI developer assistant for guidance.
-            </p>
           </motion.section>
 
           <div className="relative min-h-[400px]">

@@ -435,28 +435,33 @@ export default function AdminJobAssistancePage() {
   };
 
   return (
-    <div className="min-h-screen space-y-6 p-4 md:p-6" style={{ backgroundColor: "var(--bg-main)", color: "var(--text-primary)" }}>
+    <div className="w-full animate-fade-in space-y-8 pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
+            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+            <Briefcase size={12} className="text-violet-500 animate-pulse" />
+            JOB ASSISTANCE
+          </div>
+          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
             Job Assistance Applications
           </h1>
-          <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>
-            Super Admin portal to review applications, confirm interview slots, and provide final feedback
+          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+            Super Admin portal to review applications, confirm interview slots, and provide final feedback.
           </p>
         </div>
 
         <button
           onClick={fetchApplications}
           disabled={loading}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all hover:bg-[var(--bg-hover)] cursor-pointer self-start sm:self-auto"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all hover:bg-[var(--bg-hover)] cursor-pointer self-start sm:self-auto shadow-xs"
           style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
         >
-          <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+          <RefreshCw size={13} className={loading ? "animate-spin text-[var(--accent-primary)]" : ""} />
           Refresh
         </button>
-      </div>
+      </section>
 
       {/* Success banner */}
       {success && (

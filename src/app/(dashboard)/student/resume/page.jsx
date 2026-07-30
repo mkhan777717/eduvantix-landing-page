@@ -272,7 +272,7 @@ export default function ResumeBuilderPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] relative px-0 sm:px-6 pb-12">
+    <div className="w-full animate-fade-in relative pb-12">
 
       {/* Ambient premium glow behind the header — purely decorative, non-interactive */}
       <div className="absolute top-0 left-0 right-0 h-[420px] overflow-hidden pointer-events-none print:hidden -z-10">
@@ -291,32 +291,20 @@ export default function ResumeBuilderPage() {
       </div>
 
       {/* Header - Hidden when printing */}
-      <motion.section
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="flex flex-col gap-6 border-b pb-6 shrink-0 print:hidden mb-6"
-        style={{ borderColor: "var(--border-primary)" }}
-      >
-        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
-          <div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.05, duration: 0.35 }}
-              className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border mb-4 w-fit shadow-sm"
-              style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}
-            >
-              <Sparkles size={12} style={{ color: "var(--text-accent)" }} />
-              Resume Builder
-            </motion.div>
-            <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
-              Resume Builder
-            </h1>
-            <p className="text-sm max-w-xl mt-1.5" style={{ color: "var(--text-secondary)" }}>
-              Create an ATS-friendly resume to showcase your skills and experience.
-            </p>
+      <section className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 border-b pb-6 shrink-0 mb-8 print:hidden" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
+            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+            <Sparkles size={12} className="text-violet-500 animate-pulse" />
+            RESUME BUILDER
           </div>
+          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+            Resume Builder
+          </h1>
+          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+            Create an ATS-friendly resume to showcase your skills and experience.
+          </p>
+        </div>
 
           <div className="flex flex-col items-stretch lg:items-end gap-4 w-full lg:w-auto lg:min-w-[420px]">
 
@@ -462,8 +450,7 @@ export default function ResumeBuilderPage() {
               </motion.div>
             </div>
           </div>
-        </div>
-      </motion.section>
+      </section>
 
       {/* Main Content Area */}
       <div className="max-w-[1600px] mx-auto">

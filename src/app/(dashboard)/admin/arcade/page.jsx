@@ -864,7 +864,7 @@ export default function ArcadeQuestionsPage() {
   const totalAll = GAME_TYPES.reduce((sum, g) => sum + (customData[g.key]?.length || 0), 0);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-12">
+    <div className="w-full animate-fade-in space-y-8 pb-12">
       {/* ── Notification toast ─────────────────────────────────────────── */}
       <AnimatePresence>
         {notification && (
@@ -984,12 +984,12 @@ export default function ArcadeQuestionsPage() {
       </AnimatePresence>
 
       {/* ── Page Header ──────────────────────────────────────────────────── */}
-      <section className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b pb-6" style={{ borderColor: "var(--border-primary)" }}>
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8 relative" style={{ borderColor: "var(--border-primary)" }}>
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3"
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
             style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-            <Gamepad2 size={12} className="text-violet-500" />
-            Arcade Manager
+            <Gamepad2 size={12} className="text-violet-500 animate-pulse" />
+            ARCADE MANAGER
           </div>
           <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
             Question Bank
