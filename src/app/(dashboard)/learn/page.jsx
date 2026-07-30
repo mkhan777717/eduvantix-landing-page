@@ -159,12 +159,26 @@ export default function LearnCatalogPage() {
     setLoading(false);
   }, [scope, category, search, API_BASE, token]);
 
-  useEffect(() => { loadCourses(); }, [loadCourses]);
+  useEffect(() => {
+    if (user && user.role && user.role !== "STUDENT" && user.role !== "USER") {
+      if (user.role === "MENTOR") {
+        router.replace("/mentor/dashboard");
+      } else {
+        router.replace("/admin/courses");
+      }
+      return;
+    }
+    loadCourses();
+  }, [user, router, loadCourses]);
 
   const stats = [
     { icon: BookOpen, label: "Total Courses", value: courses.length, color: "text-violet-400 bg-violet-500/10" },
     { icon: CheckCircle, label: "Enrolled", value: courses.filter(c => c.isEnrolled).length, color: "text-emerald-400 bg-emerald-500/10" },
   ];
+
+  if (user && user.role && user.role !== "STUDENT" && user.role !== "USER") {
+    return null;
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-16">
