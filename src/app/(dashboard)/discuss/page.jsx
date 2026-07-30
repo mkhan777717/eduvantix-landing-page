@@ -8,20 +8,24 @@ import NotificationBell from "@/components/discuss/NotificationBell";
 export default function DiscussPage() {
   return (
     <Suspense fallback={<div className="p-8 text-center text-xs text-[var(--text-muted)]">Loading forum...</div>}>
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Page Title & Top Actions */}
-        <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)]">
-          <div>
-            <h1 className="text-2xl font-extrabold text-[var(--text-primary)] tracking-tight">
+      <div className="space-y-6 min-h-0 flex flex-col flex-1 animate-in fade-in duration-500" style={{ color: "var(--text-primary)" }}>
+        {/* Header section */}
+        <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0" style={{ borderColor: "var(--border-primary)" }}>
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3"
+              style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+              <span className="text-violet-500 font-bold text-lg leading-none mt-[-2px]">#</span>
               Discussion Forum
+            </div>
+            <h1 className="text-4xl font-serif tracking-tight">
+              Community Discussions
             </h1>
-            <p className="text-xs text-[var(--text-muted)] mt-1">
+            <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
               Join the community, solve problems together, share interview experiences, and discuss tech topics.
             </p>
           </div>
-
           <NotificationBell />
-        </div>
+        </section>
 
         {/* Main Grid: Feed + Sidebar */}
         <div className="flex flex-col lg:flex-row gap-8">

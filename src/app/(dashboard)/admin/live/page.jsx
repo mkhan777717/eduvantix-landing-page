@@ -1787,28 +1787,27 @@ export default function AdminLivePage() {
     const isActiveClass = currentClass && !currentClass.isCanceled && (nowPlus5Str >= currentClass.startTime && nowMinus20Str <= currentClass.endTime);
 
     return (
-      <>
-        <div className="flex-1 overflow-y-auto w-full custom-scrollbar pb-10">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
-
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-              <div>
-                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
-                  style={{ color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-                  <Radio size={11} className="text-rose-500 animate-pulse" />Live Sessions
+        <div className="space-y-6 min-h-0 flex flex-col flex-1 animate-in fade-in duration-500" style={{ color: "var(--text-primary)" }}>            {/* Header section */}
+            <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0" style={{ borderColor: "var(--border-primary)" }}>
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3"
+                  style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+                  <Radio size={12} className="text-violet-500 animate-pulse" />
+                  Live Sessions
                 </div>
-                <h1 className="text-3xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>Today&apos;s Classes</h1>
-                <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+                <h1 className="text-4xl font-serif tracking-tight">
+                  Today&apos;s Classes
+                </h1>
+                <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
                   {new Date().toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
                 </p>
               </div>
               {successMsg && (
-                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 text-emerald-600 text-xs font-bold border border-emerald-500/20">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 text-emerald-600 text-xs font-bold border border-emerald-500/20 shrink-0">
                   <Check size={14} />{successMsg}
                 </div>
               )}
-            </div>
+            </section>
 
             <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-8 items-start">
               <div className="space-y-8">
@@ -2044,9 +2043,6 @@ export default function AdminLivePage() {
             </div>
             </div>
 
-          </div>
-        </div>
-
         <AnimatePresence>
           {showRecordPrompt && (
             <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
@@ -2068,7 +2064,7 @@ export default function AdminLivePage() {
             </div>
           )}
         </AnimatePresence>
-      </>
+      </div>
     );
   }
 
@@ -2081,16 +2077,20 @@ export default function AdminLivePage() {
           {/* Left Column: Setup Form */}
           <div className="space-y-8 max-w-2xl w-full">
         {/* Page Header */}
-        <section className="flex flex-col gap-2 border-b pb-6 shrink-0" style={{ borderColor: "var(--border-primary)" }}>
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
-            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-            <Radio size={12} className="text-rose-500 animate-pulse" />
-            Live Broadcast
+        <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8 relative" style={{ borderColor: "var(--border-primary)" }}>
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
+              style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+              <Radio size={12} className="text-rose-500 animate-pulse" />
+              LIVE BROADCAST
+            </div>
+            <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+              Go Live
+            </h1>
+            <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+              Start a live session for your students in real-time.
+            </p>
           </div>
-          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>Go Live</h1>
-          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
-            Start a live session for your students in real-time.
-          </p>
         </section>
 
         {/* Setup Form */}

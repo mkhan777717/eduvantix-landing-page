@@ -217,40 +217,37 @@ export default function ExamsDashboard() {
 
   return (
     <div className="min-h-screen text-slate-900 dark:text-slate-100 p-6 space-y-8 font-sans">
-      {/* Upper Glass Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/60 p-8 md:p-12 backdrop-blur-xl shadow-xl dark:shadow-2xl">
-        <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl" />
-        <div className="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
-        
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/10 dark:bg-indigo-500/15 border border-indigo-500/20 px-3 py-1 text-xs font-bold text-indigo-600 dark:text-indigo-400">
-              <Award size={12} />
-              Institute Assessment Portal
-            </span>
-            <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-600 dark:from-white dark:via-slate-200 dark:to-indigo-400 bg-clip-text text-transparent">
-              {isTeacher ? "Mentor Exam Manager" : isBatchManager ? "Batch Schedule Manager" : "Student Examination Portal"}
-            </h1>
-            <p className="max-w-xl text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              {isTeacher 
-                ? "Configure MCQ, essay, and coding assessments. Grade candidate submissions and publish results."
-                : isBatchManager
-                ? "Manage and reschedule assessment timelines for your assigned batches. Note: Exam creation is restricted to mentors and admins."
-                : "View live assessments, upcoming institute schedules, and historical scorecard reports."}
-            </p>
+      {/* Header section */}
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3"
+            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+            <Award size={12} className="text-violet-500" />
+            Institute Assessment Portal
           </div>
-
-          {isTeacher && (
-            <button
-              onClick={() => router.push("/exams/create")}
-              className="group inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/30 hover:-translate-y-0.5 active:translate-y-0"
-            >
-              <Plus size={18} className="transition-transform group-hover:rotate-90" />
-              Create Exam Draft
-            </button>
-          )}
+          <h1 className="text-4xl font-serif tracking-tight">
+            {isTeacher ? "Mentor Exam Manager" : isBatchManager ? "Batch Schedule Manager" : "Student Examination Portal"}
+          </h1>
+          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+            {isTeacher 
+              ? "Configure MCQ, essay, and coding assessments. Grade candidate submissions and publish results."
+              : isBatchManager
+              ? "Manage and reschedule assessment timelines for your assigned batches. Note: Exam creation is restricted to mentors and admins."
+              : "View live assessments, upcoming institute schedules, and historical scorecard reports."}
+          </p>
         </div>
-      </div>
+
+        {isTeacher && (
+          <button
+            onClick={() => router.push("/exams/create")}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--border-primary)] transition-colors hover:bg-[var(--bg-secondary)] text-xs font-semibold cursor-pointer shrink-0"
+            style={{ borderColor: "var(--border-primary)", color: "var(--text-primary)", backgroundColor: "var(--bg-primary)" }}
+          >
+            <Plus size={14} />
+            <span>Create Exam Draft</span>
+          </button>
+        )}
+      </section>
 
       {/* Tabs list filtering */}
       <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-4">

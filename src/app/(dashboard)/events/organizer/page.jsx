@@ -124,13 +124,19 @@ export default function OrganizerDashboard() {
     });
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto min-h-screen">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight mb-2 text-[var(--text-primary)]">
+    <div className="space-y-6 min-h-0 flex flex-col flex-1 animate-in fade-in duration-500" style={{ color: "var(--text-primary)" }}>
+      {/* Header section */}
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3"
+            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+            <Calendar size={12} className="text-violet-500" />
             Organizer Dashboard
+          </div>
+          <h1 className="text-4xl font-serif tracking-tight">
+            Manage Events
           </h1>
-          <p className="text-[var(--text-secondary)]">
+          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
             Manage your events, view registrations, and download attendee lists.
           </p>
         </div>
@@ -155,7 +161,7 @@ export default function OrganizerDashboard() {
             Create Event
           </Link>
         </div>
-      </div>
+      </section>
 
       {loading ? (
         <div className="flex justify-center h-64 items-center"><Loader2 className="animate-spin text-[var(--accent-primary)]" size={32}/></div>

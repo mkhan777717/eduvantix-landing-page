@@ -343,16 +343,23 @@ export default function JobAssistancePage() {
   // ─── Application Form (no active application) ──────────────────────────────
   if (!application) {
     return (
-      <div className="max-w-2xl mx-auto space-y-6 pt-2">
+      <div className="w-full animate-fade-in space-y-6 pb-12">
         {/* Header */}
-        <div className="space-y-1">
-          <h1 className="text-2xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
-            Job Assistance
-          </h1>
-          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-            Fill in your details to apply for job & interview assistance. Our team will review your application.
-          </p>
-        </div>
+        <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8" style={{ borderColor: "var(--border-primary)" }}>
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
+              style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+              <Briefcase size={12} className="text-violet-500 animate-pulse" />
+              JOB PORTAL
+            </div>
+            <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+              Job Assistance
+            </h1>
+            <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+              Fill in your details to apply for job & interview assistance. Our team will review your application.
+            </p>
+          </div>
+        </section>
 
         {/* Form Card */}
         <div className="p-6 md:p-8 rounded-3xl border border-[var(--border-primary)] shadow-xl relative overflow-hidden"

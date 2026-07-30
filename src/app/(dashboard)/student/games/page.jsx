@@ -132,21 +132,22 @@ export default function GamesHubPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] relative animate-fade-in px-0 sm:px-6 pb-12">
+    <div className="w-full animate-fade-in pb-12">
       {/* Top Arcade Navigation Bar */}
-      <section className="flex flex-col gap-2 border-b pb-6 shrink-0 mb-8" style={{ borderColor: "var(--border-primary)" }}>
-        <div className="flex items-center justify-between">
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
             style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-            <Gamepad2 size={12} className="text-violet-500" />
-            Arcade
+            <Gamepad2 size={12} className="text-violet-500 animate-pulse" />
+            ARCADE
           </div>
+          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+            Eduvantix Arcade
+          </h1>
+          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+            Level up your engineering skills through interactive, edge-to-edge game arenas. Solve layout puzzles, repair code bases, and hack endpoints in real-time.
+          </p>
         </div>
-        
-        <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>Eduvantix Arcade</h1>
-        <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
-          Level up your engineering skills through interactive, edge-to-edge game arenas. Solve layout puzzles, repair code bases, and hack endpoints in real-time.
-        </p>
       </section>
 
       <div className="space-y-8 relative z-10">

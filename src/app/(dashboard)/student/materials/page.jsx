@@ -77,18 +77,22 @@ export default function StudentMaterialsPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in pb-12 px-0 sm:px-6">
+    <div className="w-full animate-fade-in pb-12">
       {/* Header */}
-      <section className="flex flex-col gap-2 border-b pb-6 shrink-0" style={{ borderColor: "var(--border-primary)" }}>
-        <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
-          style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-          <FileText size={12} className="text-violet-500" />
-          Class Notes Center
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
+            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+            <FileText size={12} className="text-violet-500 animate-pulse" />
+            CLASS NOTES CENTER
+          </div>
+          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+            Study Materials
+          </h1>
+          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+            Access class notes and documents taught in your batches.
+          </p>
         </div>
-        <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>Study Materials</h1>
-        <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
-          Access class notes and documents taught in your batches.
-        </p>
       </section>
 
       {error && (

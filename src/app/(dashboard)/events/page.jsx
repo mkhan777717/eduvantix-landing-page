@@ -61,34 +61,32 @@ export default function EventsDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] pb-24 font-sans selection:bg-[var(--accent-primary)] selection:text-white">
-      
-      {/* Premium Header Area */}
-      <div className="relative w-full bg-[var(--bg-card)] border-b border-[var(--border-primary)] pt-12 pb-24 overflow-hidden rounded-b-3xl md:rounded-b-[3rem] shadow-sm">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[var(--accent-primary)]/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3"></div>
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/4"></div>
-          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02] mix-blend-overlay"></div>
+    <div className="w-full animate-fade-in pb-24">
+      {/* Header */}
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
+            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+            <Calendar size={12} className="text-violet-500 animate-pulse" />
+            GLOBAL EVENTS
+          </div>
+          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+            Events Hub
+          </h1>
+          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+            Discover and register for upcoming workshops, hackathons, and global webinars designed to accelerate your growth.
+          </p>
         </div>
         
-        <div className="max-w-7xl mx-auto px-6 relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-br from-[var(--text-primary)] to-[var(--text-secondary)]">
-              Events Hub
-            </h1>
-            <p className="text-lg text-[var(--text-secondary)] font-medium">
-              Discover and register for upcoming workshops, hackathons, and global webinars designed to accelerate your growth.
-            </p>
-          </div>
-          
-          <div className="flex bg-[var(--bg-primary)]/50 backdrop-blur-md p-1.5 rounded-2xl border border-[var(--border-primary)] shadow-sm">
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="flex bg-[var(--bg-primary)]/50 backdrop-blur-md p-1.5 rounded-xl border border-[var(--border-primary)] shadow-sm">
             {['ALL', 'UPCOMING', 'PAST'].map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ${
                   filter === f
-                    ? "bg-[var(--accent-primary)] text-white shadow-lg shadow-[var(--accent-primary)]/25"
+                    ? "bg-[var(--accent-primary)] text-white shadow-md shadow-[var(--accent-primary)]/20"
                     : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
                 }`}
               >
@@ -97,9 +95,9 @@ export default function EventsDashboard() {
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="max-w-7xl mx-auto px-6 -mt-12 relative z-20">
+      <div className="w-full relative z-20">
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (

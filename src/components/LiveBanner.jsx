@@ -488,21 +488,22 @@ export default function LiveBanner() {
   const noSessions = !activeSession && pastSessions.length === 0;
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-40">
-      {/* Section Header */}
-      <section className="flex flex-col gap-2 border-b pb-6 shrink-0 mb-8" style={{ borderColor: "var(--border-primary)" }}>
-        <div className="flex items-center justify-between">
+    <div className="w-full animate-fade-in">
+      {/* Header Area */}
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
             style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-            <RadioIcon size={12} className="text-violet-500" />
-            Live Sessions
+            <Radio size={12} className="text-violet-500 animate-pulse" />
+            LIVE SESSIONS
           </div>
+          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+            Live Classes & Speedruns
+          </h1>
+          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+            Join live developer sessions, watch past streams, and learn in flow state.
+          </p>
         </div>
-        
-        <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>Live Classes & Speedruns</h1>
-        <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
-          Join live developer sessions, watch past streams, and learn in flow state.
-        </p>
       </section>
 
       {noSessions ? (
@@ -715,6 +716,6 @@ export default function LiveBanner() {
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 }

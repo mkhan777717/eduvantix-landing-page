@@ -771,21 +771,25 @@ export default function AIVivaPage() {
   };
 
   return (
-    <div className="space-y-8 animate-fade-in pb-12 px-0 sm:px-6">
+    <div className="w-full space-y-8 animate-fade-in pb-12">
       {/* ── LOBBY VIEW ── */}
       {view === "lobby" && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
           {/* Hero Card */}
-          <section className="flex flex-col gap-2 border-b pb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
-              style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-              <Brain size={12} className="text-violet-500" />
-              AI Viva
+          <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8 relative" style={{ borderColor: "var(--border-primary)" }}>
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
+                style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+                <Brain size={12} className="text-violet-500 animate-pulse" />
+                AI VIVA
+              </div>
+              <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+                AI Viva System
+              </h1>
+              <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+                Test your theoretical knowledge in a spoken viva session. Read each question, then answer verbally — your speech is transcribed live, AI-corrected for technical accuracy, and evaluated intelligently.
+              </p>
             </div>
-            <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>AI Viva System</h1>
-            <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
-              Test your theoretical knowledge in a spoken viva session. Read each question, then answer verbally — your speech is transcribed live, AI-corrected for technical accuracy, and evaluated intelligently.
-            </p>
 
             {lobbyError && (
               <div className="bg-rose-500/10 border border-[var(--border-primary)] border-rose-500/20 text-rose-500 p-3 rounded-xl text-sm font-semibold flex items-center space-x-2 w-fit mt-2">

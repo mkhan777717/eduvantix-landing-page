@@ -150,18 +150,20 @@ export default function LiveUsersPage() {
   };
 
   return (
-    <div className="min-h-screen space-y-6 p-4 md:p-6" style={{ backgroundColor: "var(--bg-main)", color: "var(--text-primary)" }}>
+    <div className="w-full animate-fade-in space-y-8 pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <Users className="text-[var(--accent-primary)]" size={24} />
-            <h1 className="text-xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
-              Live Registered Users
-            </h1>
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
+            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+            <Users size={12} className="text-violet-500 animate-pulse" />
+            DIRECTORY
           </div>
-          <p className="text-xs font-medium mt-0.5" style={{ color: "var(--text-muted)" }}>
-            Monitor all registered platform users, filter by global vs institute affiliation, and manage access flags
+          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+            Live Registered Users
+          </h1>
+          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+            Monitor all registered platform users, filter by global vs institute affiliation, and manage access flags.
           </p>
         </div>
 
@@ -174,7 +176,7 @@ export default function LiveUsersPage() {
           <RefreshCw size={13} className={loading ? "animate-spin text-[var(--accent-primary)]" : ""} />
           Refresh Directory
         </button>
-      </div>
+      </section>
 
       {/* Success Notification */}
       {success && (

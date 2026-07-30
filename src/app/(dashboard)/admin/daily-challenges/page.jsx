@@ -93,20 +93,30 @@ export default function AdminDailyChallenges() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-serif font-bold text-[var(--text-primary)]">Daily Challenges</h1>
-          <p className="text-[var(--text-secondary)] mt-1">Upload and manage daily challenges for students.</p>
+    <div className="w-full animate-fade-in space-y-8 pb-12" style={{ color: "var(--text-primary)" }}>
+      {/* Header section */}
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8 relative" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
+            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
+            <Target size={12} className="text-violet-500 animate-pulse" />
+            DAILY CHALLENGES
+          </div>
+          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+            Daily Challenges
+          </h1>
+          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+            Upload and manage daily challenges for students.
+          </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-[var(--accent-primary)] text-[var(--text-on-accent)] font-semibold rounded-xl hover:opacity-90 transition shadow-lg shadow-[var(--accent-glow)]"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[var(--accent-primary)] text-[var(--text-on-accent)] font-semibold rounded-xl hover:opacity-90 transition shadow-lg shadow-[var(--accent-glow)] shrink-0"
         >
           <Plus size={18} />
           <span>New Challenge</span>
         </button>
-      </div>
+      </section>
 
       {challenges.length === 0 ? (
         <div className="text-center py-20 border rounded-2xl border-dashed border-[var(--border-primary)] bg-[var(--bg-secondary)]">
