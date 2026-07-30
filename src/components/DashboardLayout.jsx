@@ -931,6 +931,7 @@ export default function DashboardLayout({ children }) {
                             { label: "My Lists", href: "/student/lists", icon: <BookOpen size={14} /> },
                             { label: "Notebook", href: "/student/notebook", icon: <FileText size={14} /> },
                             { label: "Profile", href: "/student/profile", icon: <Activity size={14} /> },
+                            { label: "Settings", href: "/settings/ai-providers", icon: <Settings size={14} /> },
                           ].map(item => (
                             <Link key={item.href} href={item.href} onClick={() => setIsProfileMenuOpen(false)}
                               className="flex flex-col items-center gap-1.5 p-2.5 rounded-lg transition-colors text-center"
