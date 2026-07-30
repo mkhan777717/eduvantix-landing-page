@@ -95,9 +95,7 @@ export default function LiveAttendanceScreen({ params }) {
                 <div className="w-[300px] h-[300px] flex flex-col items-center justify-center bg-red-50 rounded-2xl border-2 border-red-200">
                   <AlertTriangle size={48} className="text-red-500 mb-4" />
                   <p className="text-red-700 font-bold text-lg">QR Code Expired</p>
-                  <button className="mt-4 flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-sm font-medium text-red-600 hover:bg-red-50 transition">
-                    <RefreshCw size={16} /> Generate New
-                  </button>
+
                 </div>
               ) : (
                 <QRCodeSVG 

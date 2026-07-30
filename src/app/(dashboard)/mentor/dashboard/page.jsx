@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { useTimetableStore } from "@/store/useTimetableStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Users, CheckSquare, Calendar, Star,
@@ -12,6 +14,14 @@ import {
 
 export default function MentorDashboard() {
   const router = useRouter();
+  const { token, API_BASE } = useAuth();
+  const { todayClasses, isLoading: loadingClasses, fetchTodayClasses } = useTimetableStore();
+
+  React.useEffect(() => {
+    if (token) {
+      fetchTodayClasses('FACULTY', token, API_BASE || process.env.NEXT_PUBLIC_API_URL || '');
+    }
+  }, [token, fetchTodayClasses, API_BASE]);
   
   // Interactive Code Review States
   const [selectedReview, setSelectedReview] = useState(null);
@@ -151,8 +161,8 @@ export default function MentorDashboard() {
       {/* ── MAIN CONTENT (Asymmetrical Grid) ──────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* Left: Pending Submissions review queue (Col 8) */}
-        <section className="lg:col-span-8 space-y-6">
+        {/* Left/Main: Pending Submissions review queue (Col 8, moved to right via order) */}
+        <section className="lg:col-span-8 space-y-6 order-last">
           <div className="flex items-center justify-between pb-4 border-b" style={{ borderColor: "var(--border-primary)" }}>
             <h2 className="text-2xl font-serif" style={{ color: "var(--text-primary)" }}>Submission Queue</h2>
             <div className="flex items-center gap-2">
@@ -293,9 +303,71 @@ export default function MentorDashboard() {
           </AnimatePresence>
         </section>
 
-        {/* Right column: Mentoring Cohorts & Office Hours Planner (Col 4) */}
-        <section className="lg:col-span-4 space-y-10">
+        {/* Right/Sidebar: Mentoring Cohorts & Office Hours Planner (Col 4, moved to left via order) */}
+        <section className="lg:col-span-4 space-y-10 order-first">
           
+          {/* Today's Scheduled Classes */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-2 border-b" style={{ borderColor: "var(--border-primary)" }}>
+              <h2 className="text-xl font-serif" style={{ color: "var(--text-primary)" }}>
+                Today's Scheduled Classes
+              </h2>
+              <button onClick={() => router.push("/admin/live")}
+                className="text-[10px] font-bold uppercase tracking-wider hover:underline"
+                style={{ color: "var(--accent-primary)" }}>
+                View All
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              {loadingClasses ? (
+                <div className="flex justify-center py-6">
+                  <div className="w-5 h-5 rounded-full animate-spin border-2 border-t-transparent" style={{ borderColor: "var(--accent-primary)", borderTopColor: "transparent" }} />
+                </div>
+              ) : todayClasses.length === 0 ? (
+                <div className="text-center py-6 border border-dashed rounded-2xl" style={{ borderColor: "var(--border-primary)", color: "var(--text-muted)" }}>
+                  <p className="text-xs">No classes scheduled for today.</p>
+                </div>
+              ) : ( (() => {
+                  const nowStr = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                  // Filter for upcoming/ongoing classes and sort by start time
+                  const upcoming = [...todayClasses].filter(c => (c.endTime || "") >= nowStr).sort((a,b) => (a.startTime || "").localeCompare(b.startTime || ""));
+                  // If none upcoming, fallback to the last past class
+                  const displayClasses = upcoming.length > 0 ? upcoming.slice(0, 1) : todayClasses.slice(-1);
+                  const hiddenCount = todayClasses.length - displayClasses.length;
+
+                  return (
+                    <>
+                      {displayClasses.map((entry) => (
+                        <div key={entry.id} className="p-4 rounded-2xl border flex flex-col gap-2 transition-colors hover:border-[var(--accent-primary)] cursor-pointer"
+                          style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-primary)" }}
+                          onClick={() => router.push("/admin/live")}>
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-bold truncate" style={{ color: "var(--text-primary)" }}>{entry.subject?.name}</h4>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[var(--bg-secondary)]" style={{ color: "var(--text-secondary)" }}>
+                              {entry.timetable?.batch?.name}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs font-medium" style={{ color: "var(--text-muted)" }}>
+                            <span className="flex items-center gap-1.5"><Clock size={12} /> {entry.startTime} - {entry.endTime}</span>
+                          </div>
+                        </div>
+                      ))}
+                      {hiddenCount > 0 && (
+                        <div className="text-center pt-2">
+                          <button onClick={() => router.push("/admin/live")} 
+                            className="text-[10px] font-bold text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors px-3 py-1 rounded-full bg-[var(--bg-hover)] border border-[var(--border-primary)]">
+                            + {hiddenCount} more {hiddenCount === 1 ? 'class' : 'classes'} today
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()
+              )}
+            </div>
+          </div>
+
           {/* Cohorts Progress */}
           <div className="space-y-6">
             <h2 className="text-xl font-serif pb-2 border-b" style={{ color: "var(--text-primary)", borderColor: "var(--border-primary)" }}>
