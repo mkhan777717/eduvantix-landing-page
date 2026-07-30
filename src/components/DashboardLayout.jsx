@@ -449,7 +449,7 @@ export default function DashboardLayout({ children }) {
   if (isStudentSession) {
     sidebarLinks = [
       { label: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
-      // { label: "Learn", href: "/learn", icon: BookOpen }, // Hidden for students during dev phase
+      { label: "Learn", href: "/learn", icon: BookOpen },
       { label: "Practice Arena", href: "/practice", icon: Code },
       { label: "Contest Arena", href: "/contest", icon: Trophy },
       { label: "Exam Center", href: "/exams", icon: FileText },
