@@ -99,7 +99,8 @@ function Textarea({ rows = 4, ...props }) {
 
 export default function CreateCoursePage() {
   const router = useRouter();
-  const { token, API_BASE } = useAuth();
+  const { user, token, API_BASE } = useAuth();
+  const isSuperAdmin = !user?.role || user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [tagInput, setTagInput] = useState("");
