@@ -205,38 +205,42 @@ export default function CreateCoursePage() {
         <div className="p-6 rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] space-y-5">
           <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "var(--text-accent)" }}>Basic Information</h2>
 
-          <FormField label="Course Scope" sublabel="Select whether this course is platform-wide or for a specific institute">
-            <div className="flex items-center gap-3">
-              <button type="button" onClick={() => set("isInstituteCourse", false)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${!form.isInstituteCourse ? "border-[var(--border-accent)] bg-[var(--accent-glow)] text-[var(--text-accent)]" : "border-[var(--border-primary)] hover:bg-[var(--bg-hover)]"}`}>
-                <Globe size={14} /> Global Course
-              </button>
-              <button type="button" onClick={() => set("isInstituteCourse", true)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${form.isInstituteCourse ? "border-blue-500/50 bg-blue-500/10 text-blue-400" : "border-[var(--border-primary)] hover:bg-[var(--bg-hover)]"}`}>
-                <Building2 size={14} /> Institute Specific Course
-              </button>
-            </div>
-          </FormField>
+          {/* Course Scope (Only visible to Super Admin) */}
+          {isSuperAdmin && (
+            <>
+              <FormField label="Course Scope" sublabel="Select whether this course is platform-wide or for a specific institute">
+                <div className="flex items-center gap-3">
+                  <button type="button" onClick={() => set("isInstituteCourse", false)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${!form.isInstituteCourse ? "border-[var(--border-accent)] bg-[var(--accent-glow)] text-[var(--text-accent)]" : "border-[var(--border-primary)] hover:bg-[var(--bg-hover)]"}`}>
+                    <Globe size={14} /> Global Course
+                  </button>
+                  <button type="button" onClick={() => set("isInstituteCourse", true)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${form.isInstituteCourse ? "border-blue-500/50 bg-blue-500/10 text-blue-400" : "border-[var(--border-primary)] hover:bg-[var(--bg-hover)]"}`}>
+                    <Building2 size={14} /> Institute Specific Course
+                  </button>
+                </div>
+              </FormField>
 
-          {form.isInstituteCourse && (
-            <FormField label="Target Institute" sublabel="Select the educational institution this course belongs to">
-              <div className="flex items-center gap-2">
-                <Building2 size={16} className="text-blue-400 shrink-0" />
-                <select
-                  value={form.instituteId}
-                  onChange={e => set("instituteId", e.target.value)}
-                  required
-                  className="w-full px-4 py-2.5 rounded-xl text-sm outline-none border border-[var(--border-primary)] cursor-pointer"
-                  style={{ backgroundColor: "var(--bg-input)", color: "var(--text-primary)" }}>
-                  <option value="">-- Select an Institute --</option>
-                  {institutes.map(inst => (
-                    <option key={inst.id} value={inst.id}>
-                      {inst.name || inst.title || `Institute #${inst.id}`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </FormField>
+              {form.isInstituteCourse && (
+                <FormField label="Target Institute" sublabel="Select the educational institution this course belongs to">
+                  <div className="relative">
+                    <Building2 size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-blue-400" />
+                    <select
+                      value={form.instituteId}
+                      onChange={e => set("instituteId", e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm outline-none border border-[var(--border-primary)] focus:border-[var(--border-accent)] transition-all cursor-pointer"
+                      style={{ backgroundColor: "var(--bg-input)", color: "var(--text-primary)" }}>
+                      <option value="">-- Select an Institute --</option>
+                      {institutes.map(inst => (
+                        <option key={inst.id} value={inst.id}>
+                          {inst.name || inst.title || `Institute #${inst.id}`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </FormField>
+              )}
+            </>
           )}
 
           <FormField label="Course Title" sublabel="A clear, descriptive name (e.g. 'Python Fundamentals', 'Dynamic Programming Mastery')">

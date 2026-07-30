@@ -159,12 +159,26 @@ export default function LearnCatalogPage() {
     setLoading(false);
   }, [scope, category, search, API_BASE, token]);
 
-  useEffect(() => { loadCourses(); }, [loadCourses]);
+  useEffect(() => {
+    if (user && user.role && user.role !== "STUDENT" && user.role !== "USER") {
+      if (user.role === "MENTOR") {
+        router.replace("/mentor/dashboard");
+      } else {
+        router.replace("/admin/courses");
+      }
+      return;
+    }
+    loadCourses();
+  }, [user, router, loadCourses]);
 
   const stats = [
     { icon: BookOpen, label: "Total Courses", value: courses.length, color: "text-violet-400 bg-violet-500/10" },
     { icon: CheckCircle, label: "Enrolled", value: courses.filter(c => c.isEnrolled).length, color: "text-emerald-400 bg-emerald-500/10" },
   ];
+
+  if (user && user.role && user.role !== "STUDENT" && user.role !== "USER") {
+    return null;
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-16">
@@ -217,7 +231,7 @@ export default function LearnCatalogPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col gap-4">
+      <div className="space-y-4">
         {/* Search */}
         <div className="relative max-w-md">
           <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }} />
@@ -226,27 +240,34 @@ export default function LearnCatalogPage() {
             className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm outline-none border border-[var(--border-primary)] focus:border-[var(--border-accent)] transition-all"
             style={{ backgroundColor: "var(--bg-input)", color: "var(--text-primary)" }} />
         </div>
-        {/* Scope + Categories */}
-        <div className="flex flex-wrap items-center gap-2">
+
+        {/* Scope + Categories Filter Toolbar */}
+        <div className="space-y-3 pt-1">
           {user?.instituteId && (
-            <div className="flex rounded-xl overflow-hidden border border-[var(--border-primary)]">
-              {[["all", "All Courses"], ["institute", "My Institute"]].map(([val, label]) => (
-                <button key={val} onClick={() => setScope(val)}
-                  className={`px-4 py-2 text-xs font-bold transition-colors cursor-pointer ${scope === val ? "text-[var(--text-on-accent)]" : "text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]"}`}
-                  style={scope === val ? { background: "var(--accent-gradient)" } : { backgroundColor: "var(--bg-card)" }}>
-                  {label}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] block">Course Source</span>
+              <div className="flex rounded-xl overflow-hidden border border-[var(--border-primary)] w-fit">
+                {[["all", "All Courses"], ["global", "Global Courses"], ["institute", "Institute Courses"]].map(([val, label]) => (
+                  <button key={val} onClick={() => setScope(val)}
+                    className={`px-4 py-2 text-xs font-bold transition-colors cursor-pointer ${scope === val ? "text-[var(--text-on-accent)]" : "text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]"}`}
+                    style={scope === val ? { background: "var(--accent-gradient)" } : { backgroundColor: "var(--bg-card)" }}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] block">Categories</span>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map(cat => (
+                <button key={cat} onClick={() => setCategory(cat)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${category === cat ? "border-[var(--border-accent)] text-[var(--text-accent)] bg-[var(--accent-glow)] font-bold" : "border-[var(--border-primary)] hover:bg-[var(--bg-hover)] text-[var(--text-secondary)]"}`}>
+                  {cat}
                 </button>
               ))}
             </div>
-          )}
-          <div className="flex flex-wrap gap-1.5">
-            {CATEGORIES.map(cat => (
-              <button key={cat} onClick={() => setCategory(cat)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${category === cat ? "border-[var(--border-accent)] text-[var(--text-accent)] bg-[var(--accent-glow)]" : "border-[var(--border-primary)] hover:bg-[var(--bg-hover)]"}`}
-                style={{ color: category === cat ? "var(--text-accent)" : "var(--text-secondary)" }}>
-                {cat}
-              </button>
-            ))}
           </div>
         </div>
       </div>

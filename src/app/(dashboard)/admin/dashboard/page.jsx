@@ -380,8 +380,8 @@ export default function AdminDashboard() {
                           No recent submissions.
                         </td>
                       </tr>
-                    ) : submissionsFeed.map((sub) => (
-                      <tr key={sub.id} className="hover:bg-[var(--bg-secondary)] transition-colors">
+                    ) : submissionsFeed.map((sub, idx) => (
+                      <tr key={sub.id ? `sub-${sub.id}-${idx}` : `sub-${idx}`} className="hover:bg-[var(--bg-secondary)] transition-colors">
                         <td className="px-6 py-4 font-semibold" style={{ color: "var(--text-primary)" }}>
                           {sub.user}
                         </td>
@@ -433,8 +433,8 @@ export default function AdminDashboard() {
                         </td>
                       </tr>
                     ) : (
-                      participationReports.map((report) => (
-                        <tr key={report.id || `${report.userId}-${report.contestId}`} className="hover:bg-[var(--bg-secondary)] transition-colors">
+                      participationReports.map((report, idx) => (
+                        <tr key={report.id ? `report-${report.id}-${idx}` : `report-${idx}`} className="hover:bg-[var(--bg-secondary)] transition-colors">
                           <td className="px-6 py-4 font-semibold" style={{ color: "var(--text-primary)" }}>
                             {report.user?.username || "N/A"}
                           </td>
@@ -490,13 +490,13 @@ export default function AdminDashboard() {
           </div>
 
           <div className="space-y-4">
-            {allContests.slice(0, 4).map((contest) => {
+            {allContests.slice(0, 4).map((contest, idx) => {
               const isActive = contest.status === "active";
               const isUpcoming = contest.status === "upcoming";
               const isDbContest = contest.isDbContest || /^\d+$/.test(String(contest.id));
               return (
                 <div
-                  key={contest.id}
+                  key={contest.id ? `contest-${contest.id}-${idx}` : `contest-${idx}`}
                   className="p-5 rounded-2xl border border-[var(--border-primary)] space-y-4 transition-colors hover:shadow-lg"
                   style={{
                     backgroundColor: "var(--bg-primary)",
