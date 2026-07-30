@@ -259,27 +259,6 @@ export default function AdminCoursesPage() {
 
   const isSuperAdmin = !user?.role || user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
 
-  if (!isSuperAdmin) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh] space-y-4 text-center px-4">
-        <div className="p-5 rounded-3xl bg-[var(--accent-glow)] border border-[var(--border-accent)] text-[var(--text-accent)] shadow-xl">
-          <BookOpen size={40} />
-        </div>
-        <div className="max-w-md space-y-2">
-          <h2 className="text-2xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>Feature Under Development</h2>
-          <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-            The Learning Management System (LMS) courses feature is currently under active development and will be available for Institute Admins, Managers, and Mentors soon.
-          </p>
-        </div>
-        <div className="pt-2">
-          <span className="px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 border border-amber-500/20 text-amber-400">
-            🚧 Coming Soon
-          </span>
-        </div>
-      </div>
-    );
-  }
-
   const hasRealToken = token && !token.startsWith("demo-") && !token.startsWith("local-");
   const authHeaders = {
     "Content-Type": "application/json",
@@ -398,34 +377,38 @@ export default function AdminCoursesPage() {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-        {/* Scope tabs */}
-        <div className="flex rounded-xl overflow-hidden border border-[var(--border-primary)] shrink-0">
-          {[["all", "All"], ["global", "Global"], ["institute", "Institute"]].map(([val, label]) => (
-            <button key={val} onClick={() => { setScope(val); setSelectedInstituteId("all"); }}
-              className={`px-4 py-2 text-xs font-bold transition-colors cursor-pointer ${scope === val ? "text-[var(--text-on-accent)]" : "text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]"}`}
-              style={scope === val ? { background: "var(--accent-gradient)" } : { backgroundColor: "var(--bg-card)" }}>
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Institute Selector Dropdown */}
-        {scope === "institute" && (
-          <div className="flex items-center gap-2 animate-in fade-in duration-200 shrink-0">
-            <Building2 size={14} className="text-blue-400 shrink-0" />
-            <select
-              value={selectedInstituteId}
-              onChange={e => setSelectedInstituteId(e.target.value)}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold outline-none border border-[var(--border-primary)] transition-all cursor-pointer"
-              style={{ backgroundColor: "var(--bg-input)", color: "var(--text-primary)" }}>
-              <option value="all">All Institutes</option>
-              {institutes.map(inst => (
-                <option key={inst.id} value={inst.id}>
-                  {inst.name || inst.title || `Institute #${inst.id}`}
-                </option>
+        {/* Scope tabs (Only shown to Super Admin) */}
+        {isSuperAdmin && (
+          <>
+            <div className="flex rounded-xl overflow-hidden border border-[var(--border-primary)] shrink-0">
+              {[["all", "All"], ["global", "Global"], ["institute", "Institute"]].map(([val, label]) => (
+                <button key={val} onClick={() => { setScope(val); setSelectedInstituteId("all"); }}
+                  className={`px-4 py-2 text-xs font-bold transition-colors cursor-pointer ${scope === val ? "text-[var(--text-on-accent)]" : "text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]"}`}
+                  style={scope === val ? { background: "var(--accent-gradient)" } : { backgroundColor: "var(--bg-card)" }}>
+                  {label}
+                </button>
               ))}
-            </select>
-          </div>
+            </div>
+
+            {/* Institute Selector Dropdown (Only for Super Admin filtering institute scope) */}
+            {scope === "institute" && (
+              <div className="flex items-center gap-2 animate-in fade-in duration-200 shrink-0">
+                <Building2 size={14} className="text-blue-400 shrink-0" />
+                <select
+                  value={selectedInstituteId}
+                  onChange={e => setSelectedInstituteId(e.target.value)}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold outline-none border border-[var(--border-primary)] transition-all cursor-pointer"
+                  style={{ backgroundColor: "var(--bg-input)", color: "var(--text-primary)" }}>
+                  <option value="all">All Institutes</option>
+                  {institutes.map(inst => (
+                    <option key={inst.id} value={inst.id}>
+                      {inst.name || inst.title || `Institute #${inst.id}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </>
         )}
 
         {/* Search */}
@@ -467,10 +450,14 @@ export default function AdminCoursesPage() {
       ) : (
         <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)]">
           {/* Table Header */}
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 px-5 py-3 border-b border-[var(--border-primary)] bg-[var(--bg-secondary)] rounded-t-2xl">
-            {["Course", "Category", "Difficulty", "Chapters", "Learners", "Status", "Actions"].map(h => (
-              <span key={h} className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>{h}</span>
-            ))}
+          <div className="grid grid-cols-[2.5fr_1.2fr_1fr_1fr_1fr_1fr_150px] gap-4 px-5 py-3 border-b border-[var(--border-primary)] bg-[var(--bg-secondary)] rounded-t-2xl items-center text-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Course</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Category</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] text-center">Difficulty</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] text-center">Chapters</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] text-center">Learners</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] text-center">Status</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] text-right pr-2">Actions</span>
           </div>
           {/* Rows */}
           <AnimatePresence>
@@ -479,7 +466,7 @@ export default function AdminCoursesPage() {
                 initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.98 }}
                 transition={{ delay: i * 0.03 }}
                 onClick={() => router.push(`/admin/courses/${course.id}/content`)}
-                className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-4 px-5 py-4 border-b border-[var(--border-primary)] hover:bg-[var(--bg-hover)] transition-colors last:border-b-0 items-center cursor-pointer group/row">
+                className="grid grid-cols-[2.5fr_1.2fr_1fr_1fr_1fr_1fr_150px] gap-4 px-5 py-4 border-b border-[var(--border-primary)] hover:bg-[var(--bg-hover)] transition-colors last:border-b-0 items-center cursor-pointer group/row">
                 {/* Course name */}
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0 bg-[var(--bg-secondary)] border border-[var(--border-primary)] overflow-hidden">
@@ -495,8 +482,8 @@ export default function AdminCoursesPage() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-semibold text-sm truncate group-hover/row:text-[var(--text-accent)] transition-colors" style={{ color: "var(--text-primary)" }}>{course.title}</p>
-                    <p className="text-[10px] truncate flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
-                      {course.instituteId ? <><Building2 size={9} /> Institute</> : <><Globe size={9} /> Global</>}
+                    <p className="text-[10px] truncate flex items-center gap-1 font-medium" style={{ color: "var(--text-muted)" }}>
+                      {course.instituteId ? <><Building2 size={9} className="text-cyan-400" /> {isSuperAdmin ? (course.institute?.name || "Institute") : "Institute"}</> : <><Globe size={9} className="text-emerald-400" /> Global</>}
                       {" · "}
                       {course.isFree ? "Free" : `₹${course.offerPrice || course.price}`}
                     </p>
@@ -505,23 +492,27 @@ export default function AdminCoursesPage() {
                 {/* Category */}
                 <span className="text-xs font-medium truncate" style={{ color: "var(--text-secondary)" }}>{course.category}</span>
                 {/* Difficulty */}
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border w-fit ${DIFFICULTY_COLORS[course.difficulty]}`}>
-                  {course.difficulty}
-                </span>
+                <div className="flex justify-center">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border w-fit ${DIFFICULTY_COLORS[course.difficulty]}`}>
+                    {course.difficulty}
+                  </span>
+                </div>
                 {/* Chapters */}
-                <div className="flex items-center gap-1 text-xs" style={{ color: "var(--text-secondary)" }}>
+                <div className="flex items-center justify-center gap-1 text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
                   <Layers size={12} /> {course._count?.chapters || 0}
                 </div>
                 {/* Learners */}
-                <div className="flex items-center gap-1 text-xs" style={{ color: "var(--text-secondary)" }}>
+                <div className="flex items-center justify-center gap-1 text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
                   <Users size={12} /> {course._count?.enrollments || course.learnerCount || 0}
                 </div>
                 {/* Status */}
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border w-fit ${VISIBILITY_COLORS[course.visibility]}`}>
-                  {course.visibility}
-                </span>
+                <div className="flex justify-center">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border w-fit ${VISIBILITY_COLORS[course.visibility]}`}>
+                    {course.visibility}
+                  </span>
+                </div>
                 {/* Actions */}
-                <div className="flex items-center gap-1 shrink-0" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center gap-1 shrink-0 justify-end" onClick={e => e.stopPropagation()}>
                   {/* 1. Submissions */}
                   <div className="relative group/tip">
                     <button onClick={(e) => { e.stopPropagation(); setSubmissionsCourse(course); }}

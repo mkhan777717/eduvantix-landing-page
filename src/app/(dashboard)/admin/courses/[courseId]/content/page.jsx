@@ -1103,6 +1103,24 @@ export default function ContentBuilderPage() {
     } catch (e) { console.error(e); }
   };
 
+  const moveStep = async (chapterId, stepId, dir) => {
+    const chapter = course.chapters.find(c => c.id === chapterId);
+    if (!chapter) return;
+    const steps = chapter.steps;
+    const idx = steps.findIndex(s => s.id === stepId);
+    const newIdx = dir === "up" ? idx - 1 : idx + 1;
+    if (newIdx < 0 || newIdx >= steps.length) return;
+    const swapped = [...steps];
+    [swapped[idx], swapped[newIdx]] = [swapped[newIdx], swapped[idx]];
+    const orderList = swapped.map((s, i) => ({ id: s.id, order: i }));
+    try {
+      await fetch(`${API_BASE}/api/learn/admin/chapters/${chapterId}/steps/reorder`, {
+        method: "PATCH", headers: authHeaders(), body: JSON.stringify({ order: orderList }),
+      });
+      await loadCourse();
+    } catch (e) { console.error(e); }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -1220,13 +1238,30 @@ export default function ContentBuilderPage() {
                           return (
                             <div key={step.id}
                               onClick={() => openStep(step)}
-                              className={`flex items-center gap-2.5 px-3 py-2 mx-1 rounded-lg cursor-pointer group transition-all ${isActive ? "bg-[var(--accent-glow)] border border-[var(--border-accent)]" : "hover:bg-[var(--bg-hover)]"}`}>
+                              className={`flex items-center gap-1.5 px-2 py-2 mx-1 rounded-lg cursor-pointer group transition-all ${isActive ? "bg-[var(--accent-glow)] border border-[var(--border-accent)]" : "hover:bg-[var(--bg-hover)]"}`}>
+                              {/* Step number */}
+                              <span className="text-[9px] font-bold shrink-0 w-4 text-center" style={{ color: "var(--text-muted)" }}>{si + 1}</span>
                               <div className={`p-1 rounded-md shrink-0 ${TYPE_COLORS[step.type]}`}>
                                 <StepIcon size={11} />
                               </div>
                               <span className={`text-xs truncate flex-1 ${isActive ? "font-bold" : "font-medium"}`} style={{ color: isActive ? "var(--text-accent)" : "var(--text-primary)" }}>
                                 {step.title}
                               </span>
+                              {/* Move up/down buttons */}
+                              <div className="flex flex-col opacity-0 group-hover:opacity-100 transition-all shrink-0">
+                                <button onClick={e => { e.stopPropagation(); moveStep(chapter.id, step.id, "up"); }}
+                                  disabled={si === 0}
+                                  className="p-0.5 hover:bg-[var(--bg-hover)] rounded cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed text-[var(--text-muted)]"
+                                  title="Move step up">
+                                  <ArrowUp size={9} />
+                                </button>
+                                <button onClick={e => { e.stopPropagation(); moveStep(chapter.id, step.id, "down"); }}
+                                  disabled={si === (chapter.steps?.length ?? 0) - 1}
+                                  className="p-0.5 hover:bg-[var(--bg-hover)] rounded cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed text-[var(--text-muted)]"
+                                  title="Move step down">
+                                  <ArrowDown size={9} />
+                                </button>
+                              </div>
                               <button onClick={e => { e.stopPropagation(); setDeleteStepTarget(step); }}
                                 className="opacity-0 group-hover:opacity-100 p-1 hover:text-rose-400 transition-all cursor-pointer shrink-0" style={{ color: "var(--text-muted)" }} title="Delete Step">
                                 <Trash2 size={11} />

@@ -375,17 +375,13 @@ function CodingContent({ step, progress, onRunCode, onSubmitCode }) {
     };
   }, []);
 
-  // Initialize and hydrate editorCodes when step or progress changes
+  // Reset everything when step changes (navigation)
   useEffect(() => {
     const initial = {};
     availableLangs.forEach(l => {
-      // 1. Check local storage draft first
       const localDraft = typeof window !== "undefined" ? localStorage.getItem(`eduvantix_code_${step.id}_${l.id}`) : null;
-      // 2. Check saved codes from backend progress
       const dbSavedCode = progress?.savedCodes?.[l.id] || (progress?.codingLanguage === l.id ? progress?.codingCode : null);
-      // 3. Default starter template
       const defaultTemplate = step.starterCode?.[l.id] || DEFAULT_STARTER_TEMPLATES[l.id] || "";
-
       initial[l.id] = localDraft || dbSavedCode || defaultTemplate;
     });
 
@@ -399,7 +395,28 @@ function CodingContent({ step, progress, onRunCode, onSubmitCode }) {
     } else {
       setLang(availableLangs[0]?.id || "python");
     }
-  }, [step.id, progress]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step.id]); // Only reset UI when navigating to a different step
+
+  // Update saved codes when progress changes WITHOUT resetting the active tab/verdict
+  useEffect(() => {
+    if (!progress) return;
+    setEditorCodes(prev => {
+      const updated = { ...prev };
+      availableLangs.forEach(l => {
+        // Only update if we don't already have a local draft
+        const localDraft = typeof window !== "undefined" ? localStorage.getItem(`eduvantix_code_${step.id}_${l.id}`) : null;
+        if (!localDraft) {
+          const dbSavedCode = progress?.savedCodes?.[l.id] || (progress?.codingLanguage === l.id ? progress?.codingCode : null);
+          if (dbSavedCode && !prev[l.id]) {
+            updated[l.id] = dbSavedCode;
+          }
+        }
+      });
+      return updated;
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progress]);
 
   const currentCode = editorCodes[lang] !== undefined
     ? editorCodes[lang]
@@ -760,33 +777,107 @@ function CodingContent({ step, progress, onRunCode, onSubmitCode }) {
                 {submitting ? (
                   <div className="flex items-center gap-2 text-violet-400 py-4">
                     <RefreshCw size={14} className="animate-spin" />
-                    <span>Submitting solution to judge engine...</span>
+                    <span>Running all test cases (including hidden)...</span>
                   </div>
-                ) : verdict ? (
-                  <div className={`p-3.5 rounded-xl border text-xs whitespace-pre-wrap space-y-2 ${verdict.verdict === "ACCEPTED" || verdict.verdict === "Accepted"
-                      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
-                      : "border-rose-500/40 bg-rose-500/10 text-rose-400"
-                    }`}>
-                    <div className="font-bold flex items-center justify-between">
-                      <span className="flex items-center gap-2 text-sm">
-                        {verdict.verdict === "ACCEPTED" || verdict.verdict === "Accepted" ? <CheckCircle size={16} /> : <X size={16} />}
-                        Verdict: {verdict.verdict}
-                      </span>
-                      {verdict.totalCount !== undefined && (
-                        <span className="text-xs opacity-90 font-bold">{verdict.passedCount || 0} / {verdict.totalCount} passed</span>
+                ) : verdict ? (() => {
+                  const isAccepted = verdict.verdict === "ACCEPTED" || verdict.verdict === "Accepted";
+                  const isCompilation = verdict.verdict === "COMPILATION_ERROR" || verdict.failedTestCase?.status === "COMPILATION_ERROR";
+                  const isRuntime = verdict.verdict === "RUNTIME_ERROR" || verdict.failedTestCase?.status === "RUNTIME_ERROR";
+                  const isWrong = verdict.failedTestCase?.status === "WRONG_ANSWER";
+
+                  if (isAccepted) {
+                    return (
+                      <div className="space-y-2">
+                        {/* Big success banner */}
+                        <div className="p-5 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 text-center space-y-2">
+                          <div className="flex items-center justify-center gap-2">
+                            <Trophy size={22} className="text-yellow-400" />
+                            <span className="text-lg font-extrabold text-emerald-400">All Test Cases Passed!</span>
+                            <Sparkles size={18} className="text-yellow-400" />
+                          </div>
+                          <p className="text-emerald-300 text-xs font-semibold">
+                            ✓ {verdict.totalCount || verdict.passedCount} / {verdict.totalCount || verdict.passedCount} test cases passed (including hidden)
+                          </p>
+                          <div className="flex items-center justify-center gap-2 mt-1">
+                            <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 uppercase tracking-wide">
+                              ✓ Accepted
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="space-y-2">
+                      {/* Header row */}
+                      <div className="flex items-center justify-between">
+                        <span className={`px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wide border
+                          ${isCompilation ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                          : isRuntime ? "bg-orange-500/10 border-orange-500/30 text-orange-400"
+                          : "bg-rose-500/10 border-rose-500/30 text-rose-400"}`}>
+                          {isCompilation ? "❌ Compilation Error"
+                           : isRuntime ? "💥 Runtime Error"
+                           : isWrong ? "✗ Wrong Answer"
+                           : `✗ ${verdict.verdict || "Error"}`}
+                        </span>
+                        {verdict.totalCount !== undefined && (
+                          <span className="text-xs font-bold text-rose-400">{verdict.passedCount || 0} / {verdict.totalCount} passed</span>
+                        )}
+                      </div>
+
+                      {/* Error details */}
+                      {(isCompilation || isRuntime) && (verdict.failedTestCase?.error || verdict.output) && (
+                        <div className="p-3.5 rounded-xl border border-amber-500/20 bg-[#1e1e1e] space-y-1.5">
+                          <p className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+                            {isCompilation ? "Compilation Error on Test Case " : "Runtime Error on Test Case "}
+                            {verdict.failedTestCase?.index || ""}
+                          </p>
+                          <pre className="text-xs font-mono text-amber-200 whitespace-pre-wrap leading-relaxed">
+                            {cleanExecutionError(verdict.failedTestCase?.error || verdict.output)}
+                          </pre>
+                        </div>
+                      )}
+
+                      {/* Wrong answer details */}
+                      {isWrong && verdict.failedTestCase && (
+                        <div className="p-3.5 rounded-xl border border-rose-500/20 bg-[#1e1e1e] space-y-2">
+                          <p className="text-[10px] font-bold text-rose-400 uppercase tracking-wider">
+                            Failed on Test Case {verdict.failedTestCase.index}
+                          </p>
+                          <div className="grid grid-cols-1 gap-2 text-[11px]">
+                            <div>
+                              <span className="text-gray-400 font-bold block mb-0.5">Input:</span>
+                              <pre className="p-2 rounded bg-[#2a2a2a] text-gray-200 whitespace-pre-wrap font-mono text-xs border border-[#333]">
+                                {verdict.failedTestCase.input || "(hidden)"}
+                              </pre>
+                            </div>
+                            <div>
+                              <span className="text-emerald-400 font-bold block mb-0.5">Expected Output:</span>
+                              <pre className="p-2 rounded bg-emerald-950/40 text-emerald-300 whitespace-pre-wrap font-mono text-xs border border-emerald-500/20">
+                                {verdict.failedTestCase.expected || "(hidden)"}
+                              </pre>
+                            </div>
+                            <div>
+                              <span className="text-rose-400 font-bold block mb-0.5">Your Output:</span>
+                              <pre className="p-2 rounded bg-rose-950/40 text-rose-300 whitespace-pre-wrap font-mono text-xs border border-rose-500/20">
+                                {verdict.failedTestCase.actual || "(empty output)"}
+                              </pre>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Generic error fallback */}
+                      {!isCompilation && !isRuntime && !isWrong && verdict.output && (
+                        <div className="p-3.5 rounded-xl border border-rose-500/20 bg-[#1e1e1e]">
+                          <pre className="text-xs font-mono text-rose-300 whitespace-pre-wrap">{cleanExecutionError(verdict.output)}</pre>
+                        </div>
                       )}
                     </div>
-                    <div className="text-xs leading-relaxed opacity-95">{cleanExecutionError(verdict.output)}</div>
-                    {verdict.failedTestCase && verdict.failedTestCase.status === "WRONG_ANSWER" && (
-                      <div className="pt-2 border-t border-rose-500/20 text-xs space-y-1 text-rose-300">
-                        <div><span className="font-bold">Input:</span> {verdict.failedTestCase.input}</div>
-                        <div><span className="font-bold">Expected Output:</span> {verdict.failedTestCase.expected}</div>
-                        <div><span className="font-bold">Actual Output:</span> {verdict.failedTestCase.actual}</div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-gray-400 text-xs py-2">Click &quot;Submit Code&quot; above to submit your solution for official evaluation.</p>
+                  );
+                })() : (
+                  <p className="text-gray-400 text-xs py-2">Click &quot;Submit Code&quot; above to evaluate against all test cases (including hidden ones).</p>
                 )}
               </div>
             )}
