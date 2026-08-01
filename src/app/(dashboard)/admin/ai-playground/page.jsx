@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { getApiBase } from "@/utils/api";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE = getApiBase();
 
 const ALL_PROVIDERS = [
   { id: 'AUTO', name: 'Auto (Best Available)' },

@@ -83,6 +83,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "datamindx.in",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
     ],
   },
 };

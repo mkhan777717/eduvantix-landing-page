@@ -488,3 +488,688 @@ html.theme-dark .live-chat-sidebar-fullscreen {
   }
 }
 
+/* =============================================
+   EDUVANTIX JOURNAL — DESIGN SYSTEM
+   Scoped under .journal-root to never clash
+   with the main platform theme.
+   ============================================= */
+
+.journal-root {
+  /* ── Color Tokens (Light Theme) ─────────────── */
+  --j-bg:               #FFFFFF;
+  --j-bg-secondary:     #F8FAFC;
+  --j-bg-card:          #FFFFFF;
+  --j-bg-terminal:      #1B2233;
+  --j-text:             #0F172A;
+  --j-text-secondary:   #475569;
+  --j-text-muted:       #94A3B8;
+  --j-border:           #E2E8F0;
+  --j-border-subtle:    #F1F5F9;
+  --j-accent:           #3454D1;
+  --j-accent-hover:     #2844BE;
+  --j-accent-light:     rgba(52, 84, 209, 0.08);
+  --j-eyebrow:          #C97A1A;
+  --j-eyebrow-bg:       rgba(201, 122, 26, 0.08);
+  --j-success:          #1A7340;
+  --j-error:            #C0392B;
+  --j-warning:          #C97A1A;
+
+  /* ── Typography ───────────────────────────── */
+  --j-font-heading:     'Fraunces', 'Georgia', serif;
+  --j-font-reading:     'Source Serif 4', 'Georgia', serif;
+  --j-font-mono:        'IBM Plex Mono', 'Courier New', monospace;
+
+  /* ── Terminal Colors ──────────────────────── */
+  --j-term-green:       #4EC994;
+  --j-term-purple:      #C792EA;
+  --j-term-blue:        #89DDFF;
+  --j-term-orange:      #F78C6C;
+  --j-term-yellow:      #FFCB6B;
+  --j-term-comment:     #637777;
+  --j-term-white:       #EEFFFF;
+  --j-term-prompt:      #C3E88D;
+
+  /* ── Spacing & Sizing ─────────────────────── */
+  --j-content-width:    720px;
+  --j-prose-width:      65ch;
+  --j-gutter-width:     48px;
+  --j-header-height:    60px;
+
+  /* ── Shadows ──────────────────────────────── */
+  --j-terminal-shadow:  0 24px 64px rgba(0, 0, 0, 0.22),
+                        0 8px 24px rgba(0, 0, 0, 0.14);
+
+  background-color: var(--j-bg);
+  color: var(--j-text);
+  font-family: var(--j-font-reading);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Dark Theme Overrides for Journal ─────────────── */
+html.theme-dark .journal-root,
+.theme-dark .journal-root,
+.dark .journal-root {
+  --j-bg:               #0A0A0A;
+  --j-bg-secondary:     #121212;
+  --j-bg-card:          #121212;
+  --j-bg-terminal:      #000000;
+  --j-text:             #F8FAFC;
+  --j-text-secondary:   #CBD5E1;
+  --j-text-muted:       #64748B;
+  --j-border:           #222222;
+  --j-border-subtle:    #1A1A1A;
+  --j-accent:           #3B82F6;
+  --j-accent-hover:     #60A5FA;
+  --j-accent-light:     rgba(59, 130, 246, 0.15);
+  --j-eyebrow:          #F59E0B;
+  --j-eyebrow-bg:       rgba(245, 158, 11, 0.15);
+  --j-success:          #10B981;
+  --j-error:            #EF4444;
+  --j-warning:          #F59E0B;
+
+  background-color: var(--j-bg);
+  color: var(--j-text);
+}
+
+/* ── Journal Body Typography ─────────────────── */
+.journal-root h1,
+.journal-root h2,
+.journal-root h3,
+.journal-root h4,
+.journal-root h5,
+.journal-root h6 {
+  font-family: var(--j-font-heading);
+  color: var(--j-text);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+/* ── Monospace Interface Elements ─────────────── */
+.j-mono {
+  font-family: var(--j-font-mono);
+  font-size: 0.8125rem;  /* 13px */
+  letter-spacing: 0;
+}
+
+/* ── File Path Label ──────────────────────────── */
+.j-filepath {
+  font-family: var(--j-font-mono);
+  font-size: 0.8125rem;
+  color: var(--j-accent);
+  letter-spacing: 0;
+  opacity: 0.9;
+}
+
+/* ── Eyebrow Label ────────────────────────────── */
+.j-eyebrow {
+  font-family: var(--j-font-mono);
+  font-size: 0.6875rem;   /* 11px */
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--j-eyebrow);
+}
+
+/* ── Hairline Divider ─────────────────────────── */
+.j-divider {
+  height: 1px;
+  background: var(--j-border);
+  border: none;
+  margin: 0;
+}
+
+/* ── Article Card Hover ───────────────────────── */
+.j-article-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--j-border);
+  cursor: pointer;
+  transition: opacity 0.18s ease;
+}
+
+.j-article-row:hover .j-article-title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.j-article-row:hover {
+  opacity: 0.8;
+}
+
+/* ── Reading Progress Bar ─────────────────────── */
+.j-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: var(--j-accent);
+  z-index: 9999;
+  transition: width 0.1s linear;
+  border-radius: 0 1px 1px 0;
+}
+
+/* ── Line Number Gutter ───────────────────────── */
+.j-line-gutter {
+  display: none;
+  position: absolute;
+  left: calc(-1 * var(--j-gutter-width));
+  top: 0.25rem;
+  width: calc(var(--j-gutter-width) - 16px);
+  text-align: right;
+  font-family: var(--j-font-mono);
+  font-size: 0.6875rem;
+  color: var(--j-border);
+  user-select: none;
+  pointer-events: none;
+  line-height: 1.8;
+}
+
+@media (min-width: 1024px) {
+  .j-line-gutter {
+    display: block;
+  }
+}
+
+/* ── Terminal Window ──────────────────────────── */
+.j-terminal {
+  background: var(--j-bg-terminal);
+  border-radius: 10px;
+  box-shadow: var(--j-terminal-shadow);
+  overflow: hidden;
+}
+
+.j-terminal-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.j-terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.j-terminal-content {
+  padding: 1.25rem 1.5rem;
+  font-family: var(--j-font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--j-term-white);
+}
+
+/* ── Code Block ───────────────────────────────── */
+.j-code-block {
+  background: var(--j-bg-terminal);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1.75rem 0;
+}
+
+.j-code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: var(--j-font-mono);
+  font-size: 0.75rem;
+  color: var(--j-term-comment);
+}
+
+.j-code-content {
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  font-family: var(--j-font-mono);
+  font-size: 0.875rem;
+  line-height: 1.65;
+}
+
+/* ── Callout Blocks ───────────────────────────── */
+.j-callout {
+  border-left: 3px solid var(--j-accent);
+  background: var(--j-accent-light);
+  padding: 1rem 1.25rem;
+  border-radius: 0 6px 6px 0;
+  margin: 1.5rem 0;
+  font-family: var(--j-font-reading);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--j-text);
+}
+
+.j-callout.warning {
+  border-color: var(--j-warning);
+  background: rgba(201, 122, 26, 0.07);
+}
+
+.j-callout.success {
+  border-color: var(--j-success);
+  background: rgba(26, 115, 64, 0.07);
+}
+
+/* ── Widget Cards (Problem, Course, etc) ───────── */
+.j-widget {
+  border: 1px solid var(--j-border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 1.75rem 0;
+  background: #FFFFFF;
+}
+
+.j-widget-eyebrow {
+  font-family: var(--j-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--j-eyebrow);
+  margin-bottom: 0.5rem;
+}
+
+/* ── Tag Pills ────────────────────────────────── */
+.j-tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--j-font-mono);
+  font-size: 0.75rem;
+  color: var(--j-text-secondary);
+  background: var(--j-bg-secondary);
+  border: 1px solid var(--j-border);
+  border-radius: 4px;
+  padding: 0.2rem 0.6rem;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.j-tag:hover {
+  border-color: var(--j-accent);
+  color: var(--j-accent);
+}
+
+/* ── Difficulty Badge ─────────────────────────── */
+.j-difficulty {
+  font-family: var(--j-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.j-difficulty.beginner  { color: #1A7340; background: rgba(26, 115, 64, 0.1); }
+.j-difficulty.intermediate { color: #C97A1A; background: rgba(201, 122, 26, 0.1); }
+.j-difficulty.advanced  { color: #C0392B; background: rgba(192, 57, 43, 0.1); }
+
+/* ── Search Modal ────────────────────────────── */
+.j-search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 35, 51, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9998;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+}
+
+.j-search-modal {
+  background: #FFFFFF;
+  border: 1px solid var(--j-border);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 640px;
+  box-shadow: 0 20px 60px rgba(27, 34, 51, 0.2);
+  overflow: hidden;
+}
+
+/* ── Prose Reading Width ──────────────────────── */
+.j-prose {
+  max-width: var(--j-content-width);
+  margin-inline: auto;
+  font-family: var(--j-font-reading);
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: var(--j-text);
+}
+
+.j-prose p {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.j-prose h2 {
+  font-family: var(--j-font-heading);
+  font-size: 1.875rem;
+  font-weight: 600;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.j-prose h3 {
+  font-family: var(--j-font-heading);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.j-prose a {
+  color: var(--j-accent);
+  text-underline-offset: 3px;
+}
+
+.j-prose code {
+  font-family: var(--j-font-mono);
+  font-size: 0.875em;
+  background: var(--j-bg-secondary);
+  border: 1px solid var(--j-border);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+}
+
+.j-prose blockquote {
+  border-left: 3px solid var(--j-border);
+  margin-left: 0;
+  padding: 0.25rem 0 0.25rem 1.5rem;
+  color: var(--j-text-secondary);
+  font-style: italic;
+}
+
+/* ── Reduced motion ───────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .j-progress-bar { transition: none; }
+  .j-article-row  { transition: none; }
+}
+
+/* ── Journal Header hairline ─────────────────── */
+.j-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--j-bg);
+  border-bottom: 1px solid var(--j-border);
+  height: var(--j-header-height);
+}
+
+/* ── Cursor typing animation (terminal) ──────── */
+@keyframes j-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.j-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1em;
+  background: var(--j-term-green);
+  animation: j-cursor-blink 1.2s step-end infinite;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+}
+
+/* ── Terminal line typewriter animation ───────── */
+@keyframes j-type-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.j-term-line {
+  animation: j-type-in 0.25s ease forwards;
+}
+
+/* ── Typography & Element Primitives ────────────────────────────────────────── */
+
+.journal-root h1,
+.journal-root h2,
+.journal-root h3,
+.journal-root h4 {
+  font-family: var(--j-font-heading);
+  color: var(--j-text);
+  letter-spacing: -0.02em;
+}
+
+.journal-root .j-mono {
+  font-family: var(--j-font-mono);
+}
+
+.journal-root .j-filepath {
+  font-family: var(--j-font-mono);
+  font-size: 0.75rem;
+  color: var(--j-text-muted);
+  letter-spacing: 0.02em;
+}
+
+.journal-root .j-eyebrow {
+  font-family: var(--j-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--j-eyebrow);
+}
+
+.journal-root .j-tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--j-font-mono);
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--j-border);
+  background-color: var(--j-bg-card);
+  color: var(--j-text-secondary);
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.journal-root .j-tag:hover {
+  border-color: var(--j-accent);
+  color: var(--j-accent);
+  background-color: var(--j-accent-light);
+}
+
+.journal-root .j-divider {
+  border: 0;
+  height: 1px;
+  background-color: var(--j-border);
+  margin: 2rem 0;
+}
+
+/* ── Sticky Reading Progress Line ───────────────────────────────────────────── */
+
+.j-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background-color: var(--j-accent);
+  z-index: 9999;
+  transition: width 0.1s linear;
+}
+
+/* ── Prose Typography Wrapper (Article Body) ─────────────────────────────────── */
+
+.j-prose {
+  font-family: var(--j-font-reading);
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: var(--j-text);
+  max-width: var(--j-content-width);
+  margin: 0 auto;
+}
+
+.j-prose p {
+  margin-bottom: 1.75rem;
+}
+
+.j-prose h2 {
+  font-family: var(--j-font-heading);
+  font-size: 1.875rem;
+  font-weight: 600;
+  font-style: italic;
+  margin-top: 3rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.3;
+}
+
+.j-prose h3 {
+  font-family: var(--j-font-heading);
+  font-size: 1.375rem;
+  font-weight: 600;
+  margin-top: 2.25rem;
+  margin-bottom: 1rem;
+}
+
+.j-prose code {
+  font-family: var(--j-font-mono);
+  font-size: 0.875em;
+  background-color: var(--j-bg-secondary);
+  border: 1px solid var(--j-border-subtle);
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+  color: var(--j-text);
+}
+
+.j-prose pre {
+  background-color: var(--j-terminal-bg);
+  color: #E2E8F0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: var(--j-font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 2rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.j-prose pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+.j-prose blockquote {
+  border-left: 3px solid var(--j-accent);
+  padding-left: 1.25rem;
+  margin: 2rem 0;
+  font-style: italic;
+  color: var(--j-text-secondary);
+}
+
+.j-prose ul, .j-prose ol {
+  margin-bottom: 1.75rem;
+  padding-left: 1.5rem;
+}
+
+.j-prose li {
+  margin-bottom: 0.5rem;
+}
+
+/* ── Interactive EduVantix Widgets & Callouts ────────────────────────────────── */
+
+.j-widget {
+  background-color: var(--j-bg-secondary);
+  border: 1px solid var(--j-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+
+.j-widget-eyebrow {
+  font-family: var(--j-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--j-eyebrow);
+  margin-bottom: 0.75rem;
+}
+
+.j-callout {
+  background-color: var(--j-bg-secondary);
+  border-left: 3px solid var(--j-accent);
+  padding: 1.25rem 1.5rem;
+  margin: 2rem 0;
+  border-radius: 0 6px 6px 0;
+}
+
+.j-callout.warning {
+  border-left-color: #C97A1A;
+}
+
+.j-callout.success {
+  border-left-color: #1A7340;
+}
+
+/* ── VS Code Terminal Window ─────────────────────────────────────────────────── */
+
+.j-terminal {
+  background-color: var(--j-terminal-bg);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.j-terminal-titlebar {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.j-terminal-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.j-terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.j-terminal-content {
+  padding: 1.25rem 1.5rem;
+  font-family: var(--j-font-mono);
+  font-size: 0.8125rem;
+  color: #94A3B8;
+  line-height: 1.7;
+}
+
+/* ── Search Overlay & Modal ─────────────────────────────────────────────────── */
+
+.j-search-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(28, 35, 51, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+}
+
+.j-search-modal {
+  background-color: #FFFFFF;
+  border: 1px solid var(--j-border);
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+

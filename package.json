@@ -11,7 +11,7 @@
   "dependencies": {
     "@livekit/components-react": "^2.9.21",
     "@livekit/components-styles": "^1.2.0",
-    "@marsidev/react-turnstile": "^1.5.3",
+    "@marsidev/react-turnstile": "^1.5.4",
     "@monaco-editor/react": "^4.7.0",
     "@prisma/client": "^5.12.1",
     "@react-oauth/google": "^0.13.5",

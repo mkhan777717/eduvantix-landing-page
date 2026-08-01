@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Trophy, LogOut,
   Menu, X, ChevronLeft, ChevronRight, BookOpen, ArrowLeftRight,
   Code, Brain, Radio, AlertTriangle, FileText, Gamepad2, FileCheck, Activity, Settings, Paintbrush,
-  ShieldAlert, Layers, Users, PlusCircle, List, Bell, BellDot, CheckCircle2, Check, MessageSquare, Crown, HeartHandshake, ClipboardList, Target, Briefcase, CalendarDays
+  ShieldAlert, Layers, Users, PlusCircle, List, Bell, BellDot, CheckCircle2, Check, MessageSquare, Crown, HeartHandshake, ClipboardList, Target, Briefcase, CalendarDays, Newspaper
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/context/AuthContext";
@@ -454,6 +454,7 @@ export default function DashboardLayout({ children }) {
       { label: "Contest Arena", href: "/contest", icon: Trophy },
       { label: "Exam Center", href: "/exams", icon: FileText },
       { label: "Discuss Forum", href: "/discuss", icon: MessageSquare },
+      { label: "Journal / Blog", href: "/journal", icon: Newspaper },
       { label: "AI Viva", href: "/student/viva", icon: Brain },
       { label: "AI Agents", href: "/student/ai-agents", icon: Brain },
       { label: "Live Sessions", href: "/live-classes", icon: Radio },
@@ -480,6 +481,7 @@ export default function DashboardLayout({ children }) {
       isInstAdmin && { label: "Manage People", href: "/admin/people", icon: Users, featureFlag: "allowedManagePeople" },
       isBatchMgr && canShowFeature("allowedManageBatches") && { label: "My Batches", href: "/admin/batch-manager", icon: Layers, featureFlag: "allowedManageBatches" },
       { label: "Discuss Forum", href: "/discuss", icon: MessageSquare },
+      { label: "Journal / Blog", href: "/journal", icon: Newspaper },
       (isBatchMgr || isInstAdmin || isMentor) && canShowFeature("allowedAiViva") && { label: "AI Viva", href: "/mentor/viva/questions", icon: Brain, featureFlag: "allowedAiViva" },
       (isBatchMgr || isInstAdmin || isMentor) && canShowFeature("allowedStudyMaterial") && { label: "Study Materials", href: "/mentor/viva/materials", icon: FileText, featureFlag: "allowedStudyMaterial" },
       isSuperAdmin && { label: "AI Viva", href: "/admin/viva/ai-settings", icon: Brain },
