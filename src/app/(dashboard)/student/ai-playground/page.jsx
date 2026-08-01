@@ -236,6 +236,30 @@ export default function AIPlaygroundPage() {
               </div>
             </div>
 
+            {response.routing && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-md">
+                <h3 className="font-semibold text-blue-800 mb-2">Routing Metadata</h3>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  <li><strong>Requested Model:</strong> {response.routing.requestedModel}</li>
+                  <li><strong>Actual Model:</strong> {response.routing.actualModel}</li>
+                  <li><strong>Actual Provider:</strong> {response.routing.actualProvider}</li>
+                  <li><strong>Fallback Used:</strong> {response.routing.fallbackUsed ? 'Yes' : 'No'}</li>
+                  <li><strong>Retry Count:</strong> {response.routing.retryCount}</li>
+                </ul>
+                
+                {response.routing.warnings && response.routing.warnings.length > 0 && (
+                  <div className="mt-3">
+                    <strong className="text-xs text-orange-600 uppercase">Warnings:</strong>
+                    <ul className="mt-1 list-disc pl-5 text-sm text-orange-700">
+                      {response.routing.warnings.map((w, i) => (
+                        <li key={i}>{w}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
             <details className="mt-4">
               <summary className="text-xs text-gray-400 cursor-pointer">Raw JSON</summary>
               <pre className="text-xs text-gray-700 bg-gray-100 rounded p-3 mt-2 overflow-auto max-h-64">
