@@ -927,40 +927,6 @@ html.theme-dark .journal-root,
   animation: j-type-in 0.25s ease forwards;
 }
 
-/* ==========================================================================
-   EDUVANTIX JOURNAL DESIGN SYSTEM (WARM PAPER / TYPESET NOTEBOOK AESTHETIC)
-   ========================================================================== */
-
-.journal-root {
-  /* Typography Tokens */
-  --j-font-heading: 'Fraunces', Georgia, serif;
-  --j-font-reading: 'Source Serif 4', Georgia, serif;
-  --j-font-mono: 'IBM Plex Mono', Menlo, Consolas, monospace;
-
-  /* Color Palette — Clean Engineering Notebook */
-  --j-bg: #FFFFFF;
-  --j-bg-secondary: #F8FAFC;
-  --j-text: #0F172A;
-  --j-text-secondary: #475569;
-  --j-text-muted: #94A3B8;
-  --j-border: #E2E8F0;
-  --j-border-subtle: #F1F5F9;
-  --j-accent: #3454D1;
-  --j-accent-light: rgba(52, 84, 209, 0.08);
-  --j-eyebrow: #C97A1A;
-  --j-terminal-bg: #1B2233;
-
-  /* Content Boundaries */
-  --j-max-width: 1200px;
-  --j-content-width: 740px;
-
-  background-color: var(--j-bg);
-  color: var(--j-text);
-  font-family: var(--j-font-reading);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 /* ── Typography & Element Primitives ────────────────────────────────────────── */
 
 .journal-root h1,
@@ -1000,14 +966,15 @@ html.theme-dark .journal-root,
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
   border: 1px solid var(--j-border);
-  background-color: #FFFFFF;
+  background-color: var(--j-bg-card);
   color: var(--j-text-secondary);
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
 }
 
 .journal-root .j-tag:hover {
   border-color: var(--j-accent);
   color: var(--j-accent);
+  background-color: var(--j-accent-light);
 }
 
 .journal-root .j-divider {
