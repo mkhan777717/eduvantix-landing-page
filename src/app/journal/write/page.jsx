@@ -8,9 +8,9 @@ import {
   Shield, ChevronRight, X, Image as ImageIcon, Send, ArrowLeft, Lock, Loader2
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { buildAuthHeaders } from "@/utils/api";
+import { buildAuthHeaders, getApiBase } from "@/utils/api";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API = getApiBase();
 
 function JournalEditorContent() {
   const router = useRouter();
