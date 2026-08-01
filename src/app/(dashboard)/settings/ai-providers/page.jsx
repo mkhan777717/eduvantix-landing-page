@@ -145,6 +145,32 @@ export default function AIProvidersSettingsPage() {
             const isConnected = !!connectedInfo;
             const msg = messages[sp.id];
             
+            const isHealthy = connectedInfo?.providerStatus === 'CONNECTED';
+            const statusColor = isHealthy ? 'text-emerald-500' : 'text-rose-500';
+            const statusBg = isHealthy ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-rose-500/10 border-rose-500/20';
+            
+            const handleRefresh = async () => {
+              setConnecting(sp.id); // Reusing connecting state for loading
+              setMessages(prev => ({ ...prev, [sp.id]: null }));
+              try {
+                const res = await fetch(`${API_BASE}/api/ai/providers/${sp.id}/refresh`, {
+                  method: "POST",
+                  headers: getHeaders()
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                  setMessages(prev => ({ ...prev, [sp.id]: { type: 'success', text: data.message } }));
+                  fetchProviders();
+                } else {
+                  setMessages(prev => ({ ...prev, [sp.id]: { type: 'error', text: data.message || 'Refresh failed' } }));
+                }
+              } catch {
+                setMessages(prev => ({ ...prev, [sp.id]: { type: 'error', text: 'Network Error' } }));
+              } finally {
+                setConnecting(null);
+              }
+            };
+
             return (
               <div key={sp.id} className="p-6 rounded-2xl border border-[var(--border-primary)] space-y-5 transition-all hover:bg-[var(--bg-secondary)]" style={{ backgroundColor: "var(--bg-primary)" }}>
                 <div className="flex justify-between items-start">
@@ -152,66 +178,78 @@ export default function AIProvidersSettingsPage() {
                     <span className="text-3xl">{sp.icon}</span>
                     <h3 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>{sp.name}</h3>
                   </div>
-                  <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border flex items-center gap-1.5 ${isConnected ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-zinc-500/10 border-zinc-500/20 text-[var(--text-muted)]'}`}>
-                    {isConnected ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
-                    {isConnected ? "Connected" : "Disconnected"}
+                  <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border flex items-center gap-1.5 ${isConnected ? statusBg + ' ' + statusColor : 'bg-zinc-500/10 border-zinc-500/20 text-[var(--text-muted)]'}`}>
+                    {isConnected ? (isHealthy ? <CheckCircle2 size={12} /> : <XCircle size={12} />) : <XCircle size={12} />}
+                    {isConnected ? (connectedInfo.providerStatus || "Connected") : "Disconnected"}
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
-                    API Key
-                  </label>
-                  
                   {isConnected ? (
-                    <div className="flex items-center justify-between p-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] text-sm font-mono text-[var(--text-secondary)]">
-                      <div className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-                        <Key size={14} className="shrink-0" />
-                        <span>AIza********************X9A</span>
+                    <>
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        <div className="p-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] text-sm">
+                          <div className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--text-muted)" }}>Models</div>
+                          <div className="font-bold text-[var(--text-primary)]">{connectedInfo.modelCount || 0}</div>
+                        </div>
+                        <div className="p-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)] text-sm">
+                          <div className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "var(--text-muted)" }}>Last Synced</div>
+                          <div className="font-bold text-[var(--text-primary)] truncate" title={connectedInfo.lastSyncedAt ? new Date(connectedInfo.lastSyncedAt).toLocaleString() : 'Never'}>
+                            {connectedInfo.lastSyncedAt ? new Date(connectedInfo.lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Never'}
+                          </div>
+                        </div>
                       </div>
-                      <button 
-                        onClick={() => handleDisconnect(sp.id)}
-                        disabled={disconnecting === sp.id}
-                        className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10 transition-colors shrink-0"
-                        title="Disconnect Provider"
-                      >
-                        {disconnecting === sp.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-                      </button>
-                    </div>
+                      
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleRefresh}
+                          disabled={connecting === sp.id}
+                          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] font-semibold text-sm rounded-xl hover:bg-[var(--accent-primary)]/20 transition-colors disabled:opacity-50"
+                        >
+                          {connecting === sp.id ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                          Refresh Models
+                        </button>
+                        <button 
+                          onClick={() => handleDisconnect(sp.id)}
+                          disabled={disconnecting === sp.id}
+                          className="px-3 py-2 rounded-xl text-rose-500 bg-rose-500/10 hover:bg-rose-500/20 transition-colors shrink-0 flex items-center justify-center font-semibold text-sm"
+                          title="Disconnect Provider"
+                        >
+                          {disconnecting === sp.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                          Disconnect
+                        </button>
+                      </div>
+                    </>
                   ) : (
-                    <div className="relative">
-                      <input
-                        type="password"
-                        placeholder={`Enter ${sp.name} API Key`}
-                        value={apiKeys[sp.id] || ""}
-                        onChange={(e) => setApiKeys(prev => ({ ...prev, [sp.id]: e.target.value }))}
-                        className="w-full bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--text-muted)] transition-colors text-[var(--text-primary)]"
-                        disabled={connecting === sp.id}
-                      />
-                    </div>
+                    <>
+                      <label className="block text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+                        API Key
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="password"
+                          placeholder={`Enter ${sp.name} API Key`}
+                          value={apiKeys[sp.id] || ""}
+                          onChange={(e) => setApiKeys(prev => ({ ...prev, [sp.id]: e.target.value }))}
+                          className="w-full bg-[var(--bg-secondary)] border border-[var(--border-primary)] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--text-muted)] transition-colors text-[var(--text-primary)]"
+                          disabled={connecting === sp.id}
+                        />
+                      </div>
+                      <button
+                        onClick={() => handleConnect(sp.id)}
+                        disabled={connecting === sp.id || !apiKeys[sp.id]}
+                        className="w-full mt-2 flex items-center justify-center gap-2 px-5 py-2.5 bg-[var(--accent-primary)] text-[var(--text-on-accent)] font-semibold text-sm rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+                      >
+                        {connecting === sp.id ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                        Connect
+                      </button>
+                    </>
                   )}
                   
                   {msg && (
-                    <p className={`text-xs font-semibold ${msg.type === 'success' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                    <p className={`text-xs font-semibold mt-2 ${msg.type === 'success' ? 'text-emerald-500' : 'text-rose-500'}`}>
                       {msg.text}
                     </p>
-                  )}
-
-                  {!isConnected && (
-                    <button
-                      onClick={() => handleConnect(sp.id)}
-                      disabled={connecting === sp.id || !apiKeys[sp.id]}
-                      className="w-full mt-2 flex items-center justify-center gap-2 px-5 py-2.5 bg-[var(--accent-primary)] text-[var(--text-on-accent)] font-semibold text-sm rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
-                    >
-                      {connecting === sp.id ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                      Connect
-                    </button>
-                  )}
-                  
-                  {isConnected && (
-                    <div className="pt-2 text-xs" style={{ color: "var(--text-muted)" }}>
-                      Update key by disconnecting first, or contact support for assistance.
-                    </div>
                   )}
                 </div>
               </div>
