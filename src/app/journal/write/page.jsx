@@ -5,18 +5,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Save, Eye, CheckCircle2, Clock, FileCode, Search, Sparkles, AlertCircle,
-  HelpCircle, ChevronRight, X, Image as ImageIcon, Send, ArrowLeft
+  Shield, ChevronRight, X, Image as ImageIcon, Send, ArrowLeft, Lock
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { getApiBase, buildAuthHeaders } from "@/utils/api";
+import { buildAuthHeaders } from "@/utils/api";
 
-const API = getApiBase();
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 function JournalEditorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editSlug = searchParams.get("slug");
   const { user } = useAuth();
+
+  const isSuperAdmin = user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
 
   // Form State
   const [title, setTitle] = useState("");
@@ -33,6 +35,7 @@ function JournalEditorContent() {
   const [rejectionReason, setRejectionReason] = useState("");
   const [categories, setCategories] = useState([]);
   const [notificationMsg, setNotificationMsg] = useState("");
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
 
   // UI Drawer states
   const [activeDrawer, setActiveDrawer] = useState(null); // 'seo' | 'workflow' | 'blocks' | 'revisions'
@@ -159,7 +162,7 @@ function JournalEditorContent() {
         const msg = data.article.status === "PUBLISHED"
           ? "✓ Article Published & Live!"
           : data.article.status === "IN_REVIEW"
-          ? "⏳ Article submitted for Super Admin approval!"
+          ? "⏳ Publishing permission request sent to Super Admin!"
           : "✓ Draft Saved!";
         setNotificationMsg(msg);
         setTimeout(() => setNotificationMsg(""), 5000);
@@ -179,8 +182,18 @@ function JournalEditorContent() {
 
   // Status Workflow Change Handler
   const handleStatusChange = async (newStatus) => {
+    if (newStatus === "PUBLISHED" && !isSuperAdmin) {
+      setShowPermissionModal(true);
+      return;
+    }
     setStatus(newStatus);
     handleSaveArticle(false, newStatus);
+  };
+
+  const confirmSubmitPermission = () => {
+    setShowPermissionModal(false);
+    setStatus("IN_REVIEW");
+    handleSaveArticle(false, "IN_REVIEW");
   };
 
   // Insert Custom Block into Editor HTML
@@ -206,10 +219,44 @@ function JournalEditorContent() {
       {/* ── Notification Banner ────────────────────────────────────────────── */}
       {notificationMsg && (
         <div
-          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full shadow-lg text-xs font-semibold text-white transition-all"
+          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full shadow-lg text-xs font-semibold text-white transition-all flex items-center gap-2"
           style={{ background: "var(--j-accent)", fontFamily: "var(--j-font-mono)" }}
         >
           {notificationMsg}
+        </div>
+      )}
+
+      {/* ── Permission Request Modal ──────────────────────────────────────── */}
+      {showPermissionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border" style={{ borderColor: "var(--j-border)" }}>
+            <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mb-4">
+              <Shield size={24} />
+            </div>
+            <h3 className="text-xl font-bold mb-2" style={{ fontFamily: "var(--j-font-heading)" }}>
+              Super Admin Permission Required
+            </h3>
+            <p className="text-xs leading-relaxed text-slate-600 mb-6" style={{ fontFamily: "var(--j-font-reading)" }}>
+              Your blog post will be sent as a publishing permission request to the <strong>Super Admin</strong> for editorial review. It will not be visible publicly until the Super Admin approves and publishes it on EduVantix.
+            </p>
+
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setShowPermissionModal(false)}
+                className="px-4 py-2 rounded-lg text-xs font-medium border text-slate-600 hover:bg-slate-50"
+                style={{ fontFamily: "var(--j-font-mono)" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmSubmitPermission}
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 shadow-sm flex items-center gap-1.5"
+                style={{ fontFamily: "var(--j-font-mono)" }}
+              >
+                <Shield size={13} /> Send Permission Request
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -229,11 +276,11 @@ function JournalEditorContent() {
           <span
             className="j-mono text-xs px-2 py-0.5 rounded font-medium"
             style={{
-              background: status === "PUBLISHED" ? "rgba(26,115,64,0.12)" : "var(--j-bg-secondary)",
-              color: status === "PUBLISHED" ? "#1A7340" : "var(--j-text-secondary)",
+              background: status === "PUBLISHED" ? "rgba(26,115,64,0.12)" : status === "IN_REVIEW" ? "rgba(201,122,26,0.12)" : "var(--j-bg-secondary)",
+              color: status === "PUBLISHED" ? "#1A7340" : status === "IN_REVIEW" ? "#C97A1A" : "var(--j-text-secondary)",
             }}
           >
-            {status}
+            {status === "IN_REVIEW" ? "PENDING PERMISSION" : status}
           </span>
           {lastSavedAt && (
             <span className="j-mono text-[11px]" style={{ color: "var(--j-text-muted)" }}>
@@ -284,17 +331,31 @@ function JournalEditorContent() {
           </button>
 
           <button
-            onClick={() => setActiveDrawer(activeDrawer === "workflow" ? null : "workflow")}
+            onClick={() => handleStatusChange("PUBLISHED")}
             className="px-4 py-1.5 rounded text-xs font-medium flex items-center gap-1.5 text-white transition-opacity hover:opacity-90 shadow-sm"
-            style={{ fontFamily: "var(--j-font-mono)", background: "var(--j-accent)" }}
+            style={{ fontFamily: "var(--j-font-mono)", background: isSuperAdmin ? "var(--j-accent)" : "#D97706" }}
           >
-            <Send size={12} /> Publish / Workflow
+            {isSuperAdmin ? <Send size={12} /> : <Shield size={12} />}
+            {isSuperAdmin ? "Publish Article" : "Request Super Admin Permission"}
           </button>
         </div>
       </header>
 
       {/* ── Main Editor Canvas ─────────────────────────────────────────────── */}
       <div className="flex-1 max-w-4xl w-full mx-auto px-6 py-10 relative">
+
+        {/* Permission Request Banner */}
+        {status === "IN_REVIEW" && (
+          <div className="p-4 rounded-md border mb-6 flex items-start gap-3 bg-amber-50 border-amber-300">
+            <Shield size={18} className="text-amber-700 mt-0.5 shrink-0" />
+            <div>
+              <p className="j-mono text-xs font-bold uppercase tracking-wider text-amber-800">Publishing Permission Requested</p>
+              <p className="text-xs mt-1 text-amber-900" style={{ fontFamily: "var(--j-font-reading)" }}>
+                Your article is currently pending Super Admin permission and review. Once approved, it will automatically go live across the platform.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Rejection Alert if applicable */}
         {status === "REJECTED" && rejectionReason && (
@@ -516,9 +577,9 @@ function JournalEditorContent() {
           </div>
           <div className="space-y-3">
             {[
-              { statusKey: "PUBLISHED", label: "🚀 Publish Article", desc: "Make public on Journal immediately" },
+              { statusKey: "PUBLISHED", label: isSuperAdmin ? "🚀 Publish Article" : "🛡️ Request Super Admin Permission", desc: isSuperAdmin ? "Make public on Journal immediately" : "Send publishing permission request to Super Admin" },
               { statusKey: "DRAFT", label: "Save as Draft", desc: "Keep private while writing" },
-              { statusKey: "IN_REVIEW", label: "Submit for Review", desc: "Send to editorial queue" },
+              { statusKey: "IN_REVIEW", label: "Submit for Permission", desc: "Send to Super Admin queue" },
               { statusKey: "ARCHIVED", label: "Archive Article", desc: "Unpublish from public listing" },
             ].map(({ statusKey, label, desc }) => (
               <button
