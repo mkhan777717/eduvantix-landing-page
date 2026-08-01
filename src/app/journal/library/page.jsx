@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Bookmark, FolderPlus, Clock, BookOpen, Trash2, ArrowRight } from "lucide-react";
+import { Bookmark, FolderPlus, Clock, BookOpen, Trash2, ArrowRight, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { getApiBase, buildAuthHeaders } from "@/utils/api";
 
@@ -58,6 +58,15 @@ export default function PersonalLibraryPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-5 py-12" style={{ color: "var(--j-text)" }}>
+
+      {/* Back arrow navigation */}
+      <Link
+        href="/journal"
+        className="inline-flex items-center gap-1.5 text-xs font-semibold mb-6 transition-colors hover:text-[var(--j-accent)]"
+        style={{ fontFamily: "var(--j-font-mono)", color: "var(--j-text-muted)" }}
+      >
+        <ArrowLeft size={14} /> Back to Journal
+      </Link>
 
       {/* Header */}
       <div className="mb-8 pb-6 border-b" style={{ borderColor: "var(--j-border)" }}>

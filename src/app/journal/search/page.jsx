@@ -4,7 +4,8 @@ import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArticleCard } from "@/components/journal/cards/ArticleCards";
 import { TagPill, DifficultyBadge } from "@/components/journal/ui/JournalUI";
-import { Search, X } from "lucide-react";
+import { Search, X, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { getApiBase } from "@/utils/api";
 
 const API = getApiBase();
@@ -87,6 +88,15 @@ function SearchPageContent() {
 
   return (
     <div className="max-w-7xl mx-auto px-5 py-12">
+      {/* Back arrow navigation */}
+      <Link
+        href="/journal"
+        className="inline-flex items-center gap-1.5 text-xs font-semibold mb-6 transition-colors hover:text-[var(--j-accent)]"
+        style={{ fontFamily: "var(--j-font-mono)", color: "var(--j-text-muted)" }}
+      >
+        <ArrowLeft size={14} /> Back to Journal
+      </Link>
+
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-12">
 
         {/* ── Filters sidebar ─────────────────── */}
