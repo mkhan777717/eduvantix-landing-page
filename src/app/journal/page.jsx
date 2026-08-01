@@ -156,7 +156,14 @@ export default async function JournalHomePage() {
         </div>
 
         {/* Action button */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <Link
+            href="/journal/admin"
+            className="px-4 py-2 rounded-full text-xs font-semibold border flex items-center gap-1.5 transition-colors hover:border-[var(--j-accent)]"
+            style={{ fontFamily: "var(--j-font-mono)", borderColor: "var(--j-border)", background: "var(--j-bg-secondary)", color: "var(--j-accent)" }}
+          >
+            🛡️ Admin Moderation
+          </Link>
           <Link
             href="/journal/write"
             className="px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 text-white transition-opacity hover:opacity-90 shadow-sm"
