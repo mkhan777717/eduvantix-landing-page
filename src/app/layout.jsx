@@ -279,6 +279,11 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Instrument+Serif:ital@0;1&display=swap"
           rel="stylesheet"
         />
+        {/* ── Journal Fonts (Fraunces + Source Serif 4 + IBM Plex Mono) ── */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"
+          rel="stylesheet"
+        />
 
         {/* ── Favicon ──────────────────────── */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
