@@ -456,6 +456,7 @@ export default function DashboardLayout({ children }) {
       { label: "Discuss Forum", href: "/discuss", icon: MessageSquare },
       { label: "Journal / Blog", href: "/journal", icon: Newspaper },
       { label: "AI Viva", href: "/student/viva", icon: Brain },
+      { label: "AI Agents", href: "/student/ai-agents", icon: Brain },
       { label: "Live Sessions", href: "/live-classes", icon: Radio },
       { label: "Learn with Games", href: "/student/games", icon: Gamepad2 },
       { label: "Events", href: "/events", icon: CalendarDays },
