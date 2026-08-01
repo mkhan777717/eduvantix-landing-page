@@ -220,7 +220,7 @@ export default async function JournalHomePage() {
             className="w-full pl-9 pr-4 py-2 rounded-full border text-xs outline-none transition-colors focus:border-[#10B981]"
             style={{
               fontFamily: "var(--j-font-mono)",
-              background: "#FFFFFF",
+              background: "var(--j-bg-card)",
               borderColor: "var(--j-border)",
               color: "var(--j-text)",
             }}
@@ -384,11 +384,11 @@ export default async function JournalHomePage() {
           </div>
 
           {/* ── Sidebar ─────────────────────────────────────────────────── */}
-          <aside aria-label="Sidebar">
+          <aside aria-label="Sidebar" className="space-y-10">
 
-            {/* Popular this week */}
+            {/* Popular this week / Trending */}
             {popular.length > 0 && (
-              <div className="mb-10 sticky top-[76px]">
+              <div>
                 <h2
                   className="text-sm font-medium mb-4"
                   style={{
@@ -410,7 +410,7 @@ export default async function JournalHomePage() {
                     >
                       <span
                         className="text-xl font-bold leading-none mt-1 shrink-0"
-                        style={{ fontFamily: "var(--j-font-heading)", color: "var(--j-border)" }}
+                        style={{ fontFamily: "var(--j-font-heading)", color: "var(--j-text-muted)" }}
                       >
                         {String(i + 1).padStart(2, "0")}
                       </span>
@@ -441,7 +441,7 @@ export default async function JournalHomePage() {
 
             {/* Categories */}
             {categories.length > 0 && (
-              <div className="mb-10">
+              <div>
                 <h2
                   className="text-sm font-medium mb-4"
                   style={{
@@ -458,7 +458,8 @@ export default async function JournalHomePage() {
                     <Link
                       key={cat.slug}
                       href={`/journal/category/${cat.slug}`}
-                      className="flex items-center justify-between py-1.5 group"
+                      className="flex items-center justify-between py-1.5 group border-b border-dashed"
+                      style={{ borderColor: "var(--j-border-subtle)" }}
                     >
                       <span
                         className="text-sm group-hover:text-[var(--j-accent)] transition-colors"
@@ -467,8 +468,8 @@ export default async function JournalHomePage() {
                         {cat.name}
                       </span>
                       <span
-                        className="text-xs"
-                        style={{ fontFamily: "var(--j-font-mono)", color: "var(--j-text-muted)" }}
+                        className="text-xs font-semibold px-2 py-0.5 rounded"
+                        style={{ fontFamily: "var(--j-font-mono)", color: "var(--j-text-muted)", background: "var(--j-bg-secondary)" }}
                       >
                         {cat.articleCount || 0}
                       </span>

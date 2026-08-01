@@ -495,9 +495,10 @@ html.theme-dark .live-chat-sidebar-fullscreen {
    ============================================= */
 
 .journal-root {
-  /* ── Color Tokens ─────────────────────────── */
+  /* ── Color Tokens (Light Theme) ─────────────── */
   --j-bg:               #FFFFFF;
   --j-bg-secondary:     #F8FAFC;
+  --j-bg-card:          #FFFFFF;
   --j-bg-terminal:      #1B2233;
   --j-text:             #0F172A;
   --j-text-secondary:   #475569;
@@ -534,15 +535,40 @@ html.theme-dark .live-chat-sidebar-fullscreen {
   --j-gutter-width:     48px;
   --j-header-height:    60px;
 
-  /* ── Shadows (terminal is the only one) ────── */
-  --j-terminal-shadow:  0 24px 64px rgba(27, 34, 51, 0.22),
-                        0 8px 24px rgba(27, 34, 51, 0.14);
+  /* ── Shadows ──────────────────────────────── */
+  --j-terminal-shadow:  0 24px 64px rgba(0, 0, 0, 0.22),
+                        0 8px 24px rgba(0, 0, 0, 0.14);
 
-  /* Force journal background */
   background-color: var(--j-bg);
   color: var(--j-text);
   font-family: var(--j-font-reading);
   -webkit-font-smoothing: antialiased;
+}
+
+/* ── Dark Theme Overrides for Journal ─────────────── */
+html.theme-dark .journal-root,
+.theme-dark .journal-root,
+.dark .journal-root {
+  --j-bg:               #0A0A0A;
+  --j-bg-secondary:     #121212;
+  --j-bg-card:          #121212;
+  --j-bg-terminal:      #000000;
+  --j-text:             #F8FAFC;
+  --j-text-secondary:   #CBD5E1;
+  --j-text-muted:       #64748B;
+  --j-border:           #222222;
+  --j-border-subtle:    #1A1A1A;
+  --j-accent:           #3B82F6;
+  --j-accent-hover:     #60A5FA;
+  --j-accent-light:     rgba(59, 130, 246, 0.15);
+  --j-eyebrow:          #F59E0B;
+  --j-eyebrow-bg:       rgba(245, 158, 11, 0.15);
+  --j-success:          #10B981;
+  --j-error:            #EF4444;
+  --j-warning:          #F59E0B;
+
+  background-color: var(--j-bg);
+  color: var(--j-text);
 }
 
 /* ── Journal Body Typography ─────────────────── */
@@ -901,40 +927,6 @@ html.theme-dark .live-chat-sidebar-fullscreen {
   animation: j-type-in 0.25s ease forwards;
 }
 
-/* ==========================================================================
-   EDUVANTIX JOURNAL DESIGN SYSTEM (WARM PAPER / TYPESET NOTEBOOK AESTHETIC)
-   ========================================================================== */
-
-.journal-root {
-  /* Typography Tokens */
-  --j-font-heading: 'Fraunces', Georgia, serif;
-  --j-font-reading: 'Source Serif 4', Georgia, serif;
-  --j-font-mono: 'IBM Plex Mono', Menlo, Consolas, monospace;
-
-  /* Color Palette — Clean Engineering Notebook */
-  --j-bg: #FFFFFF;
-  --j-bg-secondary: #F8FAFC;
-  --j-text: #0F172A;
-  --j-text-secondary: #475569;
-  --j-text-muted: #94A3B8;
-  --j-border: #E2E8F0;
-  --j-border-subtle: #F1F5F9;
-  --j-accent: #3454D1;
-  --j-accent-light: rgba(52, 84, 209, 0.08);
-  --j-eyebrow: #C97A1A;
-  --j-terminal-bg: #1B2233;
-
-  /* Content Boundaries */
-  --j-max-width: 1200px;
-  --j-content-width: 740px;
-
-  background-color: var(--j-bg);
-  color: var(--j-text);
-  font-family: var(--j-font-reading);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 /* ── Typography & Element Primitives ────────────────────────────────────────── */
 
 .journal-root h1,
@@ -974,14 +966,15 @@ html.theme-dark .live-chat-sidebar-fullscreen {
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
   border: 1px solid var(--j-border);
-  background-color: #FFFFFF;
+  background-color: var(--j-bg-card);
   color: var(--j-text-secondary);
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
 }
 
 .journal-root .j-tag:hover {
   border-color: var(--j-accent);
   color: var(--j-accent);
+  background-color: var(--j-accent-light);
 }
 
 .journal-root .j-divider {

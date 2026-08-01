@@ -149,7 +149,7 @@ export default function AdminCMSPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Filter title or author..."
             className="w-full pl-8 pr-3 py-1.5 rounded-full border text-xs outline-none"
-            style={{ fontFamily: "var(--j-font-mono)", borderColor: "var(--j-border)", background: "#FFFFFF", color: "var(--j-text)" }}
+            style={{ fontFamily: "var(--j-font-mono)", borderColor: "var(--j-border)", background: "var(--j-bg-card)", color: "var(--j-text)" }}
           />
           <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--j-text-muted)" }} />
         </form>
@@ -164,7 +164,7 @@ export default function AdminCMSPage() {
             <p className="j-mono text-sm" style={{ color: "var(--j-text-muted)" }}>No articles found for filter &quot;{statusFilter}&quot;.</p>
           </div>
         ) : (
-          <div className="divide-y border rounded-lg overflow-hidden" style={{ borderColor: "var(--j-border)", background: "#FFFFFF" }}>
+          <div className="divide-y border rounded-lg overflow-hidden" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)" }}>
             {articles.map((article) => (
               <div key={article.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[var(--j-bg-secondary)] transition-colors">
                 <div className="min-w-0 flex-1">
