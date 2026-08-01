@@ -10,7 +10,8 @@ import { useAuth } from "@/context/AuthContext";
 import useThemeStore from "@/store/useThemeStore";
 
 const navItems = [
-  { name: "Free Courses", href: "/courses" }
+  { name: "Free Courses", href: "/courses" },
+  { name: "Blogs", href: "/journal" }
 ];
 
 export default function Navbar({ type = 1 }) {
@@ -277,7 +278,7 @@ export default function Navbar({ type = 1 }) {
             <Link
               href="/"
               className="flex items-start cursor-pointer"
-         
+
               style={{ color: "var(--text-primary)" }}
             >
               <div className="w-full">
@@ -296,7 +297,7 @@ export default function Navbar({ type = 1 }) {
                   <a
                     href={item.href}
                     className="block px-3 py-2 text-sm font-medium transition-colors duration-200 underline-draw cursor-pointer"
-               
+
                     style={{ color: "var(--text-secondary)" }}
                     onMouseEnter={e => e.currentTarget.style.color = "var(--text-primary)"}
                     onMouseLeave={e => e.currentTarget.style.color = "var(--text-secondary)"}
@@ -318,7 +319,7 @@ export default function Navbar({ type = 1 }) {
                 >
                   <button
                     className="relative flex items-center gap-1.5 px-4 py-2 text-sm font-semibold transition-colors outline-none curser-pointer rounded-full border"
-               
+
                     style={{
                       color: isSignInDropdownOpen ? "var(--text-accent)" : "var(--text-secondary)",
                       backgroundColor: "var(--bg-card)",

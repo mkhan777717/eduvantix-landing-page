@@ -12,16 +12,32 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
         brand: {
-          purple: "#6366f1", // indigo-500
-          cyan: "#06b6d4",   // cyan-500
-          fuchsia: "#d946ef", // fuchsia-500
-          dark: "#030014",    // deep space dark
+          purple:  "#6366f1",
+          cyan:    "#06b6d4",
+          fuchsia: "#d946ef",
+          dark:    "#030014",
+        },
+        // EduVantix Journal palette
+        journal: {
+          bg:         "#FFFFFF",
+          bgSecond:   "#F8FAFC",
+          terminal:   "#1B2233",
+          text:       "#0F172A",
+          textSecond: "#475569",
+          textMuted:  "#94A3B8",
+          border:     "#E2E8F0",
+          accent:     "#3454D1",
+          eyebrow:    "#C97A1A",
         },
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
-        serif: ["var(--font-serif)", "Georgia", "serif"],
-        display: ["var(--font-sans)", "sans-serif"],
+        sans:       ["var(--font-sans)", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        serif:      ["var(--font-serif)", "Georgia", "serif"],
+        display:    ["var(--font-sans)", "sans-serif"],
+        // Journal fonts
+        fraunces:   ["Fraunces", "Georgia", "serif"],
+        sourceSerif:["Source Serif 4", "Georgia", "serif"],
+        ibmMono:    ["IBM Plex Mono", "Courier New", "monospace"],
       },
       animation: {
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
