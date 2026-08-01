@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Save, Eye, CheckCircle2, Clock, FileCode, Search, Sparkles, AlertCircle,
-  Shield, ChevronRight, X, Image as ImageIcon, Send, ArrowLeft, Lock
+  Shield, ChevronRight, X, Image as ImageIcon, Send, ArrowLeft, Lock, Loader2
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { buildAuthHeaders } from "@/utils/api";
@@ -36,6 +36,7 @@ function JournalEditorContent() {
   const [categories, setCategories] = useState([]);
   const [notificationMsg, setNotificationMsg] = useState("");
   const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [loadingArticle, setLoadingArticle] = useState(!!editSlug);
 
   // UI Drawer states
   const [activeDrawer, setActiveDrawer] = useState(null); // 'seo' | 'workflow' | 'blocks' | 'revisions'
@@ -52,18 +53,32 @@ function JournalEditorContent() {
       .catch(() => {});
 
     if (editSlug) {
-      fetch(`${API}/api/journal/articles/${editSlug}`)
+      setLoadingArticle(true);
+      const token = localStorage.getItem("token") || "";
+      const headers = buildAuthHeaders(token, user);
+
+      fetch(`${API}/api/journal/articles/${editSlug}`, { headers })
         .then((res) => res.json())
         .then((data) => {
           const a = data.article;
           if (a) {
             setTitle(a.title || "");
             setSubtitle(a.subtitle || "");
-            setFilePath(a.filePath || "");
+            setFilePath(a.filePath || `/dsa/${a.slug}.md`);
             setSlug(a.slug || "");
             setSavedSlug(a.slug);
             setExcerpt(a.excerpt || "");
-            setContentHtml(a.contentHtml || "");
+
+            let rawHtml = a.contentHtml || "";
+            if (!rawHtml && a.content) {
+              try {
+                const parsed = JSON.parse(a.content);
+                rawHtml = parsed.html || a.content;
+              } catch (_) {
+                rawHtml = a.content;
+              }
+            }
+            setContentHtml(rawHtml);
             setCoverImage(a.coverImage || "");
             setDifficulty(a.difficulty || "BEGINNER");
             setCategoryId(a.categoryId ? String(a.categoryId) : "");
@@ -71,9 +86,12 @@ function JournalEditorContent() {
             setRejectionReason(a.rejectionReason || "");
           }
         })
-        .catch(() => {});
+        .catch((err) => console.error("Error loading article for edit:", err))
+        .finally(() => setLoadingArticle(false));
+    } else {
+      setLoadingArticle(false);
     }
-  }, [editSlug]);
+  }, [editSlug, user]);
 
   // 2. Auto-generate slug from title if not set
   useEffect(() => {
@@ -93,12 +111,12 @@ function JournalEditorContent() {
 
   // 4. Autosave timer (every 15s)
   useEffect(() => {
-    if (!title.trim()) return;
+    if (!title.trim() || loadingArticle) return;
     const tid = setInterval(() => {
       handleSaveArticle(true);
     }, 15000);
     return () => clearInterval(tid);
-  }, [title, subtitle, contentHtml, filePath, slug, savedSlug, status]);
+  }, [title, subtitle, contentHtml, filePath, slug, savedSlug, status, loadingArticle]);
 
   // 5. Internal link search (@ trigger)
   useEffect(() => {
@@ -212,6 +230,15 @@ function JournalEditorContent() {
     setContentHtml((prev) => prev + "\n" + blockHtml);
     setActiveDrawer(null);
   };
+
+  if (loadingArticle) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-3" style={{ background: "var(--j-bg)", color: "var(--j-text)" }}>
+        <Loader2 size={24} className="animate-spin text-[var(--j-accent)]" />
+        <p className="j-mono text-xs" style={{ color: "var(--j-text-muted)" }}>Loading existing article data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "var(--j-bg)", color: "var(--j-text)" }}>
