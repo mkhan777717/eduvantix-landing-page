@@ -156,13 +156,13 @@ function JournalEditorContent() {
         setStatus(data.article.status);
         setLastSavedAt(new Date());
 
-        const msg = overrideStatus === "PUBLISHED"
-          ? "✓ Article Published Successfully!"
-          : overrideStatus === "IN_REVIEW"
-          ? "✓ Submitted for Review!"
+        const msg = data.article.status === "PUBLISHED"
+          ? "✓ Article Published & Live!"
+          : data.article.status === "IN_REVIEW"
+          ? "⏳ Article submitted for Super Admin approval!"
           : "✓ Draft Saved!";
         setNotificationMsg(msg);
-        setTimeout(() => setNotificationMsg(""), 4000);
+        setTimeout(() => setNotificationMsg(""), 5000);
 
         if (overrideStatus === "PUBLISHED") {
           setActiveDrawer(null);
