@@ -220,7 +220,7 @@ export default async function JournalHomePage() {
             className="w-full pl-9 pr-4 py-2 rounded-full border text-xs outline-none transition-colors focus:border-[#10B981]"
             style={{
               fontFamily: "var(--j-font-mono)",
-              background: "#FFFFFF",
+              background: "var(--j-bg-card)",
               borderColor: "var(--j-border)",
               color: "var(--j-text)",
             }}

@@ -109,7 +109,7 @@ export default function PersonalLibraryPage() {
                 <p className="j-mono text-sm py-8" style={{ color: "var(--j-text-muted)" }}>No bookmarked articles yet.</p>
               ) : (
                 bookmarks.map((bm, i) => (
-                  <div key={i} className="p-4 rounded border flex items-center justify-between" style={{ borderColor: "var(--j-border)", background: "#FFFFFF" }}>
+                  <div key={i} className="p-4 rounded border flex items-center justify-between" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)" }}>
                     <div>
                       <span className="j-filepath text-xs">{bm.article?.filePath}</span>
                       <Link href={`/journal/article/${bm.article?.slug}`} className="text-base font-semibold block hover:underline" style={{ fontFamily: "var(--j-font-heading)" }}>
@@ -161,7 +161,7 @@ export default function PersonalLibraryPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {collections.map((col) => (
-                  <div key={col.id} className="p-5 rounded-lg border bg-white" style={{ borderColor: "var(--j-border)" }}>
+                  <div key={col.id} className="p-5 rounded-lg border" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)" }}>
                     <span className="j-mono text-[10px] px-2 py-0.5 rounded" style={{ background: "var(--j-accent-light)", color: "var(--j-accent)" }}>
                       {col.scope}
                     </span>
@@ -180,7 +180,7 @@ export default function PersonalLibraryPage() {
                 <p className="j-mono text-sm py-8" style={{ color: "var(--j-text-muted)" }}>No in-progress articles found.</p>
               ) : (
                 history.map((h, i) => (
-                  <div key={i} className="p-4 rounded border flex items-center justify-between" style={{ borderColor: "var(--j-border)", background: "#FFFFFF" }}>
+                  <div key={i} className="p-4 rounded border flex items-center justify-between" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)" }}>
                     <div>
                       <span className="j-filepath text-xs">{h.article?.filePath}</span>
                       <Link href={`/journal/article/${h.article?.slug}`} className="text-base font-semibold block hover:underline" style={{ fontFamily: "var(--j-font-heading)" }}>

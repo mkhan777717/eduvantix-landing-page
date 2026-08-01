@@ -219,7 +219,7 @@ export default function AuthorDashboardPage() {
 
           {/* ── TAB 3: LEARNING ANALYTICS ──────────────────────────────────── */}
           {activeTab === "analytics" && (
-            <div className="p-6 rounded-lg border bg-white space-y-6" style={{ borderColor: "var(--j-border)" }}>
+            <div className="p-6 rounded-lg border space-y-6" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)" }}>
               <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--j-font-heading)" }}>
                 Learning Analytics & EduVantix Conversions
               </h3>
@@ -245,7 +245,7 @@ export default function AuthorDashboardPage() {
               <p className="j-mono text-xs mb-4" style={{ color: "var(--j-text-muted)" }}>Uploaded Assets ({mediaList.length})</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {mediaList.map((m) => (
-                  <div key={m.id} className="p-3 rounded border bg-white" style={{ borderColor: "var(--j-border)" }}>
+                  <div key={m.id} className="p-3 rounded border" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)" }}>
                     <div className="h-28 bg-[var(--j-bg-secondary)] rounded flex items-center justify-center overflow-hidden mb-2">
                       {m.type === "IMAGE" ? (
                         <img src={m.url} alt={m.filename} className="w-full h-full object-cover" />

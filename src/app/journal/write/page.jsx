@@ -256,7 +256,7 @@ function JournalEditorContent() {
       {/* ── Permission Request Modal ──────────────────────────────────────── */}
       {showPermissionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border" style={{ borderColor: "var(--j-border)" }}>
+          <div className="rounded-xl max-w-md w-full p-6 shadow-2xl border" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)", color: "var(--j-text)" }}>
             <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mb-4">
               <Shield size={24} />
             </div>
@@ -528,7 +528,7 @@ function JournalEditorContent() {
 
       {/* ── Drawers (SEO & Blocks & Workflow) ────────────────────────────────── */}
       {activeDrawer === "blocks" && (
-        <div className="fixed right-0 top-14 bottom-0 w-80 bg-white border-l p-6 shadow-xl z-50 overflow-y-auto" style={{ borderColor: "var(--j-border)" }}>
+        <div className="fixed right-0 top-14 bottom-0 w-80 border-l p-6 shadow-xl z-50 overflow-y-auto" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)", color: "var(--j-text)" }}>
           <div className="flex items-center justify-between mb-6">
             <h3 className="j-mono text-sm font-semibold">Custom EduVantix Blocks</h3>
             <button onClick={() => setActiveDrawer(null)}><X size={14} /></button>
@@ -555,7 +555,7 @@ function JournalEditorContent() {
       )}
 
       {activeDrawer === "seo" && (
-        <div className="fixed right-0 top-14 bottom-0 w-80 bg-white border-l p-6 shadow-xl z-50 overflow-y-auto" style={{ borderColor: "var(--j-border)" }}>
+        <div className="fixed right-0 top-14 bottom-0 w-80 border-l p-6 shadow-xl z-50 overflow-y-auto" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)", color: "var(--j-text)" }}>
           <div className="flex items-center justify-between mb-6">
             <h3 className="j-mono text-sm font-semibold">SEO & Meta Settings</h3>
             <button onClick={() => setActiveDrawer(null)}><X size={14} /></button>
@@ -568,7 +568,7 @@ function JournalEditorContent() {
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 className="w-full p-2 border rounded outline-none"
-                style={{ borderColor: "var(--j-border)" }}
+                style={{ borderColor: "var(--j-border)", background: "var(--j-bg-secondary)", color: "var(--j-text)" }}
               />
             </div>
             <div>
@@ -578,7 +578,7 @@ function JournalEditorContent() {
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
                 className="w-full p-2 border rounded outline-none"
-                style={{ borderColor: "var(--j-border)" }}
+                style={{ borderColor: "var(--j-border)", background: "var(--j-bg-secondary)", color: "var(--j-text)" }}
               />
             </div>
             <div>
@@ -589,7 +589,7 @@ function JournalEditorContent() {
                 onChange={(e) => setCoverImage(e.target.value)}
                 placeholder="https://res.cloudinary.com/..."
                 className="w-full p-2 border rounded outline-none"
-                style={{ borderColor: "var(--j-border)" }}
+                style={{ borderColor: "var(--j-border)", background: "var(--j-bg-secondary)", color: "var(--j-text)" }}
               />
             </div>
           </div>
@@ -597,7 +597,7 @@ function JournalEditorContent() {
       )}
 
       {activeDrawer === "workflow" && (
-        <div className="fixed right-0 top-14 bottom-0 w-80 bg-white border-l p-6 shadow-xl z-50 overflow-y-auto" style={{ borderColor: "var(--j-border)" }}>
+        <div className="fixed right-0 top-14 bottom-0 w-80 border-l p-6 shadow-xl z-50 overflow-y-auto" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)", color: "var(--j-text)" }}>
           <div className="flex items-center justify-between mb-6">
             <h3 className="j-mono text-sm font-semibold">Publishing Workflow</h3>
             <button onClick={() => setActiveDrawer(null)}><X size={14} /></button>

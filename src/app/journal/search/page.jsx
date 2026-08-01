@@ -112,7 +112,7 @@ function SearchPageContent() {
             </label>
             <div
               className="flex items-center gap-2 px-3 py-2 rounded-md border"
-              style={{ borderColor: query ? "var(--j-accent)" : "var(--j-border)", background: "#FFFFFF" }}
+              style={{ borderColor: query ? "var(--j-accent)" : "var(--j-border)", background: "var(--j-bg-card)" }}
             >
               <Search size={13} style={{ color: "var(--j-text-muted)" }} />
               <input
