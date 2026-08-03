@@ -26,6 +26,12 @@ export default function AIAgentsPage() {
   const [openThoughts, setOpenThoughts] = useState({});
   const [error, setError] = useState("");
 
+  // Capabilities State
+  const [attachments, setAttachments] = useState([]);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
+  const [webSearchEnabled, setWebSearchEnabled] = useState(false);
+  const [githubUrl, setGithubUrl] = useState("");
+
   const fetchAgents = useCallback(async () => {
     try {
       const authToken = token || localStorage.getItem('eduvantix_auth_token');
@@ -55,24 +61,89 @@ export default function AIAgentsPage() {
     const apiMessages = messages
       .filter(m => m.role === 'user' || m.role === 'assistant')
       .map(m => ({ role: m.role, content: m.thinking ? `<think>${m.thinking}</think>\n\n${m.content}` : m.content }));
-    const newApiMessages = [...apiMessages, { role: 'user', content: prompt }];
 
     setMessages(prev => [
       ...prev,
-      { role: 'user', content: prompt },
+      { role: 'user', content: prompt, attachments: attachments.map(f => f.originalname) },
       { role: 'assistant', content: '', thinking: null, isStreaming: true }
     ]);
     setPrompt('');
+    setAttachments([]); // Clear attachments after send
     setLoading(true);
     setIsThinking(true);
     setError('');
 
     try {
       const authToken = token || localStorage.getItem('eduvantix_auth_token');
+      
+      // Determine requested capabilities based on UI state
+      const capabilities = [];
+      const capabilityParams = {};
+      
+      if (webSearchEnabled) {
+        capabilities.push('WebSearch');
+        capabilityParams.searchQuery = prompt;
+      }
+      
+      if (githubUrl) {
+        capabilities.push('GitHub');
+        capabilityParams.githubUrl = githubUrl;
+      }
+      
+      // Build file context blocks — inject extracted text directly into the message (ChatGPT-style)
+      let fileContextBlock = '';
+      if (attachments.length > 0) {
+        fileContextBlock = attachments.map(f => {
+          if (f.extractedText) {
+            return `--- FILE: ${f.originalname} ---\n${f.extractedText}\n--- END OF FILE ---`;
+          } else if (f.extractionError) {
+            return `--- FILE: ${f.originalname} ---\n[Could not read file: ${f.extractionError}]\n--- END OF FILE ---`;
+          }
+          return '';
+        }).filter(Boolean).join('\n\n');
+      }
+
+      // Smart code block extraction
+      const codeBlockMatch = prompt.match(/```(python|javascript|js|node|c\+\+|cpp|c|java)\n([\s\S]*?)```/i);
+      
+      let finalLanguage = null;
+      let finalCode = prompt;
+
+      if (codeBlockMatch) {
+        let extractedLang = codeBlockMatch[1].toLowerCase();
+        if (extractedLang === 'js' || extractedLang === 'node') extractedLang = 'javascript';
+        if (extractedLang === 'cpp') extractedLang = 'c++';
+        
+        finalLanguage = extractedLang;
+        finalCode = codeBlockMatch[2].trim();
+      }
+
+      if (finalLanguage) {
+        capabilities.push('CodeExecution');
+        capabilityParams.language = finalLanguage;
+        capabilityParams.code = finalCode; 
+      }
+
+      // Build the final message to send to API (inject file content as context)
+      const messageWithContext = fileContextBlock
+        ? `${fileContextBlock}\n\n--- USER QUERY ---\n${prompt}`
+        : prompt;
+
+      const newApiMessages = [...apiMessages, { role: 'user', content: messageWithContext }];
+
+      console.log('Sending payload:', { agent: selectedAgentId, capabilities, hasFiles: attachments.length > 0, messageLength: messageWithContext.length });
+
       const res = await fetch(`${API_BASE}/api/ai/agent/stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-        body: JSON.stringify({ agent: selectedAgentId, messages: newApiMessages, provider, model: model === 'AUTO' ? undefined : model })
+        body: JSON.stringify({ 
+          agent: selectedAgentId, 
+          messages: newApiMessages, 
+          provider, 
+          model: model === 'AUTO' ? undefined : model,
+          capabilities,
+          capabilityParams
+        })
       });
 
       if (!res.ok) {
@@ -167,6 +238,37 @@ export default function AIAgentsPage() {
     } finally {
       setLoading(false);
       setIsThinking(false);
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingFiles(true);
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('files', files[i]);
+    }
+
+    try {
+      const authToken = token || localStorage.getItem('eduvantix_auth_token');
+      const res = await fetch(`${API_BASE}/api/ai/upload`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${authToken}` },
+        body: formData
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAttachments(prev => [...prev, ...data.files]);
+      } else {
+        setError(data.error || 'Failed to upload files');
+      }
+    } catch (err) {
+      setError('File upload failed');
+    } finally {
+      setUploadingFiles(false);
+      e.target.value = ''; // Reset input
     }
   };
 
@@ -267,6 +369,15 @@ export default function AIAgentsPage() {
                           <div className="max-w-[80%] rounded-2xl rounded-br-none p-4 shadow-sm border"
                             style={{ backgroundColor: 'var(--accent-primary)', color: '#ffffff', borderColor: 'var(--accent-primary)' }}
                           >
+                            {msg.attachments && msg.attachments.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mb-2">
+                                {msg.attachments.map((fname, ai) => (
+                                  <span key={ai} className="text-xs px-2 py-0.5 rounded-full flex items-center gap-1" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
+                                    📎 {fname}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                             <p className="whitespace-pre-wrap">{msg.content}</p>
                           </div>
                         </div>
@@ -377,6 +488,61 @@ export default function AIAgentsPage() {
 
             {/* Input Area */}
             <div className="p-4 border-t rounded-b-xl" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
+              
+              {/* Action Bar */}
+              <div className="flex flex-wrap items-center gap-3 mb-3 text-sm">
+                
+                {/* File Upload */}
+                <div>
+                  <input type="file" id="file-upload" multiple className="hidden" onChange={handleFileUpload} disabled={uploadingFiles} />
+                  <label htmlFor="file-upload" className="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors hover:bg-gray-700/10" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-secondary)' }}>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                    {uploadingFiles ? 'Uploading...' : 'Attach'}
+                  </label>
+                </div>
+
+                {/* Web Search Toggle */}
+                <button 
+                  onClick={() => setWebSearchEnabled(!webSearchEnabled)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors ${webSearchEnabled ? 'bg-blue-500/10 border-blue-500 text-blue-500' : 'hover:bg-gray-700/10'}`}
+                  style={!webSearchEnabled ? { borderColor: 'var(--border-primary)', color: 'var(--text-secondary)' } : {}}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                  </svg>
+                  Search
+                </button>
+
+                {/* GitHub Repo */}
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border focus-within:border-blue-500 transition-colors" style={{ borderColor: 'var(--border-primary)', backgroundColor: 'var(--bg-primary)' }}>
+                  <svg className="w-4 h-4" style={{ color: 'var(--text-secondary)' }} fill="currentColor" viewBox="0 0 24 24">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.48 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.455-1.152-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.52-4.477-10-10-10z" />
+                  </svg>
+                  <input 
+                    type="text" 
+                    placeholder="GitHub Repo URL..." 
+                    value={githubUrl}
+                    onChange={(e) => setGithubUrl(e.target.value)}
+                    className="bg-transparent border-none outline-none text-xs w-36"
+                    style={{ color: 'var(--text-primary)' }}
+                  />
+                </div>
+              </div>
+
+              {/* Attachments Preview */}
+              {attachments.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {attachments.map((file, idx) => (
+                    <div key={idx} className="flex items-center gap-2 px-2 py-1 rounded-md border text-xs" style={{ backgroundColor: 'var(--bg-hover)', borderColor: 'var(--border-primary)', color: 'var(--text-secondary)' }}>
+                      <span className="truncate max-w-[150px]">{file.originalname}</span>
+                      <button onClick={() => setAttachments(prev => prev.filter((_, i) => i !== idx))} className="hover:text-red-500">×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="flex gap-3">
                 <textarea
                   value={prompt}
