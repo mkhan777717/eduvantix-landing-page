@@ -22,6 +22,8 @@ export default function AIAgentsPage() {
   const [prompt, setPrompt] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
+  const [openThoughts, setOpenThoughts] = useState({});
   const [error, setError] = useState("");
 
   const fetchAgents = useCallback(async () => {
@@ -49,76 +51,114 @@ export default function AIAgentsPage() {
   const handleSend = async () => {
     if (!prompt.trim()) return;
 
-    const newMessages = [...messages, { role: 'user', content: prompt }];
-    setMessages([...newMessages, { role: 'assistant', content: "" }]);
-    setPrompt("");
+    // Only send user messages (strip thinking/response separation for API)
+    const apiMessages = messages
+      .filter(m => m.role === 'user' || m.role === 'assistant')
+      .map(m => ({ role: m.role, content: m.thinking ? `<think>${m.thinking}</think>\n\n${m.content}` : m.content }));
+    const newApiMessages = [...apiMessages, { role: 'user', content: prompt }];
+
+    setMessages(prev => [
+      ...prev,
+      { role: 'user', content: prompt },
+      { role: 'assistant', content: '', thinking: null, isStreaming: true }
+    ]);
+    setPrompt('');
     setLoading(true);
-    setError("");
+    setIsThinking(true);
+    setError('');
 
     try {
       const authToken = token || localStorage.getItem('eduvantix_auth_token');
       const res = await fetch(`${API_BASE}/api/ai/agent/stream`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${authToken}`
-        },
-        body: JSON.stringify({
-          agent: selectedAgentId,
-          messages: newMessages,
-          provider: provider,
-          model: model === 'AUTO' ? undefined : model
-        })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+        body: JSON.stringify({ agent: selectedAgentId, messages: newApiMessages, provider, model: model === 'AUTO' ? undefined : model })
       });
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to start stream");
+        throw new Error(errorData.error || 'Failed to start stream');
       }
 
       const reader = res.body.getReader();
-      const decoder = new TextDecoder("utf-8");
-      let assistantMessage = "";
-      let buffer = "";
+      const decoder = new TextDecoder('utf-8');
+      let rawAccum = '';  // accumulates everything
+      let buffer = '';
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        
+
         let newlineIndex;
         while ((newlineIndex = buffer.indexOf('\n\n')) >= 0) {
           const chunkStr = buffer.slice(0, newlineIndex).trim();
           buffer = buffer.slice(newlineIndex + 2);
-          
-          const lines = chunkStr.split('\n');
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const dataStr = line.slice(6);
-              if (dataStr === '[DONE]') {
-                setLoading(false);
-                return;
-              }
-              try {
-                const data = JSON.parse(dataStr);
-                if (data.error) {
-                  setError(data.error);
-                  setLoading(false);
-                  return;
-                }
-                if (data.text) {
-                  assistantMessage += data.text;
-                  setMessages(prev => {
-                    const updated = [...prev];
-                    updated[updated.length - 1] = { role: 'assistant', content: assistantMessage };
-                    return updated;
-                  });
-                }
-              } catch (e) {
-                // Ignore partial JSON chunks if they somehow still happen
-              }
+
+          for (const line of chunkStr.split('\n')) {
+            if (!line.startsWith('data: ')) continue;
+            const dataStr = line.slice(6);
+
+            if (dataStr === '[DONE]') {
+              setLoading(false);
+              setIsThinking(false);
+              setMessages(prev => {
+                const updated = [...prev];
+                updated[updated.length - 1] = { ...updated[updated.length - 1], isStreaming: false };
+                return updated;
+              });
+              return;
             }
+
+            try {
+              const data = JSON.parse(dataStr);
+              if (data.error) { setError(data.error); setLoading(false); setIsThinking(false); return; }
+              if (!data.text) continue;
+
+              rawAccum += data.text;
+
+              // --- Stream-time parsing ---
+              // Route each chunk to thinking or content field
+              const openIdx = rawAccum.indexOf('<think>');
+              const closeIdx = rawAccum.indexOf('</think>');
+
+              let thinkingField = null;
+              let contentField = '';
+              let stillStreaming = true;
+
+              if (openIdx !== -1) {
+                if (closeIdx !== -1) {
+                  // Both tags present → complete think block
+                  thinkingField = rawAccum.slice(openIdx + 7, closeIdx).trim();
+                  contentField = rawAccum.slice(closeIdx + 8).trim();
+                  stillStreaming = false;
+                  setIsThinking(false);
+                } else {
+                  // Think tag open, still receiving thoughts
+                  thinkingField = rawAccum.slice(openIdx + 7);
+                  contentField = '';
+                  setIsThinking(true);
+                }
+              } else {
+                // No think tags → direct response
+                thinkingField = null;
+                contentField = rawAccum.trim();
+                stillStreaming = false;
+                setIsThinking(false);
+              }
+
+              setMessages(prev => {
+                const updated = [...prev];
+                updated[updated.length - 1] = {
+                  role: 'assistant',
+                  thinking: thinkingField,
+                  content: contentField,
+                  isStreaming: stillStreaming
+                };
+                return updated;
+              });
+            } catch (e) { /* skip malformed chunks */ }
           }
         }
       }
@@ -126,6 +166,7 @@ export default function AIAgentsPage() {
       setError(err.message);
     } finally {
       setLoading(false);
+      setIsThinking(false);
     }
   };
 
@@ -134,10 +175,10 @@ export default function AIAgentsPage() {
   return (
     <div className="flex h-[calc(100vh-100px)] p-6 max-w-6xl mx-auto gap-6">
       {/* Agent Selector Sidebar */}
-      <div className="w-1/3 bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-col h-full overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4 text-gray-800">AI Agents</h2>
+      <div className="w-1/3 rounded-xl shadow-sm border p-4 flex flex-col h-full overflow-y-auto" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
+        <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>AI Agents</h2>
         {loadingAgents ? (
-          <p className="text-gray-500">Loading agents...</p>
+          <p style={{ color: 'var(--text-muted)' }}>Loading agents...</p>
         ) : (
           <div className="space-y-2">
             {agents.map(agent => (
@@ -146,12 +187,18 @@ export default function AIAgentsPage() {
                 onClick={() => { setSelectedAgentId(agent.id); setMessages([]); setError(""); }}
                 className={`w-full text-left p-3 rounded-lg border transition-colors ${
                   selectedAgentId === agent.id 
-                    ? 'bg-blue-50 border-blue-200 text-blue-800 shadow-sm' 
-                    : 'bg-white border-transparent hover:bg-gray-50 hover:border-gray-200 text-gray-700'
+                    ? 'shadow-sm' 
+                    : 'border-transparent'
                 }`}
+                style={{ 
+                  backgroundColor: selectedAgentId === agent.id ? 'var(--bg-hover)' : 'transparent',
+                  borderColor: selectedAgentId === agent.id ? 'var(--accent-primary)' : 'transparent',
+                }}
+                onMouseEnter={e => { if (selectedAgentId !== agent.id) e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
+                onMouseLeave={e => { if (selectedAgentId !== agent.id) e.currentTarget.style.backgroundColor = 'transparent'; }}
               >
-                <div className="font-semibold">{agent.name}</div>
-                <div className="text-xs text-gray-500 truncate">{agent.description}</div>
+                <div className="font-semibold" style={{ color: 'var(--text-primary)' }}>{agent.name}</div>
+                <div className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{agent.description}</div>
               </button>
             ))}
           </div>
@@ -161,34 +208,48 @@ export default function AIAgentsPage() {
       {/* Main Chat Area */}
       <div className="w-2/3 flex flex-col h-full">
         {selectedAgent ? (
-          <div className="flex flex-col h-full bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="flex flex-col h-full rounded-xl shadow-sm border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
             
             {/* Agent Header */}
-            <div className="p-4 border-b border-gray-100 bg-gray-50 rounded-t-xl">
-              <h1 className="text-2xl font-bold text-gray-800">{selectedAgent.name}</h1>
-              <p className="text-gray-600 text-sm mt-1">{selectedAgent.description}</p>
+            <div className="p-4 border-b rounded-t-xl" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
+              <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{selectedAgent.name}</h1>
+              <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>{selectedAgent.description}</p>
               <div className="flex flex-wrap gap-2 mt-3">
-                {selectedAgent.supportsCode && <span className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded text-xs border border-indigo-100">Code</span>}
-                {selectedAgent.supportsFiles && <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded text-xs border border-emerald-100">Files</span>}
-                {selectedAgent.supportsSearch && <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-xs border border-blue-100">Search</span>}
-                {selectedAgent.supportsVision && <span className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded text-xs border border-purple-100">Vision</span>}
+                {selectedAgent.allowedCapabilities && selectedAgent.allowedCapabilities.length > 0 ? (
+                  selectedAgent.allowedCapabilities.map(cap => (
+                    <span key={cap} className="px-2 py-0.5 rounded text-xs border" style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--accent-primary)', borderColor: 'var(--border-primary)' }}>
+                      ✓ {cap}
+                    </span>
+                  ))
+                ) : (
+                  // Fallback for older configs
+                  <>
+                    {selectedAgent.supportsCode && <span className="px-2 py-0.5 rounded text-xs border" style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--accent-primary)', borderColor: 'var(--border-primary)' }}>Code</span>}
+                    {selectedAgent.supportsFiles && <span className="px-2 py-0.5 rounded text-xs border" style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--accent-primary)', borderColor: 'var(--border-primary)' }}>Files</span>}
+                    {selectedAgent.supportsSearch && <span className="px-2 py-0.5 rounded text-xs border" style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--accent-primary)', borderColor: 'var(--border-primary)' }}>Search</span>}
+                    {selectedAgent.supportsVision && <span className="px-2 py-0.5 rounded text-xs border" style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--accent-primary)', borderColor: 'var(--border-primary)' }}>Vision</span>}
+                  </>
+                )}
               </div>
             </div>
 
             {/* Chat Messages */}
-            <div className="flex-1 p-4 overflow-y-auto bg-gray-50/50">
+            <div className="flex-1 p-4 overflow-y-auto" style={{ backgroundColor: 'var(--bg-primary)' }}>
               {messages.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
-                  <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mb-2">
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mb-2" style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--accent-primary)' }}>
                     ✨
                   </div>
-                  <h3 className="text-xl font-medium text-gray-700">How can I help you today?</h3>
+                  <h3 className="text-xl font-medium" style={{ color: 'var(--text-primary)' }}>How can I help you today?</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-md mt-4">
                     {selectedAgent.examplePrompts?.map((ex, i) => (
                       <button 
                         key={i}
                         onClick={() => setPrompt(ex)}
-                        className="text-left p-3 text-sm bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all"
+                        className="text-left p-3 text-sm border rounded-lg transition-all"
+                        style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)', color: 'var(--text-secondary)' }}
+                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; e.currentTarget.style.borderColor = 'var(--accent-primary)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'var(--bg-card)'; e.currentTarget.style.borderColor = 'var(--border-primary)'; }}
                       >
                         {ex}
                       </button>
@@ -197,70 +258,109 @@ export default function AIAgentsPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {messages.map((msg, i) => (
-                    <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[80%] rounded-2xl p-4 ${
-                        msg.role === 'user' 
-                          ? 'bg-blue-600 text-white rounded-br-none shadow-sm' 
-                          : 'bg-white text-gray-800 rounded-bl-none shadow-sm border border-gray-100 markdown-body overflow-hidden'
-                      }`}>
-                        {msg.role === 'user' ? (
-                          <p className="whitespace-pre-wrap">{msg.content}</p>
-                        ) : (
-                          <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            components={{
-                              code({node, inline, className, children, ...props}) {
-                                const match = /language-(\w+)/.exec(className || '');
-                                return !inline && match ? (
-                                  <div className="relative group rounded-md overflow-hidden my-4 border border-gray-200">
-                                    <div className="flex items-center justify-between px-4 py-1.5 bg-gray-800 text-gray-200 text-xs">
-                                      <span>{match[1]}</span>
-                                      <button 
-                                        onClick={() => navigator.clipboard.writeText(String(children).replace(/\\n$/, ''))}
-                                        className="opacity-0 group-hover:opacity-100 hover:text-white transition-opacity"
-                                      >
-                                        Copy Code
-                                      </button>
-                                    </div>
-                                    <SyntaxHighlighter
-                                      style={vscDarkPlus}
-                                      language={match[1]}
-                                      PreTag="div"
-                                      customStyle={{ margin: 0, borderRadius: 0 }}
-                                      {...props}
-                                    >
-                                      {String(children).replace(/\\n$/, '')}
-                                    </SyntaxHighlighter>
-                                  </div>
-                                ) : (
-                                  <code className="bg-gray-100 text-pink-600 px-1 py-0.5 rounded text-sm font-mono" {...props}>
-                                    {children}
-                                  </code>
-                                )
-                              },
-                              p: ({node, ...props}) => <p className="mb-4 last:mb-0 leading-relaxed" {...props} />,
-                              ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-4 space-y-1" {...props} />,
-                              ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-4 space-y-1" {...props} />,
-                              li: ({node, ...props}) => <li className="" {...props} />,
-                              h1: ({node, ...props}) => <h1 className="text-2xl font-bold mb-4 mt-6 border-b pb-2" {...props} />,
-                              h2: ({node, ...props}) => <h2 className="text-xl font-bold mb-3 mt-5 border-b pb-1" {...props} />,
-                              h3: ({node, ...props}) => <h3 className="text-lg font-bold mb-2 mt-4" {...props} />,
-                              table: ({node, ...props}) => <div className="overflow-x-auto mb-4"><table className="min-w-full divide-y divide-gray-200 border" {...props} /></div>,
-                              th: ({node, ...props}) => <th className="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" {...props} />,
-                              td: ({node, ...props}) => <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500 border-t" {...props} />
-                            }}
+                  {messages.map((msg, i) => {
+                    if (msg.role === 'assistant' && !msg.content && !msg.thinking) return null;
+
+                    if (msg.role === 'user') {
+                      return (
+                        <div key={i} className="flex justify-end">
+                          <div className="max-w-[80%] rounded-2xl rounded-br-none p-4 shadow-sm border"
+                            style={{ backgroundColor: 'var(--accent-primary)', color: '#ffffff', borderColor: 'var(--accent-primary)' }}
                           >
-                            {msg.content}
-                          </ReactMarkdown>
-                        )}
+                            <p className="whitespace-pre-wrap">{msg.content}</p>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    const hasThinking = msg.thinking !== null && msg.thinking !== undefined;
+                    const isThoughtOpen = openThoughts[i] !== false;
+                    const isStillThinking = msg.isStreaming && hasThinking && !msg.content;
+
+                    return (
+                      <div key={i} className="flex justify-start">
+                        <div className="max-w-[80%] rounded-2xl rounded-bl-none p-4 shadow-sm border markdown-body overflow-hidden w-full"
+                          style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', borderColor: 'var(--border-primary)' }}
+                        >
+                          {hasThinking && (
+                            <div className="mb-4 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
+                              <button
+                                onClick={() => setOpenThoughts(prev => ({ ...prev, [i]: !isThoughtOpen }))}
+                                className="font-medium hover:opacity-80 transition-opacity flex items-center gap-1.5 w-full text-left"
+                              >
+                                <span>{isStillThinking ? 'Thinking...' : 'Thought Process'}</span>
+                                <svg
+                                  className="w-3.5 h-3.5 opacity-60 transition-transform"
+                                  style={{ transform: isThoughtOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </button>
+                              {isThoughtOpen && (
+                                <div className="mt-2 pl-4 border-l-[3px] border-gray-600/50 whitespace-pre-wrap text-[13px]" style={{ color: 'var(--text-secondary)', lineHeight: '1.65' }}>
+                                  {msg.thinking || <span className="animate-pulse">...</span>}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {msg.content ? (
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                code({node, inline, className, children, ...props}) {
+                                  const match = /language-(\w+)/.exec(className || '');
+                                  return !inline && match ? (
+                                    <div className="relative group rounded-md overflow-hidden my-4 border" style={{ borderColor: 'var(--border-primary)' }}>
+                                      <div className="flex items-center justify-between px-4 py-1.5 bg-gray-800 text-gray-200 text-xs">
+                                        <span>{match[1]}</span>
+                                        <button onClick={() => navigator.clipboard.writeText(String(children).replace(/\n$/, ''))} className="opacity-0 group-hover:opacity-100 hover:text-white transition-opacity">Copy Code</button>
+                                      </div>
+                                      <SyntaxHighlighter style={vscDarkPlus} language={match[1]} PreTag="div" customStyle={{ margin: 0, borderRadius: 0 }} {...props}>
+                                        {String(children).replace(/\n$/, '')}
+                                      </SyntaxHighlighter>
+                                    </div>
+                                  ) : (
+                                    <code className="px-1 py-0.5 rounded text-sm font-mono" style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--accent-primary)' }} {...props}>{children}</code>
+                                  );
+                                },
+                                p: ({node, ...props}) => <p className="mb-4 last:mb-0 leading-relaxed" {...props} />,
+                                ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-4 space-y-1" {...props} />,
+                                ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-4 space-y-1" {...props} />,
+                                li: ({node, ...props}) => <li {...props} />,
+                                h1: ({node, ...props}) => <h1 className="text-2xl font-bold mb-4 mt-6 border-b pb-2" style={{ borderColor: 'var(--border-primary)' }} {...props} />,
+                                h2: ({node, ...props}) => <h2 className="text-xl font-bold mb-3 mt-5 border-b pb-1" style={{ borderColor: 'var(--border-primary)' }} {...props} />,
+                                h3: ({node, ...props}) => <h3 className="text-lg font-bold mb-2 mt-4" {...props} />,
+                                table: ({node, ...props}) => <div className="overflow-x-auto mb-4"><table className="min-w-full divide-y border" style={{ borderColor: 'var(--border-primary)' }} {...props} /></div>,
+                                th: ({node, ...props}) => <th className="px-4 py-2 text-left text-xs font-medium uppercase" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-muted)' }} {...props} />,
+                                td: ({node, ...props}) => <td className="px-4 py-2 text-sm border-t" style={{ borderColor: 'var(--border-primary)', color: 'var(--text-secondary)' }} {...props} />
+                              }}
+                            >
+                              {msg.content}
+                            </ReactMarkdown>
+                          ) : !isStillThinking ? (
+                            <span className="animate-pulse" style={{ color: 'var(--text-muted)' }}>...</span>
+                          ) : null}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                  {loading && (
+                    );
+                  })}
+
+                  {loading && isThinking && !messages.some(m => m.role === 'assistant' && (m.content || m.thinking)) && (
                     <div className="flex justify-start">
-                      <div className="bg-white text-gray-500 rounded-2xl rounded-bl-none shadow-sm border border-gray-100 p-4">
-                        <span className="animate-pulse">Thinking...</span>
+                      <div className="max-w-[80%] rounded-2xl p-4 shadow-sm border rounded-bl-none" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
+                        <div className="text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
+                          <div className="font-medium flex items-center gap-1.5">
+                            <span>Thinking...</span>
+                            <svg className="w-3.5 h-3.5 opacity-60 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </div>
+                          <div className="mt-2 pl-4 border-l-[3px] border-gray-600/50" style={{ color: 'var(--text-secondary)' }}>
+                            <span className="animate-pulse">...</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -276,20 +376,24 @@ export default function AIAgentsPage() {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 bg-white border-t border-gray-100 rounded-b-xl">
+            <div className="p-4 border-t rounded-b-xl" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
               <div className="flex gap-3">
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
                   placeholder="Type your message here..."
-                  className="flex-1 resize-none border border-gray-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[50px] max-h-[150px]"
+                  className="flex-1 resize-none border rounded-xl p-3 focus:outline-none min-h-[50px] max-h-[150px]"
+                  style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-primary)', color: 'var(--text-primary)' }}
                   rows={2}
                 />
                 <button
                   onClick={handleSend}
                   disabled={loading || !prompt.trim()}
-                  className="bg-blue-600 text-white rounded-xl px-6 font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                  className="text-white rounded-xl px-6 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                  style={{ backgroundColor: 'var(--accent-primary)' }}
+                  onMouseEnter={e => { if (!loading && prompt.trim()) e.currentTarget.style.opacity = '0.9'; }}
+                  onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
                 >
                   Send
                 </button>
@@ -298,7 +402,7 @@ export default function AIAgentsPage() {
             
           </div>
         ) : (
-          <div className="h-full flex items-center justify-center text-gray-400">
+          <div className="h-full flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>
             Select an agent to start chatting.
           </div>
         )}
