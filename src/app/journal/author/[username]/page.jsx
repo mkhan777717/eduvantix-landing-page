@@ -5,6 +5,8 @@ import { getApiBase } from "@/utils/api";
 
 const API = getApiBase();
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }) {
   const { username } = await params;
   return {
@@ -18,7 +20,7 @@ export default async function AuthorPage({ params }) {
   let data;
   try {
     const res = await fetch(`${API}/api/journal/authors/${username}`, {
-      next: { revalidate: 3600 },
+      cache: "no-store",
     });
     if (!res.ok) notFound();
     data = await res.json();
