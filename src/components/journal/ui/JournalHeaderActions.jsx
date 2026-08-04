@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function JournalHeaderActions() {
   const { user } = useAuth();
-  const isSuperAdmin = user?.role === "SUPER_ADMIN";
+  const isSuperAdmin = user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
 
   return (
     <div className="flex flex-wrap items-center gap-3 shrink-0">

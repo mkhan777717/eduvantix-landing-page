@@ -12,7 +12,7 @@ import { getApiBase, buildAuthHeaders } from "@/utils/api";
 const API = getApiBase();
 
 export default function AuthorDashboardPage() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [activeTab, setActiveTab] = useState("overview"); // 'overview' | 'articles' | 'analytics' | 'media'
   const [dashboardData, setDashboardData] = useState(null);
   const [learningAnalytics, setLearningAnalytics] = useState(null);
@@ -20,7 +20,6 @@ export default function AuthorDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token") || "";
     const headers = buildAuthHeaders(token, user);
 
     Promise.all([

@@ -77,7 +77,7 @@ export default function AdminCMSPage() {
     } catch (_) {}
   };
 
-  if (!authLoading && user?.role !== "SUPER_ADMIN") {
+  if (!authLoading && user?.role !== "SUPER_ADMIN" && user?.role !== "ADMIN") {
     return (
       <div className="max-w-xl mx-auto px-5 py-20 text-center">
         <div className="p-8 border rounded-2xl bg-[var(--j-bg-card)] shadow-sm border-[var(--j-border)]">

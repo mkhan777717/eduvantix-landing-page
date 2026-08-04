@@ -207,7 +207,7 @@ export default function JournalHeader({ onSearchOpen }) {
                     { label: "Write Article",    href: "/journal/write",                  icon: PenLine },
                     { label: "Author Dashboard", href: "/journal/dashboard",              icon: BookOpen },
                     { label: "My Library",       href: "/journal/library",                icon: Bell },
-                    ...(user?.role === "SUPER_ADMIN" ? [{ label: "Admin CMS", href: "/journal/admin", icon: User }] : []),
+                    ...((user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") ? [{ label: "Admin CMS", href: "/journal/admin", icon: User }] : []),
                   ].map(({ label, href, icon: Icon }) => (
                     <Link
                       key={href}
