@@ -27,11 +27,17 @@ export function getApiBase(fallbackPort = 5472) {
  * @param {object}      extra - Any extra headers to merge in
  */
 export function buildAuthHeaders(token, user, extra = {}) {
-  const hasRealToken = token && !token.startsWith("demo-") && !token.startsWith("local-");
+  const authToken =
+    token ||
+    (typeof window !== "undefined"
+      ? localStorage.getItem("eduvantix_auth_token") || localStorage.getItem("token")
+      : null);
+
+  const hasRealToken = authToken && !authToken.startsWith("demo-") && !authToken.startsWith("local-");
   const base = { "Content-Type": "application/json" };
 
   if (hasRealToken) {
-    return { ...base, Authorization: "Bearer " + token, ...extra };
+    return { ...base, Authorization: "Bearer " + authToken, ...extra };
   }
 
   // Dev / demo bypass -- send userid so backend finds the actual institute-scoped user

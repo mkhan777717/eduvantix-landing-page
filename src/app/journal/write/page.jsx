@@ -16,9 +16,9 @@ function JournalEditorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editSlug = searchParams.get("slug");
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
-  const isSuperAdmin = user?.role === "SUPER_ADMIN";
+  const isSuperAdmin = user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
 
   // Form State
   const [title, setTitle] = useState("");
@@ -54,7 +54,6 @@ function JournalEditorContent() {
 
     if (editSlug) {
       setLoadingArticle(true);
-      const token = localStorage.getItem("token") || "";
       const headers = buildAuthHeaders(token, user);
 
       fetch(`${API}/api/journal/articles/${editSlug}`, { headers })
@@ -165,7 +164,7 @@ function JournalEditorContent() {
 
       const res = await fetch(url, {
         method,
-        headers: buildAuthHeaders(localStorage.getItem("token"), user),
+        headers: buildAuthHeaders(token, user),
         body: JSON.stringify(payload),
       });
 
@@ -405,7 +404,7 @@ function JournalEditorContent() {
           style={{
             fontFamily: "var(--j-font-heading)",
             color: "var(--j-text)",
-            fontStyle: "italic",
+            fontStyle: "normal",
             letterSpacing: "-0.03em",
           }}
         />

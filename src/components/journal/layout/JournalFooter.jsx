@@ -80,7 +80,7 @@ export default function JournalFooter() {
             <Link href="/journal" className="flex items-baseline gap-2 mb-4 select-none">
               <span
                 className="text-xl font-semibold"
-                style={{ fontFamily: "var(--j-font-heading)", fontStyle: "italic", color: "var(--j-text)" }}
+                style={{ fontFamily: "var(--j-font-heading)", fontStyle: "normal", color: "var(--j-text)" }}
               >
                 EduVantix
               </span>
