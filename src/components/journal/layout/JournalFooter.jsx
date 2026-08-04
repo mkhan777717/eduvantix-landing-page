@@ -124,7 +124,7 @@ export default function JournalFooter() {
                   className="flex-1 min-w-0 px-3 py-1.5 rounded-md border text-sm outline-none transition-colors focus:border-[var(--j-accent)]"
                   style={{
                     fontFamily: "var(--j-font-mono)",
-                    background: "#FFFFFF",
+                    background: "var(--j-bg-card)",
                     borderColor: "var(--j-border)",
                     color: "var(--j-text)",
                     fontSize: "0.8125rem",

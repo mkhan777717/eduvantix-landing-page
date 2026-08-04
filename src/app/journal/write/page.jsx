@@ -18,7 +18,7 @@ function JournalEditorContent() {
   const editSlug = searchParams.get("slug");
   const { user } = useAuth();
 
-  const isSuperAdmin = user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
+  const isSuperAdmin = user?.role === "SUPER_ADMIN";
 
   // Form State
   const [title, setTitle] = useState("");
@@ -50,7 +50,7 @@ function JournalEditorContent() {
     fetch(`${API}/api/journal/categories`)
       .then((res) => res.json())
       .then((data) => setCategories(data.categories || []))
-      .catch(() => {});
+      .catch(() => { });
 
     if (editSlug) {
       setLoadingArticle(true);
@@ -180,8 +180,8 @@ function JournalEditorContent() {
         const msg = data.article.status === "PUBLISHED"
           ? "✓ Article Published & Live!"
           : data.article.status === "IN_REVIEW"
-          ? "⏳ Publishing permission request sent to Super Admin!"
-          : "✓ Draft Saved!";
+            ? "⏳ Publishing permission request sent to Super Admin!"
+            : "✓ Draft Saved!";
         setNotificationMsg(msg);
         setTimeout(() => setNotificationMsg(""), 5000);
 
@@ -395,19 +395,6 @@ function JournalEditorContent() {
           </div>
         )}
 
-        {/* File Path Editor */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="j-mono text-xs" style={{ color: "var(--j-text-muted)" }}>Path:</span>
-          <input
-            type="text"
-            value={filePath}
-            onChange={(e) => setFilePath(e.target.value)}
-            placeholder="/dsa/sliding-window.md"
-            className="j-filepath bg-transparent border-b outline-none text-xs flex-1 py-0.5 focus:border-[var(--j-accent)]"
-            style={{ borderColor: "var(--j-border)" }}
-          />
-        </div>
-
         {/* Article Title */}
         <textarea
           rows={1}
@@ -445,20 +432,20 @@ function JournalEditorContent() {
             className="bg-transparent outline-none cursor-pointer"
             style={{ color: "var(--j-accent)" }}
           >
-            <option value="BEGINNER">BEGINNER</option>
-            <option value="INTERMEDIATE">INTERMEDIATE</option>
-            <option value="ADVANCED">ADVANCED</option>
+            <option value="BEGINNER" style={{ background: "var(--j-bg-card)", color: "var(--j-text)" }}>BEGINNER</option>
+            <option value="INTERMEDIATE" style={{ background: "var(--j-bg-card)", color: "var(--j-text)" }}>INTERMEDIATE</option>
+            <option value="ADVANCED" style={{ background: "var(--j-bg-card)", color: "var(--j-text)" }}>ADVANCED</option>
           </select>
           <span style={{ color: "var(--j-text-muted)" }}>·</span>
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
             className="bg-transparent outline-none cursor-pointer"
-            style={{ color: "var(--j-eyebrow)" }}
+            style={{ color: "var(--j-accent)" }}
           >
-            <option value="">Select Category...</option>
+            <option value="" style={{ background: "var(--j-bg-card)", color: "var(--j-text)" }}>Select Category...</option>
             {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
+              <option key={cat.id} value={cat.id} style={{ background: "var(--j-bg-card)", color: "var(--j-text)" }}>{cat.name}</option>
             ))}
           </select>
         </div>

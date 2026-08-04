@@ -186,11 +186,10 @@ export default function JournalHeader({ onSearchOpen }) {
 
               {profileOpen && (
                 <div
-                  className="absolute right-0 top-full mt-2 w-52 rounded-xl border py-1.5 z-50"
+                  className="absolute right-0 top-full mt-2 w-52 rounded-xl border py-1.5 z-50 shadow-lg"
                   style={{
-                    background: "#FFFFFF",
+                    background: "var(--j-bg-card)",
                     borderColor: "var(--j-border)",
-                    boxShadow: "0 8px 24px rgba(27,34,51,0.12)",
                   }}
                 >
                   <div
@@ -208,7 +207,7 @@ export default function JournalHeader({ onSearchOpen }) {
                     { label: "Write Article",    href: "/journal/write",                  icon: PenLine },
                     { label: "Author Dashboard", href: "/journal/dashboard",              icon: BookOpen },
                     { label: "My Library",       href: "/journal/library",                icon: Bell },
-                    { label: "Admin CMS",        href: "/journal/admin",                  icon: User },
+                    ...(user?.role === "SUPER_ADMIN" ? [{ label: "Admin CMS", href: "/journal/admin", icon: User }] : []),
                   ].map(({ label, href, icon: Icon }) => (
                     <Link
                       key={href}

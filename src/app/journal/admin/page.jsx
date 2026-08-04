@@ -9,7 +9,7 @@ import { getApiBase, buildAuthHeaders } from "@/utils/api";
 const API = getApiBase();
 
 export default function AdminCMSPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("IN_REVIEW");
@@ -77,6 +77,27 @@ export default function AdminCMSPage() {
     } catch (_) {}
   };
 
+  if (!authLoading && user?.role !== "SUPER_ADMIN") {
+    return (
+      <div className="max-w-xl mx-auto px-5 py-20 text-center">
+        <div className="p-8 border rounded-2xl bg-[var(--j-bg-card)] shadow-sm border-[var(--j-border)]">
+          <Shield size={48} className="mx-auto mb-4 text-red-500" />
+          <h2 className="text-xl font-bold mb-2" style={{ fontFamily: "var(--j-font-heading)" }}>Access Denied</h2>
+          <p className="text-xs text-[var(--j-text-secondary)] mb-6" style={{ fontFamily: "var(--j-font-mono)" }}>
+            You do not have permission to access the Super Admin Moderation Suite. This area is reserved strictly for Super Administrators.
+          </p>
+          <Link
+            href="/journal"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-[#10B981] text-white"
+            style={{ fontFamily: "var(--j-font-mono)" }}
+          >
+            <ArrowLeft size={14} /> Return to Journal
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-5 py-10" style={{ color: "var(--j-text)" }}>
 
@@ -128,10 +149,13 @@ export default function AdminCMSPage() {
               onClick={() => setStatusFilter(tab.id)}
               className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
                 statusFilter === tab.id
-                  ? "bg-[#3454D1] text-white shadow-sm font-semibold"
+                  ? "text-white shadow-sm font-semibold"
                   : "hover:text-[var(--j-accent)] text-[var(--j-text-secondary)]"
               }`}
-              style={{ fontFamily: "var(--j-font-mono)" }}
+              style={{
+                fontFamily: "var(--j-font-mono)",
+                background: statusFilter === tab.id ? "var(--j-accent)" : "transparent",
+              }}
             >
               {tab.label}
             </button>
