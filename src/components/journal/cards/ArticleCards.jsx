@@ -17,23 +17,38 @@ export function ArticleCard({ article, showExcerpt = true }) {
   if (!article) return null;
 
   // Interactive States
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(
-    article.reactionCount || article.reactions || 0
-  );
+  // Interactive States (with persistent cache & valid backend route sync)
+  const [liked, setLiked] = useState(() => {
+    if (article.userState?.reacted || article.isLiked) return true;
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(`j_liked_${article.slug}`) === "true";
+    }
+    return false;
+  });
+
+  const [likeCount, setLikeCount] = useState(() => {
+    const baseCount = article.reactionCount || article.reactions || 0;
+    if (typeof window !== "undefined") {
+      const storedCount = localStorage.getItem(`j_like_count_${article.slug}`);
+      if (storedCount !== null) return parseInt(storedCount, 10);
+    }
+    return baseCount;
+  });
+
   const [disliked, setDisliked] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarked, setBookmarked] = useState(() => {
+    if (article.userState?.bookmarked || article.isBookmarked) return true;
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(`j_bookmarked_${article.slug}`) === "true";
+    }
+    return false;
+  });
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [followingAuthor, setFollowingAuthor] = useState(false);
   const [followingTopic, setFollowingTopic] = useState(false);
   const [mutedAuthor, setMutedAuthor] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
-
-  // Quick Comment State
-  const [commentDrawerOpen, setCommentDrawerOpen] = useState(false);
-  const [commentsList, setCommentsList] = useState(article.comments || []);
-  const [commentText, setCommentText] = useState("");
-  const [submittingComment, setSubmittingComment] = useState(false);
 
   const menuRef = useRef(null);
 
@@ -67,17 +82,30 @@ export function ArticleCard({ article, showExcerpt = true }) {
     e.preventDefault();
     e.stopPropagation();
     const newLiked = !liked;
+    const newCount = newLiked ? likeCount + 1 : Math.max(0, likeCount - 1);
     setLiked(newLiked);
-    setLikeCount((prev) => (newLiked ? prev + 1 : Math.max(0, prev - 1)));
+    setLikeCount(newCount);
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`j_liked_${article.slug}`, newLiked ? "true" : "false");
+      localStorage.setItem(`j_like_count_${article.slug}`, newCount.toString());
+    }
+
     triggerToast(newLiked ? "✓ Added reaction to story!" : "Removed reaction");
 
     try {
       const headers = buildAuthHeaders(token, user);
-      await fetch(`${API}/api/journal/articles/${article.slug}/react`, {
+      const res = await fetch(`${API}/api/journal/articles/${article.slug}/reaction`, {
         method: "POST",
         headers,
         body: JSON.stringify({ type: "LIKE" }),
       });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.reacted !== undefined) {
+          setLiked(data.reacted);
+        }
+      }
     } catch (_) {}
   };
 
@@ -87,17 +115,27 @@ export function ArticleCard({ article, showExcerpt = true }) {
     e.stopPropagation();
     const newBookmarked = !bookmarked;
     setBookmarked(newBookmarked);
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`j_bookmarked_${article.slug}`, newBookmarked ? "true" : "false");
+    }
+
     triggerToast(
       newBookmarked ? "✓ Saved article to your Library!" : "Removed from Library"
     );
 
     try {
       const headers = buildAuthHeaders(token, user);
-      await fetch(`${API}/api/journal/bookmarks`, {
-        method: newBookmarked ? "POST" : "DELETE",
+      const res = await fetch(`${API}/api/journal/articles/${article.slug}/bookmark`, {
+        method: "POST",
         headers,
-        body: JSON.stringify({ articleId: article.id, slug: article.slug }),
       });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.bookmarked !== undefined) {
+          setBookmarked(data.bookmarked);
+        }
+      }
     } catch (_) {}
   };
 
