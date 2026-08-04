@@ -328,7 +328,6 @@ export default function AuthorDashboardPage() {
                   {filteredArticles.map((article) => (
                     <div key={article.id} className="py-4 flex items-center justify-between gap-4">
                       <div className="min-w-0 flex-1">
-                        <p className="j-filepath text-xs mb-0.5">{article.slug}</p>
                         <h4 className="text-base font-semibold leading-snug" style={{ fontFamily: "var(--j-font-heading)" }}>
                           {article.title}
                         </h4>
