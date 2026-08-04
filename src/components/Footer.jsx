@@ -28,7 +28,7 @@ const footerLinks = [
       { name: "About Eduvantix", href: "/about" },
       { name: "Academy Blog", href: "#" },
       { name: "Student Work", href: "#" },
-      { name: "Careers", href: "#" },
+      { name: "Careers", href: "/careers" },
     ],
   },
 ];
