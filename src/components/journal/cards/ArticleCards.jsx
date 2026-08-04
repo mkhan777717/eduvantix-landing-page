@@ -67,7 +67,7 @@ export function FeaturedCard({ article }) {
               fontFamily: "var(--j-font-heading)",
               color: "var(--j-text)",
               letterSpacing: "-0.03em",
-              fontStyle: "italic",
+              fontStyle: "normal",
             }}
           >
             {article.title}

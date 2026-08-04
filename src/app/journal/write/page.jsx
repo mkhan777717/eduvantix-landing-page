@@ -404,7 +404,7 @@ function JournalEditorContent() {
           style={{
             fontFamily: "var(--j-font-heading)",
             color: "var(--j-text)",
-            fontStyle: "italic",
+            fontStyle: "normal",
             letterSpacing: "-0.03em",
           }}
         />

@@ -59,7 +59,7 @@ export default function JournalHeader({ onSearchOpen }) {
             className="text-lg font-semibold tracking-tight"
             style={{
               fontFamily: "var(--j-font-heading)",
-              fontStyle: "italic",
+              fontStyle: "normal",
               color: "var(--j-text)",
             }}
           >

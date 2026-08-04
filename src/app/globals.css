@@ -517,7 +517,8 @@ html.theme-dark .live-chat-sidebar-fullscreen {
   /* ── Typography ───────────────────────────── */
   --j-font-heading:     var(--font-sans, 'Inter', sans-serif);
   --j-font-reading:     var(--font-sans, 'Inter', sans-serif);
-  --j-font-mono:        'IBM Plex Mono', 'Courier New', monospace;
+  --j-font-mono:        var(--font-sans, 'Inter', sans-serif);
+  --j-font-code:        'IBM Plex Mono', 'Courier New', monospace;
 
   /* ── Terminal Colors ──────────────────────── */
   --j-term-green:       #4ec994;
@@ -613,7 +614,7 @@ html.theme-dark select option,
 
 /* ── File Path Label ──────────────────────────── */
 .j-filepath {
-  font-family: var(--j-font-mono);
+  font-family: var(--j-font-code);
   font-size: 0.8125rem;
   color: var(--j-accent);
   letter-spacing: 0;
