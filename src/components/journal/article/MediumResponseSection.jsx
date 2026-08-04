@@ -25,7 +25,7 @@ function CommentItem({ comment, articleSlug, triggerToast, user, token }) {
   const [likeCount, setLikeCount] = useState(comment.reactionCount || comment.likes || 0);
   const [replying, setReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
-  const [replies, setReplies] = useState(comment.replies || []);
+  const [replies, setReplies] = useState(comment.replies || comment.children || []);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const author = comment.author || {};
@@ -43,12 +43,14 @@ function CommentItem({ comment, articleSlug, triggerToast, user, token }) {
     triggerToast(nextLiked ? "✓ Liked response" : "Removed like");
 
     try {
-      const headers = buildAuthHeaders(token, user);
-      await fetch(`${API}/api/journal/comments/${comment.id}/react`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ type: "LIKE" }),
-      });
+      if (token) {
+        const headers = buildAuthHeaders(token, user);
+        await fetch(`${API}/api/journal/articles/${articleSlug}/reaction`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ type: "LIKE" }),
+        });
+      }
     } catch (_) {}
   };
 
@@ -68,16 +70,20 @@ function CommentItem({ comment, articleSlug, triggerToast, user, token }) {
     };
 
     setReplies((prev) => [...prev, newReply]);
+    const textToSubmit = replyText;
     setReplyText("");
     setReplying(false);
     triggerToast("✓ Reply published!");
 
     try {
       const headers = buildAuthHeaders(token, user);
-      await fetch(`${API}/api/journal/comments/${comment.id}/replies`, {
+      await fetch(`${API}/api/journal/articles/${articleSlug}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ content: replyText }),
+        body: JSON.stringify({
+          content: textToSubmit,
+          parentId: comment.id,
+        }),
       });
     } catch (_) {}
   };
@@ -124,7 +130,7 @@ function CommentItem({ comment, articleSlug, triggerToast, user, token }) {
                 type="button"
                 onClick={() => {
                   setMenuOpen(false);
-                  if (navigator.clipboard) {
+                  if (typeof window !== "undefined" && navigator.clipboard) {
                     navigator.clipboard.writeText(window.location.href);
                   }
                   triggerToast("✓ Link copied!");
