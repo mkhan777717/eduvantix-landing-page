@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ShieldCheck, Bold, Italic, Link2, Heart, MessageSquare, MoreHorizontal, Send, CornerDownRight } from "lucide-react";
+import { ShieldCheck, Bold, Italic, Link2, Heart, MessageSquare, MoreHorizontal, Send, CornerDownRight, Sparkles, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { getApiBase, buildAuthHeaders } from "@/utils/api";
 
@@ -20,16 +20,19 @@ function formatResponseHtml(content) {
   return html;
 }
 
-function CommentItem({ comment, articleSlug, triggerToast, user, token }) {
+function CommentItem({ comment, articleSlug, triggerToast, user, token, isAuthor = false }) {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(comment.reactionCount || comment.likes || 0);
   const [replying, setReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [replies, setReplies] = useState(comment.replies || comment.children || []);
+  const [showReplies, setShowReplies] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const author = comment.author || {};
   const name = author.fullName || author.username || "Reader";
+  const isCommentAuthor = author.role === "AUTHOR" || author.username === "admin" || isAuthor;
+
   const dateStr = comment.createdAt
     ? new Date(comment.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
     : "Recently";
@@ -65,11 +68,13 @@ function CommentItem({ comment, articleSlug, triggerToast, user, token }) {
         username: user?.username || "You",
         fullName: user?.fullName || user?.username || "You",
         avatarUrl: user?.avatarUrl || null,
+        role: user?.role === "ADMIN" ? "AUTHOR" : "READER",
       },
       createdAt: new Date().toISOString(),
     };
 
     setReplies((prev) => [...prev, newReply]);
+    setShowReplies(true);
     const textToSubmit = replyText;
     setReplyText("");
     setReplying(false);
@@ -89,43 +94,56 @@ function CommentItem({ comment, articleSlug, triggerToast, user, token }) {
   };
 
   return (
-    <div className="pt-6 space-y-3">
-      {/* Author Info Header */}
+    <div className="py-4 space-y-3 font-sans">
+      
+      {/* ── 1. Author Row & Badges ─────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3">
           {author.avatarUrl ? (
             <img
               src={author.avatarUrl}
               alt={name}
-              className="w-7 h-7 rounded-full object-cover border border-[var(--j-border)]"
+              className="w-9 h-9 rounded-full object-cover border border-[var(--j-border)] shrink-0"
             />
           ) : (
-            <div className="w-7 h-7 rounded-full bg-[var(--j-accent-light)] text-[var(--j-accent)] flex items-center justify-center font-bold text-xs">
+            <div className="w-9 h-9 rounded-full bg-[var(--j-accent-light)] text-[var(--j-accent)] flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
               {name[0].toUpperCase()}
             </div>
           )}
+
           <div>
-            <p className="text-xs font-semibold text-[var(--j-text)] leading-none">
-              {name}
-            </p>
-            <span className="text-[10px] text-[var(--j-text-muted)]">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="font-bold text-sm text-[var(--j-text)] hover:underline cursor-pointer">
+                {name}
+              </span>
+              
+              {/* Author Badge */}
+              {isCommentAuthor && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-600 text-white shadow-2xs">
+                  <CheckCircle2 size={10} /> Author
+                </span>
+              )}
+            </div>
+            
+            <p className="text-xs text-[var(--j-text-muted)] mt-0.5 font-normal">
               {dateStr}
-            </span>
+            </p>
           </div>
         </div>
 
-        {/* Options Menu */}
+        {/* Options Dropdown (···) */}
         <div className="relative">
           <button
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="p-1 text-[var(--j-text-muted)] hover:text-[var(--j-text)] transition-colors rounded-full"
+            className="p-1.5 text-[var(--j-text-muted)] hover:text-[var(--j-text)] hover:bg-[var(--j-bg-secondary)] transition-colors rounded-full"
+            aria-label="Options"
           >
-            <MoreHorizontal size={15} />
+            <MoreHorizontal size={16} />
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 top-full mt-1 w-44 rounded-lg border border-[var(--j-border)] bg-[var(--j-bg-card)] shadow-lg z-50 py-1 text-xs">
+            <div className="absolute right-0 top-full mt-1 w-44 rounded-xl border border-[var(--j-border)] bg-[var(--j-bg-card)] shadow-xl z-50 py-1 text-xs">
               <button
                 type="button"
                 onClick={() => {
@@ -135,7 +153,7 @@ function CommentItem({ comment, articleSlug, triggerToast, user, token }) {
                   }
                   triggerToast("✓ Link copied!");
                 }}
-                className="w-full text-left px-3 py-1.5 hover:bg-[var(--j-bg-secondary)]"
+                className="w-full text-left px-3 py-2 hover:bg-[var(--j-bg-secondary)] transition-colors text-[var(--j-text)]"
               >
                 Copy link
               </button>
@@ -145,7 +163,7 @@ function CommentItem({ comment, articleSlug, triggerToast, user, token }) {
                   setMenuOpen(false);
                   triggerToast("🚩 Reported response for review.");
                 }}
-                className="w-full text-left px-3 py-1.5 hover:bg-[var(--j-bg-secondary)] text-red-500 font-medium"
+                className="w-full text-left px-3 py-2 hover:bg-[var(--j-bg-secondary)] transition-colors text-red-500 font-medium"
               >
                 Report response...
               </button>
@@ -154,63 +172,74 @@ function CommentItem({ comment, articleSlug, triggerToast, user, token }) {
         </div>
       </div>
 
-      {/* Formatted Comment Content */}
+      {/* ── 2. Medium Formatted Comment Body ───────────────────────────────── */}
       <div
-        className="text-sm leading-relaxed text-[var(--j-text-secondary)] font-normal [&_strong]:font-bold [&_strong]:text-[var(--j-text)] [&_b]:font-bold [&_b]:text-[var(--j-text)] [&_em]:italic [&_i]:italic [&_a]:text-[var(--j-accent)] [&_a]:underline"
+        className="text-sm sm:text-base leading-relaxed text-[var(--j-text)] font-normal py-1 [&_strong]:font-bold [&_b]:font-bold [&_em]:italic [&_i]:italic [&_a]:text-[var(--j-accent)] [&_a]:underline"
         style={{ fontFamily: "var(--j-font-reading)" }}
         dangerouslySetInnerHTML={{ __html: formattedHtml }}
       />
 
-      {/* Response Action Bar */}
-      <div className="flex items-center gap-4 text-xs text-[var(--j-text-muted)] pt-1">
-        {/* Like Button */}
+      {/* ── 3. Medium Action Toolbar (Clap, Hide/Show Replies, Reply) ──────── */}
+      <div className="flex items-center gap-4 text-xs text-[var(--j-text-secondary)] pt-1">
+        
+        {/* Clap / Like Button */}
         <button
           type="button"
           onClick={handleToggleLike}
-          className={`flex items-center gap-1 transition-colors ${
-            liked ? "text-red-500 font-semibold" : "hover:text-red-500"
+          className={`flex items-center gap-1.5 transition-colors ${
+            liked ? "text-red-500 font-bold" : "hover:text-red-500"
           }`}
-          title={liked ? "Unlike response" : "Like response"}
+          title={liked ? "Unlike response" : "Clap response"}
         >
-          <Heart size={14} fill={liked ? "#EF4444" : "none"} />
-          <span>{likeCount}</span>
+          <span className="text-base leading-none">👏</span>
+          <span className="font-medium">{likeCount}</span>
         </button>
 
-        {/* Reply Toggle Button */}
+        {/* Hide / Show Replies Toggle */}
+        {replies.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setShowReplies(!showReplies)}
+            className="flex items-center gap-1.5 hover:text-[var(--j-text)] transition-colors font-medium"
+          >
+            <MessageSquare size={14} />
+            <span>{showReplies ? "Hide replies" : `${replies.length} ${replies.length === 1 ? "reply" : "replies"}`}</span>
+          </button>
+        )}
+
+        {/* Reply Link */}
         <button
           type="button"
           onClick={() => setReplying(!replying)}
-          className="flex items-center gap-1 hover:text-[var(--j-accent)] transition-colors"
-          title="Reply to comment"
+          className="font-semibold hover:text-[var(--j-text)] hover:underline transition-colors ml-auto sm:ml-0"
         >
-          <CornerDownRight size={13} />
-          <span>{replying ? "Cancel Reply" : "Reply"}</span>
+          {replying ? "Cancel" : "Reply"}
         </button>
       </div>
 
-      {/* Inline Reply Form */}
+      {/* ── 4. Inline Reply Input Form ──────────────────────────────────────── */}
       {replying && (
-        <form onSubmit={handlePostReply} className="mt-3 pl-4 border-l-2 border-[var(--j-accent)] space-y-2">
+        <form onSubmit={handlePostReply} className="mt-3 pl-4 border-l-2 border-[var(--j-accent)] space-y-2.5 animate-fade-in">
           <input
             type="text"
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
             placeholder={`Reply to @${author.username || name}...`}
             autoFocus
-            className="w-full px-3 py-1.5 text-xs rounded-md border border-[var(--j-border)] bg-[var(--j-bg-secondary)] text-[var(--j-text)] outline-none focus:border-[var(--j-accent)]"
+            className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-[var(--j-border)] bg-[var(--j-bg-secondary)] text-[var(--j-text)] outline-none focus:border-[var(--j-accent)] shadow-2xs"
           />
           <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={() => setReplying(false)}
-              className="px-3 py-1 text-[11px] font-medium text-[var(--j-text-muted)] hover:text-[var(--j-text)]"
+              className="px-3 py-1.5 text-xs font-medium text-[var(--j-text-secondary)] hover:text-[var(--j-text)]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!replyText.trim()}
-              className="px-3 py-1 text-[11px] font-semibold bg-[var(--j-accent)] text-white rounded-full hover:opacity-90 disabled:opacity-40"
+              className="px-4 py-1.5 text-xs font-semibold bg-[var(--j-accent)] text-white rounded-full hover:opacity-90 disabled:opacity-40 shadow-xs"
             >
               Reply
             </button>
@@ -218,24 +247,23 @@ function CommentItem({ comment, articleSlug, triggerToast, user, token }) {
         </form>
       )}
 
-      {/* Nested Replies List */}
-      {replies.length > 0 && (
-        <div className="pl-6 border-l border-[var(--j-border-subtle)] space-y-3 mt-3">
+      {/* ── 5. Medium-Style Indented Nested Replies ───────────────────────────── */}
+      {showReplies && replies.length > 0 && (
+        <div className="border-l-2 border-[var(--j-border)] pl-4 sm:pl-6 space-y-4 mt-4 pt-1">
           {replies.map((reply) => (
-            <div key={reply.id} className="text-xs space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-[var(--j-text)]">
-                  @{reply.author?.username || "user"}
-                </span>
-                <span className="text-[10px] text-[var(--j-text-muted)]">
-                  {reply.createdAt ? new Date(reply.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Just now"}
-                </span>
-              </div>
-              <p className="text-[var(--j-text-secondary)]">{reply.content}</p>
-            </div>
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              articleSlug={articleSlug}
+              triggerToast={triggerToast}
+              user={user}
+              token={token}
+              isAuthor={reply.author?.role === "AUTHOR" || reply.author?.username === "admin"}
+            />
           ))}
         </div>
       )}
+
     </div>
   );
 }
@@ -298,6 +326,7 @@ export default function MediumResponseSection({ articleSlug, initialComments = [
         username: user?.username || "You",
         fullName: displayName,
         avatarUrl: user?.avatarUrl || null,
+        role: user?.role === "ADMIN" ? "AUTHOR" : "READER",
       },
       createdAt: new Date().toISOString(),
       reactionCount: 0,
@@ -453,7 +482,7 @@ export default function MediumResponseSection({ articleSlug, initialComments = [
         </form>
       </div>
 
-      {/* ── 3. Responses / Comments List ────────────────────────────────────── */}
+      {/* ── 3. Medium Responses / Comments List ────────────────────────────── */}
       <div className="space-y-6 divide-y divide-[var(--j-border-subtle)]">
         {comments.length === 0 ? (
           <p className="text-xs text-[var(--j-text-muted)] py-6 text-center">
