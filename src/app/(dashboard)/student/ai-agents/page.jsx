@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import KnowledgeBase from './KnowledgeBase';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -32,6 +33,13 @@ export default function AIAgentsPage() {
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
   const [githubUrl, setGithubUrl] = useState("");
 
+  // History State
+  const [activeTab, setActiveTab] = useState("agents"); // 'agents' or 'history'
+  const [mainView, setMainView] = useState("chat"); // 'chat' or 'knowledge'
+  const [conversations, setConversations] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [activeConversationId, setActiveConversationId] = useState(null);
+
   const fetchAgents = useCallback(async () => {
     try {
       const authToken = token || localStorage.getItem('eduvantix_auth_token');
@@ -50,9 +58,57 @@ export default function AIAgentsPage() {
     }
   }, [token]);
 
+  const fetchConversations = useCallback(async () => {
+    try {
+      setLoadingHistory(true);
+      const authToken = token || localStorage.getItem('eduvantix_auth_token');
+      const res = await fetch(`${API_BASE}/api/ai/memory/conversations`, {
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+      const data = await res.json();
+      if (data.conversations) {
+        setConversations(data.conversations);
+      }
+    } catch (err) {
+      console.error("Failed to load history", err);
+    } finally {
+      setLoadingHistory(false);
+    }
+  }, [token]);
+
+  const loadConversation = async (conversationId, agentId) => {
+    try {
+      setLoading(true);
+      setSelectedAgentId(agentId);
+      setActiveConversationId(conversationId);
+      
+      const authToken = token || localStorage.getItem('eduvantix_auth_token');
+      const res = await fetch(`${API_BASE}/api/ai/memory/conversations/${conversationId}/messages`, {
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+      const data = await res.json();
+      if (data.messages) {
+        // Map db format to UI format
+        setMessages(data.messages.map(m => ({
+          role: m.role,
+          content: m.content,
+          thinking: null
+        })));
+      }
+    } catch (err) {
+      console.error("Failed to load messages", err);
+      setError("Failed to load previous conversation.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (token) fetchAgents();
-  }, [token, fetchAgents]);
+    if (token) {
+      fetchAgents();
+      fetchConversations();
+    }
+  }, [token, fetchAgents, fetchConversations]);
 
   const handleSend = async () => {
     if (!prompt.trim()) return;
@@ -275,36 +331,108 @@ export default function AIAgentsPage() {
   const selectedAgent = agents.find(a => a.id === selectedAgentId);
 
   return (
-    <div className="flex h-[calc(100vh-100px)] p-6 max-w-6xl mx-auto gap-6">
-      {/* Agent Selector Sidebar */}
-      <div className="w-1/3 rounded-xl shadow-sm border p-4 flex flex-col h-full overflow-y-auto" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
-        <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>AI Agents</h2>
-        {loadingAgents ? (
-          <p style={{ color: 'var(--text-muted)' }}>Loading agents...</p>
-        ) : (
-          <div className="space-y-2">
-            {agents.map(agent => (
-              <button
-                key={agent.id}
-                onClick={() => { setSelectedAgentId(agent.id); setMessages([]); setError(""); }}
-                className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                  selectedAgentId === agent.id 
-                    ? 'shadow-sm' 
-                    : 'border-transparent'
-                }`}
-                style={{ 
-                  backgroundColor: selectedAgentId === agent.id ? 'var(--bg-hover)' : 'transparent',
-                  borderColor: selectedAgentId === agent.id ? 'var(--accent-primary)' : 'transparent',
-                }}
-                onMouseEnter={e => { if (selectedAgentId !== agent.id) e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
-                onMouseLeave={e => { if (selectedAgentId !== agent.id) e.currentTarget.style.backgroundColor = 'transparent'; }}
-              >
-                <div className="font-semibold" style={{ color: 'var(--text-primary)' }}>{agent.name}</div>
-                <div className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{agent.description}</div>
-              </button>
-            ))}
-          </div>
-        )}
+    <div className="flex flex-col h-[calc(100vh-100px)] p-6 max-w-6xl mx-auto gap-4">
+      
+      {/* Top View Switcher */}
+      <div className="flex rounded-xl p-1 shadow-sm border w-fit mx-auto" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
+        <button 
+           onClick={() => setMainView('chat')} 
+           className={`px-6 py-2 rounded-lg font-medium text-sm transition-colors ${mainView === 'chat' ? 'text-white' : 'hover:bg-gray-500/10'}`}
+           style={mainView === 'chat' ? { backgroundColor: 'var(--accent-primary)' } : { color: 'var(--text-secondary)' }}
+        >
+          AI Chat
+        </button>
+        <button 
+           onClick={() => setMainView('knowledge')}
+           className={`px-6 py-2 rounded-lg font-medium text-sm transition-colors ${mainView === 'knowledge' ? 'text-white' : 'hover:bg-gray-500/10'}`}
+           style={mainView === 'knowledge' ? { backgroundColor: 'var(--accent-primary)' } : { color: 'var(--text-secondary)' }}
+        >
+          Knowledge Base
+        </button>
+      </div>
+
+      {mainView === 'knowledge' ? (
+        <div className="flex-1 overflow-y-auto">
+          <KnowledgeBase token={token} />
+        </div>
+      ) : (
+        <div className="flex flex-1 min-h-0 gap-6">
+          {/* Sidebar (Tabs for Agents & History) */}
+      <div className="w-1/3 rounded-xl shadow-sm border p-4 flex flex-col h-full overflow-hidden" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
+        
+        {/* Tabs */}
+        <div className="flex border-b mb-4" style={{ borderColor: 'var(--border-primary)' }}>
+          <button 
+            onClick={() => setActiveTab('agents')}
+            className={`flex-1 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'agents' ? 'border-purple-500 text-purple-500' : 'border-transparent text-gray-500 hover:text-gray-300'}`}
+          >
+            AI Agents
+          </button>
+          <button 
+            onClick={() => setActiveTab('history')}
+            className={`flex-1 py-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'history' ? 'border-purple-500 text-purple-500' : 'border-transparent text-gray-500 hover:text-gray-300'}`}
+          >
+            History
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          {activeTab === 'agents' ? (
+            <div className="space-y-2">
+              {loadingAgents ? (
+                <p style={{ color: 'var(--text-muted)' }}>Loading agents...</p>
+              ) : (
+                agents.map(agent => (
+                  <button
+                    key={agent.id}
+                    onClick={() => { setSelectedAgentId(agent.id); setActiveConversationId(null); setMessages([]); setError(""); }}
+                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                      selectedAgentId === agent.id && !activeConversationId
+                        ? 'shadow-sm' 
+                        : 'border-transparent'
+                    }`}
+                    style={{ 
+                      backgroundColor: selectedAgentId === agent.id && !activeConversationId ? 'var(--bg-hover)' : 'transparent',
+                      borderColor: selectedAgentId === agent.id && !activeConversationId ? 'var(--accent-primary)' : 'transparent',
+                    }}
+                    onMouseEnter={e => { if (selectedAgentId !== agent.id || activeConversationId) e.currentTarget.style.backgroundColor = 'var(--bg-hover)'; }}
+                    onMouseLeave={e => { if (selectedAgentId !== agent.id || activeConversationId) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  >
+                    <div className="font-semibold" style={{ color: 'var(--text-primary)' }}>{agent.name}</div>
+                    <div className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{agent.description}</div>
+                  </button>
+                ))
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {loadingHistory ? (
+                <p style={{ color: 'var(--text-muted)' }}>Loading history...</p>
+              ) : conversations.length === 0 ? (
+                <p style={{ color: 'var(--text-muted)' }} className="text-sm">No recent conversations.</p>
+              ) : (
+                conversations.map(conv => (
+                  <button
+                    key={conv.id}
+                    onClick={() => loadConversation(conv.id, conv.agentId)}
+                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                      activeConversationId === conv.id 
+                        ? 'shadow-sm border-purple-500 bg-purple-500/10' 
+                        : 'border-transparent hover:bg-gray-800'
+                    }`}
+                  >
+                    <div className="font-semibold text-sm text-gray-200 truncate">{conv.title || 'New Conversation'}</div>
+                    <div className="text-xs text-gray-500 mt-1 flex justify-between">
+                      <span>Agent: {conv.agentId}</span>
+                      <span>{new Date(conv.updatedAt).toLocaleDateString()}</span>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Main Chat Area */}
@@ -573,6 +701,8 @@ export default function AIAgentsPage() {
           </div>
         )}
       </div>
+        </div>
+      )}
     </div>
   );
 }
