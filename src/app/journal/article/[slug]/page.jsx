@@ -9,6 +9,7 @@ import {
   RelatedDiscussion,
 } from "@/components/journal/widgets/EduVantixWidgets";
 import LearningPathWidget from "@/components/journal/widgets/LearningPathWidget";
+import MediumResponseSection from "@/components/journal/article/MediumResponseSection";
 import { ArticleCard } from "@/components/journal/cards/ArticleCards";
 import { TagPill } from "@/components/journal/ui/JournalUI";
 import Link from "next/link";
@@ -335,6 +336,11 @@ export default async function ArticlePage({ params }) {
         {/* ── Author Card ──────────────────────────────────────────────── */}
         <div className="max-w-[var(--j-content-width)] mx-auto">
           <AuthorCard author={article.author} />
+        </div>
+
+        {/* ── Medium Responses / Comments Section ──────────────────────── */}
+        <div className="max-w-[var(--j-content-width)] mx-auto">
+          <MediumResponseSection articleSlug={article.slug} initialComments={article.comments || []} />
         </div>
 
         {/* ── More from Journal ──────────────────────────────────────── */}
