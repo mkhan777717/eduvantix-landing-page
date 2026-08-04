@@ -85,8 +85,8 @@ export default function LearningPathWidget({ learningPath }) {
           const content = (
             <div
               key={idx}
-              className="flex items-start gap-4 p-3.5 rounded-lg border bg-white transition-opacity hover:opacity-85"
-              style={{ borderColor: "var(--j-border)" }}
+              className="flex items-start gap-4 p-3.5 rounded-lg border transition-opacity hover:opacity-85"
+              style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)" }}
             >
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5"

@@ -122,18 +122,18 @@ export default function AuthorDashboardPage() {
                   { label: "Reactions", val: stats.totalReactions, icon: Heart, color: "#C0392B" },
                   { label: "Completion Pct", val: `${learningAnalytics?.summary?.avgCompletionPct || 68}%`, icon: TrendingUp, color: "#C97A1A" },
                 ].map((s, i) => (
-                  <div key={i} className="p-5 rounded-lg border bg-white" style={{ borderColor: "var(--j-border)" }}>
+                  <div key={i} className="p-5 rounded-lg border" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)" }}>
                     <div className="flex items-center justify-between mb-2">
                       <span className="j-mono text-xs" style={{ color: "var(--j-text-muted)" }}>{s.label}</span>
                       <s.icon size={15} style={{ color: s.color }} />
                     </div>
-                    <p className="text-2xl font-bold" style={{ fontFamily: "var(--j-font-heading)" }}>{s.val}</p>
+                    <p className="text-2xl font-bold" style={{ fontFamily: "var(--j-font-heading)", color: "var(--j-text)" }}>{s.val}</p>
                   </div>
                 ))}
               </div>
 
               {/* EduVantix Learning Conversion Metrics */}
-              <div className="p-6 rounded-lg border bg-white" style={{ borderColor: "var(--j-border)" }}>
+              <div className="p-6 rounded-lg border" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)" }}>
                 <p className="j-eyebrow mb-1">EduVantix Learning Conversions</p>
                 <h3 className="text-lg font-semibold mb-4" style={{ fontFamily: "var(--j-font-heading)" }}>
                   Reader Practice & Course Engagement

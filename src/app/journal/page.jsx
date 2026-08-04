@@ -1,10 +1,10 @@
 import Link from "next/link";
-import TerminalWindow from "@/components/journal/terminal/TerminalWindow";
 import { ArticleCard } from "@/components/journal/cards/ArticleCards";
 import { TagPill, CategoryBadge } from "@/components/journal/ui/JournalUI";
 import NewsletterForm from "@/components/journal/newsletter/NewsletterForm";
 import { ArrowRight } from "lucide-react";
 import { getApiBase } from "@/utils/api";
+import JournalHeaderActions from "@/components/journal/ui/JournalHeaderActions";
 
 const API = getApiBase();
 
@@ -110,18 +110,18 @@ export default async function JournalHomePage() {
     fetchJSON("/api/journal/popular?limit=5"),
   ]);
 
-  const featured   = featuredData?.article;
-  const latest     = latestData?.articles || [];
-  const dsa        = dsaData?.articles || [];
-  const webDev     = webDevData?.articles || [];
-  const ai         = aiData?.articles || [];
-  const sysDesign  = systemDesignData?.articles || [];
-  const interview  = interviewData?.articles || [];
-  const career     = careerData?.articles || [];
-  const community  = communityData?.articles || [];
+  const featured = featuredData?.article;
+  const latest = latestData?.articles || [];
+  const dsa = dsaData?.articles || [];
+  const webDev = webDevData?.articles || [];
+  const ai = aiData?.articles || [];
+  const sysDesign = systemDesignData?.articles || [];
+  const interview = interviewData?.articles || [];
+  const career = careerData?.articles || [];
+  const community = communityData?.articles || [];
   const categories = categoriesData?.categories || [];
-  const tags       = (tagsData?.tags || []).slice(0, 20);
-  const popular    = popularData?.articles || [];
+  const tags = (tagsData?.tags || []).slice(0, 20);
+  const popular = popularData?.articles || [];
 
   return (
     <div className="px-5 py-8 max-w-7xl mx-auto">
@@ -144,7 +144,7 @@ export default async function JournalHomePage() {
             className="text-3xl sm:text-4xl font-semibold tracking-tight"
             style={{
               fontFamily: "var(--j-font-heading)",
-              fontStyle: "italic",
+              fontStyle: "normal",
               color: "var(--j-text)",
             }}
           >
@@ -155,30 +155,8 @@ export default async function JournalHomePage() {
           </p>
         </div>
 
-        {/* Action button */}
-        <div className="flex flex-wrap items-center gap-3 shrink-0">
-          <Link
-            href="/journal/admin"
-            className="px-4 py-2 rounded-full text-xs font-semibold border flex items-center gap-1.5 transition-colors hover:border-[var(--j-accent)]"
-            style={{ fontFamily: "var(--j-font-mono)", borderColor: "var(--j-border)", background: "var(--j-bg-secondary)", color: "var(--j-accent)" }}
-          >
-            🛡️ Admin Moderation
-          </Link>
-          <Link
-            href="/journal/write"
-            className="px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 text-white transition-opacity hover:opacity-90 shadow-sm"
-            style={{ fontFamily: "var(--j-font-mono)", background: "#10B981" }}
-          >
-            ✏ Write Article
-          </Link>
-          <Link
-            href="/journal/dashboard"
-            className="px-4 py-2 rounded-full text-xs font-medium border transition-colors hover:border-[var(--j-accent)]"
-            style={{ fontFamily: "var(--j-font-mono)", borderColor: "var(--j-border)", color: "var(--j-text)" }}
-          >
-            Author Dashboard
-          </Link>
-        </div>
+        {/* Action buttons */}
+        <JournalHeaderActions />
       </div>
 
       {/* ── Category Pill Filter Bar + Search ─────────────────────────────── */}
@@ -199,12 +177,14 @@ export default async function JournalHomePage() {
             <Link
               key={cat.label}
               href={cat.href}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                idx === 0
-                  ? "bg-[#10B981] text-white shadow-sm font-semibold"
-                  : "hover:text-[var(--j-accent)] text-[var(--j-text-secondary)]"
-              }`}
-              style={{ fontFamily: "var(--j-font-mono)" }}
+              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${idx === 0
+                ? "text-white shadow-sm font-semibold"
+                : "hover:text-[var(--j-accent)] text-[var(--j-text-secondary)]"
+                }`}
+              style={{
+                fontFamily: "var(--j-font-mono)",
+                background: idx === 0 ? "var(--j-accent)" : "transparent",
+              }}
             >
               {cat.label}
             </Link>
@@ -217,7 +197,7 @@ export default async function JournalHomePage() {
             type="text"
             name="q"
             placeholder="Search articles..."
-            className="w-full pl-9 pr-4 py-2 rounded-full border text-xs outline-none transition-colors focus:border-[#10B981]"
+            className="w-full pl-9 pr-4 py-2 rounded-full border text-xs outline-none transition-colors focus:border-[var(--j-accent)]"
             style={{
               fontFamily: "var(--j-font-mono)",
               background: "var(--j-bg-card)",
@@ -230,87 +210,6 @@ export default async function JournalHomePage() {
           </span>
         </form>
       </div>
-
-      {/* ── Hero Section ───────────────────────────────────────────────── */}
-      <section
-        className="border-b"
-        style={{ borderColor: "var(--j-border)" }}
-        aria-label="Featured article"
-      >
-        <div className="max-w-7xl mx-auto px-5">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center py-14 lg:py-20">
-
-            {/* Left: featured editorial */}
-            <div>
-              <p className="j-eyebrow mb-5">Featured Article</p>
-
-              {featured ? (
-                <>
-                  <p className="j-filepath mb-3 text-xs">{featured.filePath}</p>
-                  <Link href={`/journal/article/${featured.slug}`} className="group block">
-                    <h1
-                      className="text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold leading-tight mb-4 group-hover:opacity-75 transition-opacity"
-                      style={{
-                        fontFamily: "var(--j-font-heading)",
-                        color: "var(--j-text)",
-                        letterSpacing: "-0.03em",
-                        fontStyle: "italic",
-                      }}
-                    >
-                      {featured.title}
-                    </h1>
-                  </Link>
-                  {featured.excerpt && (
-                    <p
-                      className="text-base leading-relaxed mb-6 max-w-lg"
-                      style={{ fontFamily: "var(--j-font-reading)", color: "var(--j-text-secondary)" }}
-                    >
-                      {featured.excerpt}
-                    </p>
-                  )}
-                  <p
-                    className="j-mono text-xs"
-                    style={{ color: "var(--j-text-muted)" }}
-                  >
-                    By {featured.author?.fullName || featured.author?.username}
-                    {featured.publishedAt && ` · ${new Date(featured.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`}
-                    {featured.readTime && ` · ${featured.readTime} min read`}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <h1
-                    className="text-4xl lg:text-5xl font-semibold leading-tight mb-4"
-                    style={{
-                      fontFamily: "var(--j-font-heading)",
-                      color: "var(--j-text)",
-                      letterSpacing: "-0.03em",
-                      fontStyle: "italic",
-                    }}
-                  >
-                    Master Dynamic Programming Without Memorizing Patterns
-                  </h1>
-                  <p
-                    className="text-base leading-relaxed mb-6 max-w-lg"
-                    style={{ fontFamily: "var(--j-font-reading)", color: "var(--j-text-secondary)" }}
-                  >
-                    A systematic approach to understanding DP problems through first principles,
-                    pattern recognition, and deliberate practice.
-                  </p>
-                  <p className="j-mono text-xs" style={{ color: "var(--j-text-muted)" }}>
-                    By Ishaan Khandelwal · Jul 28 · 12 min read
-                  </p>
-                </>
-              )}
-            </div>
-
-            {/* Right: terminal */}
-            <div className="hidden lg:block">
-              <TerminalWindow />
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ── Main content grid ────────────────────────────────────────────── */}
       <div className="max-w-7xl mx-auto px-5 py-14">
