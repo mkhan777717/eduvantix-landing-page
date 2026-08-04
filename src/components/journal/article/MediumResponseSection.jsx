@@ -1,20 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ShieldCheck, Bold, Italic, Link2, Heart, MessageSquare, MoreHorizontal, Send, CornerDownRight } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { getApiBase, buildAuthHeaders } from "@/utils/api";
 
 const API = getApiBase();
 
+function formatResponseHtml(content) {
+  if (!content) return "";
+  if (content.includes("<") && content.includes(">")) {
+    return content;
+  }
+  // Convert legacy markdown stars or bracket links into clean HTML tags
+  let html = content
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-[var(--j-accent)] underline">$1</a>');
+  return html;
+}
+
 export default function MediumResponseSection({ articleSlug, initialComments = [] }) {
   const { user, token } = useAuth();
   const [comments, setComments] = useState(initialComments);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [commentText, setCommentText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
-
+  
+  const editorRef = useRef(null);
   const displayName = user?.fullName || user?.username || "You";
 
   useEffect(() => {
@@ -35,14 +48,32 @@ export default function MediumResponseSection({ articleSlug, initialComments = [
     setTimeout(() => setToastMsg(""), 3500);
   };
 
+  // Rich Text ExecCommand Formatting
+  const handleFormat = (command, value = null) => {
+    if (editorRef.current) {
+      editorRef.current.focus();
+      if (command === "createLink") {
+        const url = prompt("Enter link URL:", "https://");
+        if (url) {
+          document.execCommand("createLink", false, url);
+        }
+      } else {
+        document.execCommand(command, false, value);
+      }
+    }
+  };
+
   const handlePostResponse = async (e) => {
     e.preventDefault();
-    if (!commentText.trim()) return;
+    const htmlContent = editorRef.current?.innerHTML || "";
+    const plainText = editorRef.current?.innerText || "";
+    
+    if (!plainText.trim() && !htmlContent.includes("<img")) return;
     setSubmitting(true);
 
     const newResponseObj = {
       id: Date.now(),
-      content: commentText,
+      content: htmlContent,
       author: {
         username: user?.username || "You",
         fullName: displayName,
@@ -53,8 +84,9 @@ export default function MediumResponseSection({ articleSlug, initialComments = [
     };
 
     setComments((prev) => [newResponseObj, ...prev]);
-    const submittedText = commentText;
-    setCommentText("");
+    if (editorRef.current) {
+      editorRef.current.innerHTML = "";
+    }
     setIsExpanded(false);
     setSubmitting(false);
     triggerToast("✓ Response published!");
@@ -64,13 +96,9 @@ export default function MediumResponseSection({ articleSlug, initialComments = [
       await fetch(`${API}/api/journal/articles/${articleSlug}/comments`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ content: submittedText }),
+        body: JSON.stringify({ content: htmlContent }),
       });
     } catch (_) {}
-  };
-
-  const handleApplyFormatting = (prefix, suffix = "") => {
-    setCommentText((prev) => `${prev}${prefix}${suffix}`);
   };
 
   return (
@@ -100,7 +128,7 @@ export default function MediumResponseSection({ articleSlug, initialComments = [
         </button>
       </div>
 
-      {/* ── 2. Medium Interactive Response Box ──────────────────────────────── */}
+      {/* ── 2. Medium Rich Response Box ──────────────────────────────── */}
       <div className="mb-10 rounded-xl border border-[var(--j-border)] bg-[var(--j-bg-card)] p-5 shadow-xs transition-all">
         
         {/* User Info Row */}
@@ -126,21 +154,25 @@ export default function MediumResponseSection({ articleSlug, initialComments = [
           {!isExpanded ? (
             /* Collapsed Input Placeholder */
             <div
-              onClick={() => setIsExpanded(true)}
+              onClick={() => {
+                setIsExpanded(true);
+                setTimeout(() => editorRef.current?.focus(), 50);
+              }}
               className="w-full p-4 rounded-lg border border-[var(--j-border-subtle)] bg-[var(--j-bg-secondary)] text-sm text-[var(--j-text-muted)] cursor-pointer hover:border-[var(--j-accent)] transition-colors"
             >
               What are your thoughts?
             </div>
           ) : (
-            /* Expanded Medium Response Rich Input */
+            /* Expanded Medium Rich Response Input */
             <div className="rounded-lg border border-[var(--j-border)] bg-[var(--j-bg-secondary)] overflow-hidden">
-              <textarea
-                rows={4}
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="What are your thoughts?"
-                autoFocus
-                className="w-full p-4 text-sm bg-transparent text-[var(--j-text)] outline-none resize-none leading-relaxed"
+              
+              {/* Rich ContentEditable Textbox */}
+              <div
+                ref={editorRef}
+                contentEditable
+                aria-label="What are your thoughts?"
+                data-placeholder="What are your thoughts?"
+                className="w-full p-4 min-h-[110px] text-sm bg-transparent text-[var(--j-text)] outline-none leading-relaxed empty:before:content-[attr(data-placeholder)] empty:before:text-[var(--j-text-muted)] focus:before:content-none [&_strong]:font-bold [&_strong]:text-[var(--j-text)] [&_b]:font-bold [&_em]:italic [&_i]:italic [&_a]:text-[var(--j-accent)] [&_a]:underline"
                 style={{ fontFamily: "var(--j-font-reading)" }}
               />
 
@@ -151,23 +183,23 @@ export default function MediumResponseSection({ articleSlug, initialComments = [
                 <div className="flex items-center gap-1.5 text-[var(--j-text-muted)]">
                   <button
                     type="button"
-                    onClick={() => handleApplyFormatting("**", "**")}
-                    className="p-1.5 rounded hover:bg-[var(--j-bg-secondary)] hover:text-[var(--j-text)] transition-colors"
-                    title="Bold"
+                    onClick={() => handleFormat("bold")}
+                    className="p-1.5 rounded hover:bg-[var(--j-bg-secondary)] hover:text-[var(--j-text)] font-bold text-xs transition-colors"
+                    title="Bold text"
                   >
                     <Bold size={15} />
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleApplyFormatting("*", "*")}
-                    className="p-1.5 rounded hover:bg-[var(--j-bg-secondary)] hover:text-[var(--j-text)] transition-colors"
-                    title="Italic"
+                    onClick={() => handleFormat("italic")}
+                    className="p-1.5 rounded hover:bg-[var(--j-bg-secondary)] hover:text-[var(--j-text)] italic text-xs transition-colors"
+                    title="Italic text"
                   >
                     <Italic size={15} />
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleApplyFormatting("[Link text](url)")}
+                    onClick={() => handleFormat("createLink")}
                     className="p-1.5 rounded hover:bg-[var(--j-bg-secondary)] hover:text-[var(--j-text)] transition-colors"
                     title="Add Link"
                   >
@@ -181,7 +213,7 @@ export default function MediumResponseSection({ articleSlug, initialComments = [
                     type="button"
                     onClick={() => {
                       setIsExpanded(false);
-                      setCommentText("");
+                      if (editorRef.current) editorRef.current.innerHTML = "";
                     }}
                     className="text-xs font-medium text-[var(--j-text-secondary)] hover:text-[var(--j-text)] transition-colors px-3 py-1.5"
                   >
@@ -189,7 +221,7 @@ export default function MediumResponseSection({ articleSlug, initialComments = [
                   </button>
                   <button
                     type="submit"
-                    disabled={submitting || !commentText.trim()}
+                    disabled={submitting}
                     className="px-4 py-1.5 rounded-full text-xs font-semibold text-white bg-[var(--j-accent)] hover:opacity-90 disabled:opacity-40 transition-opacity shadow-xs flex items-center gap-1.5"
                   >
                     <Send size={12} /> Respond
@@ -214,6 +246,8 @@ export default function MediumResponseSection({ articleSlug, initialComments = [
             const dateStr = comment.createdAt
               ? new Date(comment.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
               : "Recently";
+
+            const formattedHtml = formatResponseHtml(comment.content);
 
             return (
               <div key={comment.id} className="pt-6 space-y-3">
@@ -249,13 +283,12 @@ export default function MediumResponseSection({ articleSlug, initialComments = [
                   </button>
                 </div>
 
-                {/* Comment Content */}
-                <p
-                  className="text-sm leading-relaxed text-[var(--j-text-secondary)] font-normal"
+                {/* Formatted Comment Content */}
+                <div
+                  className="text-sm leading-relaxed text-[var(--j-text-secondary)] font-normal [&_strong]:font-bold [&_strong]:text-[var(--j-text)] [&_b]:font-bold [&_b]:text-[var(--j-text)] [&_em]:italic [&_i]:italic [&_a]:text-[var(--j-accent)] [&_a]:underline"
                   style={{ fontFamily: "var(--j-font-reading)" }}
-                >
-                  {comment.content}
-                </p>
+                  dangerouslySetInnerHTML={{ __html: formattedHtml }}
+                />
 
                 {/* Response Action Bar */}
                 <div className="flex items-center gap-4 text-xs text-[var(--j-text-muted)] pt-1">
