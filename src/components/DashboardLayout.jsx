@@ -488,6 +488,7 @@ export default function DashboardLayout({ children }) {
       (isSuperAdmin || isInstAdmin) && { label: "Courses", href: "/admin/courses", icon: BookOpen },
       isSuperAdmin && { label: "User Feedbacks", href: "/admin/feedback", icon: ClipboardList },
       isSuperAdmin && { label: "Job Assistance", href: "/admin/job-assistance", icon: Briefcase },
+      isSuperAdmin && { label: "Careers Portal", href: "/admin/careers", icon: Briefcase },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedContest") && { label: "Contests", href: "/admin/contests", icon: Trophy, featureFlag: "allowedContest" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedProblems") && { label: "Problems", href: "/admin/problems", icon: Code, featureFlag: "allowedProblems" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedGoLive") && { label: "Live Sessions", href: "/admin/live", icon: Radio, featureFlag: "allowedGoLive" },
@@ -978,7 +979,7 @@ export default function DashboardLayout({ children }) {
         )}
 
         <main className={`flex-1 overflow-y-auto ${isLiveStudioMode ? 'bg-[var(--bg-primary)]' : ''}`}>
-          <div className={isLiveStudioMode || pathname.startsWith('/courses') ? "h-full" : "max-w-7xl mx-auto p-6 md:p-8"}>
+          <div className={isLiveStudioMode || pathname.startsWith('/courses') || pathname.includes('/careers') ? "h-full flex flex-col min-h-0" : "max-w-7xl mx-auto p-6 md:p-8"}>
             {isFeatureBlocked ? <BlockedScreen /> : children}
           </div>
         </main>
