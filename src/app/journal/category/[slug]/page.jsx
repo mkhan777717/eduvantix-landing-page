@@ -5,9 +5,11 @@ import { getApiBase } from "@/utils/api";
 
 const API = getApiBase();
 
+export const dynamic = "force-dynamic";
+
 async function fetchData(url) {
   try {
-    const res = await fetch(url, { next: { revalidate: 3600 } });
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch { return null; }

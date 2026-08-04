@@ -199,7 +199,6 @@ export default function AdminCMSPage() {
                     }}>
                       {article.status}
                     </span>
-                    <span className="j-filepath text-xs">{article.filePath}</span>
                   </div>
                   <h4 className="text-base font-semibold leading-snug" style={{ fontFamily: "var(--j-font-heading)" }}>
                     {article.title}

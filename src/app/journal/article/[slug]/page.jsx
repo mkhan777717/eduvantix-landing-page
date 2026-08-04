@@ -17,10 +17,12 @@ import { getApiBase } from "@/utils/api";
 
 const API = getApiBase();
 
+export const dynamic = "force-dynamic";
+
 async function fetchArticle(slug) {
   try {
     const res = await fetch(`${API}/api/journal/articles/${slug}`, {
-      next: { revalidate: 3600 },
+      cache: "no-store",
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -34,7 +36,7 @@ async function fetchRelated(categorySlug, currentSlug) {
   try {
     const res = await fetch(
       `${API}/api/journal/latest?category=${categorySlug}&limit=4`,
-      { next: { revalidate: 3600 } }
+      { cache: "no-store" }
     );
     if (!res.ok) return [];
     const data = await res.json();

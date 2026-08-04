@@ -18,10 +18,7 @@ export default function ArticleHeader({ article }) {
         ← Back to Journal
       </Link>
 
-      {/* File path */}
-      <div className="mb-4">
-        <FilePath path={article.filePath} />
-      </div>
+
 
       {/* Category */}
       {article.category && (
