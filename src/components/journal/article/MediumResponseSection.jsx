@@ -29,6 +29,16 @@ function CommentItem({ comment, articleSlug, triggerToast, user, token, isAuthor
   const [showReplies, setShowReplies] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Persist comment likes in localStorage so they survive page refresh
+  useEffect(() => {
+    if (!comment.id) return;
+    const storedLiked = localStorage.getItem(`j_cmt_liked_${comment.id}`);
+    const storedCount = localStorage.getItem(`j_cmt_count_${comment.id}`);
+    if (storedLiked === "true") setLiked(true);
+    else if (storedLiked === "false") setLiked(false);
+    if (storedCount !== null) setLikeCount(parseInt(storedCount, 10));
+  }, [comment.id]);
+
   const author = comment.author || {};
   const name = author.fullName || author.username || "Reader";
   const isCommentAuthor = author.role === "AUTHOR" || author.username === "admin" || isAuthor;
@@ -41,8 +51,14 @@ function CommentItem({ comment, articleSlug, triggerToast, user, token, isAuthor
 
   const handleToggleLike = async () => {
     const nextLiked = !liked;
+    const nextCount = nextLiked ? likeCount + 1 : Math.max(0, likeCount - 1);
     setLiked(nextLiked);
-    setLikeCount((prev) => (nextLiked ? prev + 1 : Math.max(0, prev - 1)));
+    setLikeCount(nextCount);
+    // Persist to localStorage so likes survive refresh
+    if (comment.id) {
+      localStorage.setItem(`j_cmt_liked_${comment.id}`, nextLiked ? "true" : "false");
+      localStorage.setItem(`j_cmt_count_${comment.id}`, nextCount.toString());
+    }
     triggerToast(nextLiked ? "✓ Liked response" : "Removed like");
 
     try {
@@ -182,16 +198,16 @@ function CommentItem({ comment, articleSlug, triggerToast, user, token, isAuthor
       {/* ── 3. Medium Action Toolbar (Clap, Hide/Show Replies, Reply) ──────── */}
       <div className="flex items-center gap-4 text-xs text-[var(--j-text-secondary)] pt-1">
         
-        {/* Clap / Like Button */}
+        {/* Heart Like Button */}
         <button
           type="button"
           onClick={handleToggleLike}
           className={`flex items-center gap-1.5 transition-colors ${
             liked ? "text-red-500 font-bold" : "hover:text-red-500"
           }`}
-          title={liked ? "Unlike response" : "Clap response"}
+          title={liked ? "Unlike response" : "Like response"}
         >
-          <span className="text-base leading-none">👏</span>
+          <Heart size={14} fill={liked ? "#EF4444" : "none"} stroke={liked ? "#EF4444" : "currentColor"} />
           <span className="font-medium">{likeCount}</span>
         </button>
 
