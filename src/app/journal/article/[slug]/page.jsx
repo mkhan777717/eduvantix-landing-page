@@ -238,26 +238,21 @@ export default async function ArticlePage({ params }) {
       {/* JSON-LD */}
       <ArticleJsonLd article={article} />
 
-      {/* Cover image */}
-      {article.coverImage && (
-        <div
-          className="w-full border-b"
-          style={{ borderColor: "var(--j-border)", background: "var(--j-bg-secondary)" }}
-        >
-          <div className="max-w-[var(--j-content-width)] mx-auto px-5">
-            <img
-              src={article.coverImage}
-              alt={article.title}
-              className="w-full h-56 sm:h-72 lg:h-96 object-cover rounded-lg my-6"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Article header */}
+      {/* Article header — title, subtitle, author meta FIRST (Medium layout) */}
       <div className="px-5">
         <ArticleHeader article={article} />
       </div>
+
+      {/* Cover image — rendered AFTER header, above the body (Medium layout) */}
+      {article.coverImage && (
+        <div className="max-w-[var(--j-content-width)] mx-auto px-5 mb-10">
+          <img
+            src={article.coverImage}
+            alt={article.title}
+            className="w-full h-56 sm:h-72 lg:h-96 object-cover rounded-xl shadow-sm"
+          />
+        </div>
+      )}
 
       {/* Article body */}
       <article
