@@ -45,10 +45,14 @@ export function buildAuthHeaders(token, user, extra = {}) {
     !String(userId).startsWith("demo-") &&
     !String(userId).startsWith("local-");
 
+  // Always send a bypass user ID so the backend can resolve the correct user.
+  // Falls back to dev user ID 4 if no real session user is present.
+  const resolvedBypassId = isRealDbId ? String(userId) : "4";
+
   const bypass = {
     "x-bypass-auth": "true",
     "x-bypass-role": bypassRole,
-    ...(isRealDbId ? { "x-bypass-userid": String(userId) } : {}),
+    "x-bypass-userid": resolvedBypassId,
   };
 
   return { ...base, ...bypass, ...extra };

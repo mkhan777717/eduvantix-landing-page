@@ -495,39 +495,39 @@ html.theme-dark .live-chat-sidebar-fullscreen {
    ============================================= */
 
 .journal-root {
-  /* ── Color Tokens (Light Theme) ─────────────── */
-  --j-bg:               #FFFFFF;
-  --j-bg-secondary:     #F8FAFC;
-  --j-bg-card:          #FFFFFF;
-  --j-bg-terminal:      #1B2233;
-  --j-text:             #0F172A;
-  --j-text-secondary:   #475569;
-  --j-text-muted:       #94A3B8;
-  --j-border:           #E2E8F0;
-  --j-border-subtle:    #F1F5F9;
-  --j-accent:           #3454D1;
-  --j-accent-hover:     #2844BE;
-  --j-accent-light:     rgba(52, 84, 209, 0.08);
-  --j-eyebrow:          #C97A1A;
-  --j-eyebrow-bg:       rgba(201, 122, 26, 0.08);
-  --j-success:          #1A7340;
-  --j-error:            #C0392B;
-  --j-warning:          #C97A1A;
+  /* ── Color Tokens (Bound to Platform Theme System) ─────────────── */
+  --j-bg:               var(--bg-primary, #f8fafc);
+  --j-bg-secondary:     var(--bg-secondary, #ffffff);
+  --j-bg-card:          var(--bg-card, #ffffff);
+  --j-bg-terminal:      #1b2233;
+  --j-text:             var(--text-primary, #020617);
+  --j-text-secondary:   var(--text-secondary, #334155);
+  --j-text-muted:       var(--text-muted, #64748b);
+  --j-border:           var(--border-primary, #e2e8f0);
+  --j-border-subtle:    var(--border-subtle, #f1f5f9);
+  --j-accent:           var(--accent-primary, #059669);
+  --j-accent-hover:     var(--accent-secondary, #047857);
+  --j-accent-light:     var(--accent-glow, rgba(5, 150, 105, 0.1));
+  --j-eyebrow:          var(--accent-primary, #059669);
+  --j-eyebrow-bg:       var(--accent-glow, rgba(5, 150, 105, 0.1));
+  --j-success:          #10b981;
+  --j-error:            #ef4444;
+  --j-warning:          #f59e0b;
 
   /* ── Typography ───────────────────────────── */
-  --j-font-heading:     'Fraunces', 'Georgia', serif;
-  --j-font-reading:     'Source Serif 4', 'Georgia', serif;
+  --j-font-heading:     var(--font-sans, 'Inter', sans-serif);
+  --j-font-reading:     var(--font-sans, 'Inter', sans-serif);
   --j-font-mono:        'IBM Plex Mono', 'Courier New', monospace;
 
   /* ── Terminal Colors ──────────────────────── */
-  --j-term-green:       #4EC994;
-  --j-term-purple:      #C792EA;
-  --j-term-blue:        #89DDFF;
-  --j-term-orange:      #F78C6C;
-  --j-term-yellow:      #FFCB6B;
+  --j-term-green:       #4ec994;
+  --j-term-purple:      #c792ea;
+  --j-term-blue:        #89ddff;
+  --j-term-orange:      #f78c6c;
+  --j-term-yellow:      #ffcb6b;
   --j-term-comment:     #637777;
-  --j-term-white:       #EEFFFF;
-  --j-term-prompt:      #C3E88D;
+  --j-term-white:       #eeffff;
+  --j-term-prompt:      #c3e88d;
 
   /* ── Spacing & Sizing ─────────────────────── */
   --j-content-width:    720px;
@@ -548,24 +548,25 @@ html.theme-dark .live-chat-sidebar-fullscreen {
 /* ── Dark Theme Overrides for Journal ─────────────── */
 html.theme-dark .journal-root,
 .theme-dark .journal-root,
-.dark .journal-root {
-  --j-bg:               #0A0A0A;
-  --j-bg-secondary:     #121212;
-  --j-bg-card:          #121212;
-  --j-bg-terminal:      #000000;
-  --j-text:             #F8FAFC;
-  --j-text-secondary:   #CBD5E1;
-  --j-text-muted:       #64748B;
-  --j-border:           #222222;
-  --j-border-subtle:    #1A1A1A;
-  --j-accent:           #3B82F6;
-  --j-accent-hover:     #60A5FA;
-  --j-accent-light:     rgba(59, 130, 246, 0.15);
-  --j-eyebrow:          #F59E0B;
-  --j-eyebrow-bg:       rgba(245, 158, 11, 0.15);
-  --j-success:          #10B981;
-  --j-error:            #EF4444;
-  --j-warning:          #F59E0B;
+.dark .journal-root,
+[data-theme="dark"] .journal-root {
+  --j-bg:               var(--bg-primary, #000000);
+  --j-bg-secondary:     var(--bg-secondary, #0a0a0a);
+  --j-bg-card:          var(--bg-card, #0a0a0a);
+  --j-bg-terminal:      #050505;
+  --j-text:             var(--text-primary, #f8fafc);
+  --j-text-secondary:   var(--text-secondary, #94a3b8);
+  --j-text-muted:       var(--text-muted, #64748b);
+  --j-border:           var(--border-primary, #222222);
+  --j-border-subtle:    var(--border-subtle, #111111);
+  --j-accent:           var(--accent-primary, #10b981);
+  --j-accent-hover:     var(--accent-secondary, #34d399);
+  --j-accent-light:     var(--accent-glow, rgba(16, 185, 129, 0.15));
+  --j-eyebrow:          var(--accent-primary, #10b981);
+  --j-eyebrow-bg:       var(--accent-glow, rgba(16, 185, 129, 0.15));
+  --j-success:          #10b981;
+  --j-error:            #ef4444;
+  --j-warning:          #f59e0b;
 
   background-color: var(--j-bg);
   color: var(--j-text);
@@ -582,6 +583,25 @@ html.theme-dark .journal-root,
   color: var(--j-text);
   letter-spacing: -0.025em;
   line-height: 1.15;
+}
+
+/* ── Select Dropdown Option Popup Styling ───────── */
+select option {
+  background-color: var(--j-bg-card, #0a0a0a) !important;
+  color: var(--j-text, #f8fafc) !important;
+}
+
+html.theme-light select option {
+  background-color: #ffffff !important;
+  color: #020617 !important;
+}
+
+html.theme-dark select option,
+.theme-dark select option,
+.dark select option,
+[data-theme="dark"] select option {
+  background-color: #121212 !important;
+  color: #f8fafc !important;
 }
 
 /* ── Monospace Interface Elements ─────────────── */

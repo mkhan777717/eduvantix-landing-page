@@ -46,7 +46,7 @@ export default function NewsletterForm() {
         className="flex-1 px-4 py-2.5 rounded-md border outline-none transition-colors focus:border-[var(--j-accent)]"
         style={{
           fontFamily: "var(--j-font-mono)",
-          background: "#FFFFFF",
+          background: "var(--j-bg-card)",
           borderColor: "var(--j-border)",
           color: "var(--j-text)",
           fontSize: "0.875rem",

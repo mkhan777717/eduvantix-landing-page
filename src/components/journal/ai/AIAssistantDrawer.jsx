@@ -70,7 +70,7 @@ export default function AIAssistantDrawer({ open, onClose, articleContent, selec
   };
 
   return (
-    <div className="fixed inset-y-0 right-0 w-full sm:w-[420px] bg-white border-l shadow-2xl z-50 flex flex-col" style={{ borderColor: "var(--j-border)" }}>
+    <div className="fixed inset-y-0 right-0 w-full sm:w-[420px] border-l shadow-2xl z-50 flex flex-col" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)", color: "var(--j-text)" }}>
 
       {/* Header */}
       <div className="p-4 border-b flex items-center justify-between" style={{ borderColor: "var(--j-border)" }}>
