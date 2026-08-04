@@ -18,31 +18,10 @@ export function ArticleCard({ article, showExcerpt = true }) {
 
   // Interactive States
   // Interactive States (with persistent cache & valid backend route sync)
-  const [liked, setLiked] = useState(() => {
-    if (article.userState?.reacted || article.isLiked) return true;
-    if (typeof window !== "undefined") {
-      return localStorage.getItem(`j_liked_${article.slug}`) === "true";
-    }
-    return false;
-  });
-
-  const [likeCount, setLikeCount] = useState(() => {
-    const baseCount = article.reactionCount || article.reactions || 0;
-    if (typeof window !== "undefined") {
-      const storedCount = localStorage.getItem(`j_like_count_${article.slug}`);
-      if (storedCount !== null) return parseInt(storedCount, 10);
-    }
-    return baseCount;
-  });
-
+  const [liked, setLiked] = useState(Boolean(article.userState?.reacted || article.isLiked));
+  const [likeCount, setLikeCount] = useState(article.reactionCount || article.reactions || 0);
   const [disliked, setDisliked] = useState(false);
-  const [bookmarked, setBookmarked] = useState(() => {
-    if (article.userState?.bookmarked || article.isBookmarked) return true;
-    if (typeof window !== "undefined") {
-      return localStorage.getItem(`j_bookmarked_${article.slug}`) === "true";
-    }
-    return false;
-  });
+  const [bookmarked, setBookmarked] = useState(Boolean(article.userState?.bookmarked || article.isBookmarked));
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [followingAuthor, setFollowingAuthor] = useState(false);
@@ -60,6 +39,31 @@ export function ArticleCard({ article, showExcerpt = true }) {
 
   const categoryName = article.category?.name || "Engineering";
   const categorySlug = article.category?.slug || "general";
+
+  // Sync client-side state from localStorage on mount (prevents Next.js SSR hydration reset)
+  useEffect(() => {
+    if (typeof window === "undefined" || !article.slug) return;
+
+    const storedLiked = localStorage.getItem(`j_liked_${article.slug}`);
+    const storedCount = localStorage.getItem(`j_like_count_${article.slug}`);
+    const storedBookmarked = localStorage.getItem(`j_bookmarked_${article.slug}`);
+
+    if (storedLiked === "true") {
+      setLiked(true);
+    } else if (storedLiked === "false") {
+      setLiked(false);
+    }
+
+    if (storedCount !== null) {
+      setLikeCount(parseInt(storedCount, 10));
+    }
+
+    if (storedBookmarked === "true") {
+      setBookmarked(true);
+    } else if (storedBookmarked === "false") {
+      setBookmarked(false);
+    }
+  }, [article.slug]);
 
   // Close dropdown menu on outside click
   useEffect(() => {
