@@ -319,16 +319,15 @@ export function ArticleCard({ article, showExcerpt = true }) {
             <span>{likeCount}</span>
           </button>
 
-          {/* Quick Comments Button */}
-          <button
-            type="button"
-            onClick={handleOpenComments}
+          {/* Comments Button -> Redirects directly to responses inside article */}
+          <Link
+            href={`/journal/article/${article.slug}#comments`}
             className="inline-flex items-center gap-1 hover:text-[var(--j-accent)] text-[var(--j-text-secondary)] transition-colors"
-            title="Read & post comments"
+            title="Read & post responses"
           >
             <MessageSquare size={14} />
-            <span>{commentsList.length || article.commentCount || 0}</span>
-          </button>
+            <span>{article.commentCount || article.comments?.length || 0}</span>
+          </Link>
 
           {/* Read Time */}
           {article.readTime && (
@@ -463,76 +462,6 @@ export function ArticleCard({ article, showExcerpt = true }) {
 
         </div>
       </div>
-
-      {/* ── 4. Inline Quick Comment Drawer / Modal ────────────────────────────── */}
-      {commentDrawerOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
-          onClick={() => setCommentDrawerOpen(false)}
-        >
-          <div
-            className="w-full max-w-lg rounded-2xl border border-[var(--j-border)] bg-[var(--j-bg-card)] shadow-2xl p-6 space-y-4 max-h-[85vh] flex flex-col font-sans"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-[var(--j-border)]">
-              <div>
-                <p className="text-xs font-semibold text-[var(--j-accent)]">Responses</p>
-                <h4 className="text-base font-bold text-[var(--j-text)] line-clamp-1">
-                  {article.title}
-                </h4>
-              </div>
-              <button
-                onClick={() => setCommentDrawerOpen(false)}
-                className="p-1 rounded-full hover:bg-[var(--j-bg-secondary)] text-[var(--j-text-muted)]"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Comment Post Box */}
-            <form onSubmit={handleAddComment} className="flex gap-2">
-              <input
-                type="text"
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="What are your thoughts?"
-                className="flex-1 px-3 py-2 text-xs rounded-lg border border-[var(--j-border)] bg-[var(--j-bg-secondary)] text-[var(--j-text)] outline-none focus:border-[var(--j-accent)]"
-              />
-              <button
-                type="submit"
-                disabled={submittingComment || !commentText.trim()}
-                className="px-4 py-2 rounded-lg text-xs font-semibold bg-[var(--j-accent)] text-white hover:opacity-90 disabled:opacity-50 flex items-center gap-1"
-              >
-                <Send size={12} /> Respond
-              </button>
-            </form>
-
-            {/* Comments List */}
-            <div className="flex-1 overflow-y-auto space-y-3 pt-2">
-              {commentsList.length === 0 ? (
-                <p className="text-xs text-[var(--j-text-muted)] text-center py-6">
-                  No responses yet. Be the first to share your thoughts!
-                </p>
-              ) : (
-                commentsList.map((c, i) => (
-                  <div key={c.id || i} className="p-3 rounded-lg border border-[var(--j-border-subtle)] bg-[var(--j-bg-secondary)]/40 space-y-1 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-[var(--j-text)]">
-                        @{c.author?.username || "user"}
-                      </span>
-                      <span className="text-[10px] text-[var(--j-text-muted)]">
-                        {c.createdAt ? new Date(c.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Just now"}
-                      </span>
-                    </div>
-                    <p className="text-[var(--j-text-secondary)] leading-relaxed">{c.content}</p>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
     </article>
   );
