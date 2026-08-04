@@ -47,6 +47,20 @@ async function fetchRelated(categorySlug, currentSlug) {
   }
 }
 
+async function fetchByAuthor(username, currentSlug) {
+  try {
+    const res = await fetch(
+      `${API}/api/journal/articles?author=${username}&limit=5`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.articles || []).filter((a) => a.slug !== currentSlug).slice(0, 4);
+  } catch {
+    return [];
+  }
+}
+
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export async function generateMetadata({ params }) {
@@ -222,6 +236,12 @@ export default async function ArticlePage({ params }) {
   if (!article) notFound();
 
   const relatedArticles = await fetchRelated(article.category?.slug, article.slug);
+  const authorArticles = await fetchByAuthor(
+    article.author?.username,
+    article.slug
+  );
+  // Fallback: use category-related articles if no author articles found
+  const moreArticles = authorArticles.length > 0 ? authorArticles : relatedArticles;
 
   // EduVantix integrations from the article
   const firstRelatedProblem = article.relatedProblems?.[0]?.problem;
@@ -338,31 +358,124 @@ export default async function ArticlePage({ params }) {
           <MediumResponseSection articleSlug={article.slug} initialComments={article.comments || []} />
         </div>
 
-        {/* ── More from Journal ──────────────────────────────────────── */}
-        {relatedArticles.length > 0 && (
-          <div className="max-w-[var(--j-content-width)] mx-auto mt-16">
+        {/* ── Medium "More from [Author]" Grid ─────────────────────── */}
+        {moreArticles.length > 0 && (
+          <div
+            className="max-w-[var(--j-content-width)] mx-auto mt-16 pt-10 border-t"
+            style={{ borderColor: "var(--j-border)" }}
+          >
+            {/* Section heading */}
             <h2
-              className="text-xl font-semibold mb-6"
+              className="text-2xl font-bold mb-8"
               style={{
                 fontFamily: "var(--j-font-heading)",
                 color: "var(--j-text)",
                 letterSpacing: "-0.02em",
               }}
             >
-              More from EduVantix Journal
+              More from{" "}
+              <Link
+                href={`/journal/author/${article.author?.username}`}
+                className="hover:underline"
+                style={{ color: "var(--j-text)" }}
+              >
+                {article.author?.fullName || article.author?.username || "this author"}
+              </Link>
             </h2>
-            <div>
-              {relatedArticles.map((a) => (
-                <ArticleCard key={a.slug} article={a} />
-              ))}
+
+            {/* 2-column article grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              {moreArticles.map((a) => {
+                const aAuthor = a.author || {};
+                const aName = aAuthor.fullName || aAuthor.username || "Author";
+                const aDate = a.publishedAt || a.createdAt
+                  ? new Date(a.publishedAt || a.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })
+                  : "";
+                return (
+                  <Link
+                    key={a.slug}
+                    href={`/journal/article/${a.slug}`}
+                    className="group block"
+                  >
+                    {/* Cover image */}
+                    {a.coverImage && (
+                      <div className="w-full aspect-[16/9] overflow-hidden rounded-lg mb-4 bg-[var(--j-bg-secondary)]">
+                        <img
+                          src={a.coverImage}
+                          alt={a.title}
+                          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+                    {!a.coverImage && (
+                      <div
+                        className="w-full aspect-[16/9] rounded-lg mb-4 flex items-center justify-center"
+                        style={{ background: "var(--j-bg-secondary)" }}
+                      >
+                        <span className="text-3xl opacity-20">📄</span>
+                      </div>
+                    )}
+
+                    {/* Author meta row */}
+                    <div className="flex items-center gap-2 mb-2">
+                      {aAuthor.avatarUrl ? (
+                        <img
+                          src={aAuthor.avatarUrl}
+                          alt={aName}
+                          className="w-5 h-5 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div
+                          className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
+                          style={{ background: "var(--j-accent-light)", color: "var(--j-accent)" }}
+                        >
+                          {aName[0].toUpperCase()}
+                        </div>
+                      )}
+                      <span
+                        className="text-xs"
+                        style={{ color: "var(--j-text-secondary)", fontFamily: "var(--j-font-mono)" }}
+                      >
+                        {aName}
+                        {aDate && (
+                          <span style={{ color: "var(--j-text-muted)" }}> · {aDate}</span>
+                        )}
+                      </span>
+                    </div>
+
+                    {/* Article title */}
+                    <h3
+                      className="font-bold text-base sm:text-lg leading-snug group-hover:underline"
+                      style={{
+                        fontFamily: "var(--j-font-heading)",
+                        color: "var(--j-text)",
+                        letterSpacing: "-0.01em",
+                      }}
+                    >
+                      {a.title}
+                    </h3>
+                  </Link>
+                );
+              })}
             </div>
-            <Link
-              href="/journal"
-              className="inline-flex items-center gap-1.5 mt-8 text-sm hover:underline"
-              style={{ fontFamily: "var(--j-font-mono)", color: "var(--j-accent)" }}
-            >
-              ← Back to Journal
-            </Link>
+
+            {/* See all from author link */}
+            <div className="mt-8">
+              <Link
+                href={`/journal/author/${article.author?.username}`}
+                className="inline-flex items-center gap-1.5 text-sm font-medium px-5 py-2 rounded-full border transition-colors hover:bg-[var(--j-bg-secondary)]"
+                style={{
+                  borderColor: "var(--j-text)",
+                  color: "var(--j-text)",
+                  fontFamily: "var(--j-font-mono)",
+                }}
+              >
+                See all from {article.author?.fullName || article.author?.username} →
+              </Link>
+            </div>
           </div>
         )}
       </article>
