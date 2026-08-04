@@ -10,9 +10,11 @@ const API = getApiBase();
 
 // ── Data fetching helpers (Server Component) ─────────────────────────────────
 
+export const dynamic = "force-dynamic";
+
 async function fetchJSON(path) {
   try {
-    const res = await fetch(`${API}${path}`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${API}${path}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {

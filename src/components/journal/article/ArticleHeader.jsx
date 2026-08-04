@@ -18,10 +18,7 @@ export default function ArticleHeader({ article }) {
         ← Back to Journal
       </Link>
 
-      {/* File path */}
-      <div className="mb-4">
-        <FilePath path={article.filePath} />
-      </div>
+
 
       {/* Category */}
       {article.category && (
@@ -40,7 +37,7 @@ export default function ArticleHeader({ article }) {
           fontFamily: "var(--j-font-heading)",
           color: "var(--j-text)",
           letterSpacing: "-0.03em",
-          fontStyle: "italic",
+          fontStyle: "normal",
         }}
       >
         {article.title}

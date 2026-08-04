@@ -10,9 +10,6 @@ export function ArticleCard({ article, showExcerpt = true }) {
       className="j-article-row block group"
       aria-label={`Read: ${article.title}`}
     >
-      {/* File path */}
-      <FilePath path={article.filePath} className="text-[11px]" />
-
       {/* Title */}
       <h3
         className="j-article-title mt-1 text-lg leading-snug font-semibold"
@@ -67,7 +64,7 @@ export function FeaturedCard({ article }) {
               fontFamily: "var(--j-font-heading)",
               color: "var(--j-text)",
               letterSpacing: "-0.03em",
-              fontStyle: "italic",
+              fontStyle: "normal",
             }}
           >
             {article.title}
@@ -108,10 +105,6 @@ export function FeaturedCard({ article }) {
             ))}
           </div>
         )}
-
-        <div className="mt-6">
-          <FilePath path={article.filePath} />
-        </div>
       </div>
 
       {/* Right: terminal */}
@@ -132,7 +125,6 @@ export function MiniArticleCard({ article }) {
       style={{ borderColor: "var(--j-border)" }}
     >
       <div className="flex-1 min-w-0">
-        <FilePath path={article.filePath} className="text-[10px]" />
         <p
           className="mt-0.5 text-sm font-medium leading-snug truncate group-hover:underline"
           style={{

@@ -9,7 +9,7 @@ import { getApiBase, buildAuthHeaders } from "@/utils/api";
 const API = getApiBase();
 
 export default function PersonalLibraryPage() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [activeTab, setActiveTab] = useState("bookmarks"); // 'bookmarks' | 'collections' | 'history'
   const [bookmarks, setBookmarks] = useState([]);
   const [collections, setCollections] = useState([]);
@@ -19,7 +19,6 @@ export default function PersonalLibraryPage() {
   const [newCollectionScope, setNewCollectionScope] = useState("PERSONAL");
 
   useEffect(() => {
-    const token = localStorage.getItem("token") || "";
     const headers = buildAuthHeaders(token, user);
 
     Promise.all([
@@ -34,7 +33,7 @@ export default function PersonalLibraryPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [user]);
+  }, [user, token]);
 
   const handleCreateCollection = async (e) => {
     e.preventDefault();
@@ -42,10 +41,7 @@ export default function PersonalLibraryPage() {
     try {
       const res = await fetch(`${API}/api/journal/collections`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-        },
+        headers: buildAuthHeaders(token, user),
         body: JSON.stringify({ title: newCollectionTitle, scope: newCollectionScope }),
       });
       const data = await res.json();
@@ -111,7 +107,6 @@ export default function PersonalLibraryPage() {
                 bookmarks.map((bm, i) => (
                   <div key={i} className="p-4 rounded border flex items-center justify-between" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)" }}>
                     <div>
-                      <span className="j-filepath text-xs">{bm.article?.filePath}</span>
                       <Link href={`/journal/article/${bm.article?.slug}`} className="text-base font-semibold block hover:underline" style={{ fontFamily: "var(--j-font-heading)" }}>
                         {bm.article?.title}
                       </Link>
@@ -182,7 +177,6 @@ export default function PersonalLibraryPage() {
                 history.map((h, i) => (
                   <div key={i} className="p-4 rounded border flex items-center justify-between" style={{ borderColor: "var(--j-border)", background: "var(--j-bg-card)" }}>
                     <div>
-                      <span className="j-filepath text-xs">{h.article?.filePath}</span>
                       <Link href={`/journal/article/${h.article?.slug}`} className="text-base font-semibold block hover:underline" style={{ fontFamily: "var(--j-font-heading)" }}>
                         {h.article?.title}
                       </Link>

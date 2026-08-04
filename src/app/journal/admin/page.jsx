@@ -77,7 +77,7 @@ export default function AdminCMSPage() {
     } catch (_) {}
   };
 
-  if (!authLoading && user?.role !== "SUPER_ADMIN") {
+  if (!authLoading && user?.role !== "SUPER_ADMIN" && user?.role !== "ADMIN") {
     return (
       <div className="max-w-xl mx-auto px-5 py-20 text-center">
         <div className="p-8 border rounded-2xl bg-[var(--j-bg-card)] shadow-sm border-[var(--j-border)]">
@@ -199,7 +199,6 @@ export default function AdminCMSPage() {
                     }}>
                       {article.status}
                     </span>
-                    <span className="j-filepath text-xs">{article.filePath}</span>
                   </div>
                   <h4 className="text-base font-semibold leading-snug" style={{ fontFamily: "var(--j-font-heading)" }}>
                     {article.title}
