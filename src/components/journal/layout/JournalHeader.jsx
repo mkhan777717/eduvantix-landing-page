@@ -53,7 +53,7 @@ export default function JournalHeader({ onSearchOpen }) {
         <Link
           href="/journal"
           className="flex items-baseline gap-2 shrink-0 select-none"
-          aria-label="EduVantix Journal home"
+          aria-label="Eduvantix Journal home"
         >
           <span
             className="text-lg font-semibold tracking-tight"
@@ -63,7 +63,7 @@ export default function JournalHeader({ onSearchOpen }) {
               color: "var(--j-text)",
             }}
           >
-            EduVantix
+            Eduvantix
           </span>
           <span
             className="text-xs px-1.5 py-0.5 rounded"

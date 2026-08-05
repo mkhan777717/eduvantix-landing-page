@@ -9,7 +9,7 @@ const FEATURES = [
   "Access DSA, System Design & Interview guides",
   "Save articles to your personal library",
   "Write & publish your own articles",
-  "Join the EduVantix community of developers",
+  "Join the Eduvantix community of developers",
   "Get weekly curated newsletter picks",
 ];
 

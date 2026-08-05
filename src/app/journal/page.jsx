@@ -76,7 +76,7 @@ function CategorySection({ title, articles, categorySlug, eyebrow }) {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export const metadata = {
-  title: "EduVantix Journal — Learn. Build. Share. Grow.",
+  title: "Eduvantix Journal — Learn. Build. Share. Grow.",
   description:
     "Programming tutorials, DSA guides, interview prep, AI & ML, web development, career advice, and placement experiences from India's leading EdTech platform.",
   alternates: { canonical: "https://eduvantix.com/journal" },
@@ -151,7 +151,7 @@ export default async function JournalHomePage() {
             Eduvantix Journal
           </h1>
           <p className="text-sm max-w-xl leading-relaxed" style={{ fontFamily: "var(--j-font-reading)", color: "var(--j-text-secondary)" }}>
-            Engineering knowledge, DSA guides, system architecture, interview preparation, and technical insights from the EduVantix community.
+            Engineering knowledge, DSA guides, system architecture, interview preparation, and technical insights from the Eduvantix community.
           </p>
         </div>
 

@@ -2,13 +2,13 @@ import JournalLayoutWrapper from "@/components/journal/layout/JournalLayoutWrapp
 
 export const metadata = {
   title: {
-    default: "EduVantix Journal — Engineering Knowledge & Technical Articles",
-    template: "%s | EduVantix Journal",
+    default: "Eduvantix Journal — Engineering Knowledge & Technical Articles",
+    template: "%s | Eduvantix Journal",
   },
   description:
-    "Programming tutorials, DSA guides, interview preparation, AI & ML articles, career advice, placement stories, and engineering blogs from the EduVantix community.",
+    "Programming tutorials, DSA guides, interview preparation, AI & ML articles, career advice, placement stories, and engineering blogs from the Eduvantix community.",
   openGraph: {
-    siteName: "EduVantix Journal",
+    siteName: "Eduvantix Journal",
     type: "website",
     locale: "en_IN",
   },
