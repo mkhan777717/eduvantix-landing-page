@@ -6,7 +6,7 @@ import {
   Briefcase, Plus, Edit3, Trash2, Search, Eye, Download, X, Loader2,
   CheckCircle2, XCircle, Clock, AlertTriangle, FileText, ExternalLink,
   Users, MapPin, ChevronDown, Globe, Building2, RefreshCw, Send, Mail,
-  LayoutList, Settings2, ToggleLeft, ToggleRight, ArrowUpRight
+  LayoutList, Settings2, ToggleLeft, ToggleRight, ArrowUpRight, Flame
 } from "lucide-react";
 
 // ─── Status Badge Config (reused from job-assistance pattern) ─────────────────
@@ -19,23 +19,6 @@ const APP_STATUS = {
 };
 
 const TYPE_LABEL = { FULL_TIME: "Full-time", INTERNSHIP: "Internship", PART_TIME: "Part-time" };
-
-// ─── Mock Data (will come from backend API) ───────────────────────────────────
-const MOCK_JOBS = [
-  { id: 1, title: "Full Stack Developer",  department: "Engineering",  location: "Remote",  type: "FULL_TIME",   isActive: true,  applicants: 12, postedAt: "2026-07-28" },
-  { id: 2, title: "AI Research Engineer",  department: "AI / ML",      location: "Remote",  type: "FULL_TIME",   isActive: true,  applicants: 8,  postedAt: "2026-07-30" },
-  { id: 3, title: "DevOps Engineer",       department: "Infrastructure",location: "Onsite", type: "FULL_TIME",   isActive: true,  applicants: 5,  postedAt: "2026-07-25" },
-  { id: 4, title: "UI/UX Designer Intern", department: "Design",       location: "Remote",  type: "INTERNSHIP",  isActive: false, applicants: 21, postedAt: "2026-07-22" },
-];
-
-const MOCK_APPLICATIONS = [
-  { id: "app-1", jobTitle: "Full Stack Developer",  applicantName: "Rahul Sharma",   email: "rahul@example.com",  mobile: "+91 98765 43210", appliedAt: "2026-08-01", status: "PENDING",     resumeFileName: "resume_rahul.pdf",  coverNote: "I'm really excited about this role." },
-  { id: "app-2", jobTitle: "AI Research Engineer",  applicantName: "Priya Nair",     email: "priya@example.com",  mobile: "+91 87654 32109", appliedAt: "2026-08-01", status: "SHORTLISTED", resumeFileName: "priya_cv.pdf",       coverNote: "I have 4 years of ML experience." },
-  { id: "app-3", jobTitle: "Full Stack Developer",  applicantName: "Arjun Mehta",    email: "arjun@example.com",  mobile: "+91 76543 21098", appliedAt: "2026-07-31", status: "REJECTED",    resumeFileName: "arjun_resume.docx", coverNote: "" },
-  { id: "app-4", jobTitle: "DevOps Engineer",       applicantName: "Sneha Patel",    email: "sneha@example.com",  mobile: "+91 65432 10987", appliedAt: "2026-07-30", status: "REVIEWED",    resumeFileName: "sneha_cv.pdf",      coverNote: "AWS certified. Ready to join immediately." },
-  { id: "app-5", jobTitle: "UI/UX Designer Intern", applicantName: "Vikram Singh",   email: "vikram@example.com", mobile: "+91 54321 09876", appliedAt: "2026-07-29", status: "HIRED",       resumeFileName: "vikram_portfolio.pdf", coverNote: "Love designing clean interfaces." },
-  { id: "app-6", jobTitle: "AI Research Engineer",  applicantName: "Ananya Kumar",   email: "ananya@example.com", mobile: "+91 43210 98765", appliedAt: "2026-07-28", status: "PENDING",     resumeFileName: "ananya_resume.pdf", coverNote: "PhD candidate with LLM experience." },
-];
 
 // ─── DocxViewer (reused from job-assistance admin page) ───────────────────────
 function DocxViewer({ blobUrl, selectedApp, onDownload }) {
@@ -117,8 +100,8 @@ export default function AdminCareersPage() {
   const { user, token, API_BASE } = useAuth();
 
   const [activeTab, setActiveTab] = useState("jobs"); // "jobs" | "applications"
-  const [jobs, setJobs] = useState(MOCK_JOBS);
-  const [applications, setApplications] = useState(MOCK_APPLICATIONS);
+  const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState([]);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("ALL");
   const [filterJob, setFilterJob] = useState("ALL");
@@ -280,6 +263,34 @@ export default function AdminCareersPage() {
       }
     } catch (err) {
       showFeedback("Failed to update status.", true);
+    }
+  };
+
+  const handleToggleHot = async (job) => {
+    // Optimistic update
+    setJobs((prev) =>
+      prev.map((j) => (j.id === job.id ? { ...j, isHot: !j.isHot } : j))
+    );
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/careers/admin/jobs/${job.id}/toggle-hot`, {
+        method: "PATCH",
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      });
+      const data = await res.json();
+      if (!data.success) {
+        // Revert optimistic update on failure
+        setJobs((prev) =>
+          prev.map((j) => (j.id === job.id ? { ...j, isHot: job.isHot } : j))
+        );
+        showFeedback(data.message || "Failed to toggle priority.", true);
+      } else {
+        showFeedback(data.message);
+      }
+    } catch (err) {
+      setJobs((prev) =>
+        prev.map((j) => (j.id === job.id ? { ...j, isHot: job.isHot } : j))
+      );
+      showFeedback("Failed to toggle priority.", true);
     }
   };
 
@@ -452,6 +463,7 @@ export default function AdminCareersPage() {
   const stats = {
     totalJobs: jobs.length,
     activeJobs: jobs.filter((j) => j.isActive).length,
+    hotJobs: jobs.filter((j) => j.isHot).length,
     totalApps: applications.length,
     pendingReview: applications.filter((a) => a.status === "PENDING").length,
     shortlisted: applications.filter((a) => a.status === "SHORTLISTED").length,
@@ -503,6 +515,7 @@ export default function AdminCareersPage() {
           {[
             { label: "Total Jobs", value: stats.totalJobs, color: "#3b82f6" },
             { label: "Active Jobs", value: stats.activeJobs, color: "#10b981" },
+            { label: "🔥 Priority Jobs", value: `${stats.hotJobs} / 3`, color: "#f97316" },
             { label: "Total Applications", value: stats.totalApps, color: "#8b5cf6" },
             { label: "Pending Review", value: stats.pendingReview, color: "#f59e0b" },
             { label: "Shortlisted", value: stats.shortlisted, color: "#10b981" },
@@ -563,19 +576,37 @@ export default function AdminCareersPage() {
                           <p className="text-[11px] mt-0.5" style={{ color: "var(--text-muted)" }}>{job.department}</p>
                         </div>
                       </div>
-                      {/* Active toggle */}
-                      <button
-                        onClick={() => handleToggleJob(job.id)}
-                        className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer"
-                        style={{
-                          backgroundColor: job.isActive ? "rgba(16,185,129,0.1)" : "var(--bg-hover)",
-                          color: job.isActive ? "#10b981" : "var(--text-muted)",
-                          borderColor: job.isActive ? "rgba(16,185,129,0.2)" : "var(--border-primary)",
-                        }}
-                      >
-                        {job.isActive ? <ToggleRight size={12} /> : <ToggleLeft size={12} />}
-                        {job.isActive ? "Active" : "Paused"}
-                      </button>
+                      {/* Active toggle + Hot toggle */}
+                      <div className="flex items-center gap-2">
+                        {/* 🔥 Hot / Priority toggle */}
+                        <button
+                          onClick={() => handleToggleHot(job)}
+                          title={job.isHot ? "Remove from Priority" : "Mark as Priority (max 3)"}
+                          className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer"
+                          style={{
+                            backgroundColor: job.isHot ? "rgba(249,115,22,0.12)" : "var(--bg-hover)",
+                            color: job.isHot ? "#f97316" : "var(--text-muted)",
+                            borderColor: job.isHot ? "rgba(249,115,22,0.3)" : "var(--border-primary)",
+                          }}
+                        >
+                          <Flame size={12} />
+                          {job.isHot ? "Priority" : "Set Hot"}
+                        </button>
+
+                        {/* Active toggle */}
+                        <button
+                          onClick={() => handleToggleJob(job)}
+                          className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer"
+                          style={{
+                            backgroundColor: job.isActive ? "rgba(16,185,129,0.1)" : "var(--bg-hover)",
+                            color: job.isActive ? "#10b981" : "var(--text-muted)",
+                            borderColor: job.isActive ? "rgba(16,185,129,0.2)" : "var(--border-primary)",
+                          }}
+                        >
+                          {job.isActive ? <ToggleRight size={12} /> : <ToggleLeft size={12} />}
+                          {job.isActive ? "Active" : "Paused"}
+                        </button>
+                      </div>
                     </div>
 
                     {/* Meta */}
