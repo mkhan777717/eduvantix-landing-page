@@ -1,6 +1,7 @@
 "use client";
 
 import PublicJournalNavbar from "./PublicJournalNavbar";
+import JournalFooter from "./JournalFooter";
 import ToastContainer from "@/components/ToastContainer";
 
 import useThemeStore from "@/store/useThemeStore";
@@ -10,10 +11,10 @@ export default function PublicJournalLayout({ children }) {
 
   return (
     <div
-      className="min-h-screen flex flex-col"
+      className="journal-root min-h-screen flex flex-col"
       style={{
-        background: isDark ? "var(--j-bg, #0b0f19)" : "var(--j-bg, #ffffff)",
-        color: "var(--j-text, inherit)",
+        background: "var(--j-bg)",
+        color: "var(--j-text)",
         fontFamily: "Inter, system-ui, -apple-system, sans-serif",
       }}
     >
@@ -24,6 +25,9 @@ export default function PublicJournalLayout({ children }) {
       <main className="flex-1">
         {children}
       </main>
+
+      {/* Journal Footer with official social links */}
+      <JournalFooter />
 
       <ToastContainer />
     </div>

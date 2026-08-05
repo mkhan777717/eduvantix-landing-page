@@ -271,14 +271,7 @@ export default function CTA() {
                 "No credit card required",
                 "7-day free trial on Pro plans",
                 "Cancel anytime, no lock-in",
-              ].map((t, i) => (
-                <div key={i} className="flex items-center gap-2.5 text-xs" style={{ color: "var(--text-muted)" }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  {t}
-                </div>
-              ))}
+              ]}
             </div>
           </motion.div>
         </div>

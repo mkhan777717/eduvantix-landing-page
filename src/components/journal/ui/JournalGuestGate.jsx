@@ -26,13 +26,13 @@ export default function JournalGuestGate({ children }) {
   if (user) return <>{children}</>;
 
   const fadeGradient = isDark
-    ? "linear-gradient(to bottom, transparent 0%, rgba(11,15,25,0.8) 35%, rgba(11,15,25,1) 75%)"
-    : "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.75) 35%, rgba(255,255,255,1) 75%)";
+    ? "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.85) 45%, #000000 85%)"
+    : "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.85) 45%, #ffffff 85%)";
 
-  const sectionBg = isDark ? "var(--j-bg, #0b0f19)" : "var(--j-bg, #ffffff)";
-  const textColor = isDark ? "var(--j-text, #f8fafc)" : "var(--j-text, #0f172a)";
-  const subtextColor = isDark ? "var(--j-text-secondary, #94a3b8)" : "var(--j-text-secondary, #334155)";
-  const borderColor = isDark ? "var(--j-border, #1e293b)" : "var(--j-border, #e2e8f0)";
+  const sectionBg = "var(--j-bg, inherit)";
+  const textColor = "var(--j-text, inherit)";
+  const subtextColor = "var(--j-text-secondary, #94a3b8)";
+  const borderColor = "var(--j-border, #222222)";
 
   return (
     <div className="relative">

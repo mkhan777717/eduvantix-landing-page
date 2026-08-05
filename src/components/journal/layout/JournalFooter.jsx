@@ -82,7 +82,7 @@ export default function JournalFooter() {
                 className="text-xl font-semibold"
                 style={{ fontFamily: "var(--j-font-heading)", fontStyle: "normal", color: "var(--j-text)" }}
               >
-                EduVantix
+                Eduvantix
               </span>
               <span
                 className="text-xs px-1.5 py-0.5 rounded"
