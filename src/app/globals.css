@@ -515,8 +515,8 @@ html.theme-dark .live-chat-sidebar-fullscreen {
   --j-warning:          #f59e0b;
 
   /* ── Typography ───────────────────────────── */
-  --j-font-heading:     'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --j-font-reading:     'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --j-font-heading:     'Fraunces', 'Georgia', serif;
+  --j-font-reading:     'Source Serif 4', 'Georgia', serif;
   --j-font-mono:        'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --j-font-code:        'IBM Plex Mono', 'Courier New', monospace;
 
