@@ -53,7 +53,7 @@ export default function JournalHeader({ onSearchOpen }) {
         <Link
           href="/journal"
           className="flex items-baseline gap-2 shrink-0 select-none"
-          aria-label="EduVantix Journal home"
+          aria-label="Eduvantix Journal home"
         >
           <span
             className="text-lg font-semibold tracking-tight"
@@ -63,7 +63,7 @@ export default function JournalHeader({ onSearchOpen }) {
               color: "var(--j-text)",
             }}
           >
-            EduVantix
+            Eduvantix
           </span>
           <span
             className="text-xs px-1.5 py-0.5 rounded"
@@ -140,9 +140,9 @@ export default function JournalHeader({ onSearchOpen }) {
             <Search size={16} />
           </button>
 
-          {/* Write button */}
+          {/* Write button — blocked for guests */}
           <Link
-            href="/journal/write"
+            href={user ? "/journal/write" : `/login?redirect=${encodeURIComponent("/journal/write")}`}
             id="journal-write-btn"
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-opacity hover:opacity-80"
             style={{
@@ -150,6 +150,7 @@ export default function JournalHeader({ onSearchOpen }) {
               background: "var(--j-accent)",
               color: "#ffffff",
             }}
+            title={!user ? "Sign in to write an article" : undefined}
           >
             <PenLine size={12} />
             Write

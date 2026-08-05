@@ -2,9 +2,10 @@ import Link from "next/link";
 import { ArticleCard } from "@/components/journal/cards/ArticleCards";
 import { TagPill, CategoryBadge } from "@/components/journal/ui/JournalUI";
 import NewsletterForm from "@/components/journal/newsletter/NewsletterForm";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import { getApiBase } from "@/utils/api";
 import JournalHeaderActions from "@/components/journal/ui/JournalHeaderActions";
+import JournalGuestGate from "@/components/journal/ui/JournalGuestGate";
 
 const API = getApiBase();
 
@@ -35,7 +36,6 @@ function CategorySection({ title, articles, categorySlug, eyebrow }) {
           <h2
             className="text-2xl font-semibold"
             style={{
-              fontFamily: "var(--j-font-heading)",
               color: "var(--j-text)",
               letterSpacing: "-0.02em",
             }}
@@ -76,7 +76,7 @@ function CategorySection({ title, articles, categorySlug, eyebrow }) {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export const metadata = {
-  title: "EduVantix Journal — Learn. Build. Share. Grow.",
+  title: "Eduvantix Journal — Learn. Build. Share. Grow.",
   description:
     "Programming tutorials, DSA guides, interview prep, AI & ML, web development, career advice, and placement experiences from India's leading EdTech platform.",
   alternates: { canonical: "https://eduvantix.com/journal" },
@@ -126,6 +126,7 @@ export default async function JournalHomePage() {
   const popular = popularData?.articles || [];
 
   return (
+    <JournalGuestGate>
     <div className="px-5 py-8 max-w-7xl mx-auto">
       {/* ── Platform Page Header Banner (Same layout as Contest Arena & Practice Arena) ── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-8" style={{ borderColor: "var(--j-border)" }}>
@@ -136,24 +137,21 @@ export default async function JournalHomePage() {
               borderColor: "var(--j-border)",
               color: "var(--j-eyebrow)",
               backgroundColor: "var(--j-bg-secondary)",
-              fontFamily: "var(--j-font-mono)",
             }}
           >
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             EDUVANTIX JOURNAL & BLOG
           </div>
           <h1
-            className="text-3xl sm:text-4xl font-semibold tracking-tight"
+            className="text-4xl font-serif tracking-tight"
             style={{
-              fontFamily: "var(--j-font-heading)",
-              fontStyle: "normal",
               color: "var(--j-text)",
             }}
           >
-            EduVantix Journal
+            Eduvantix Journal
           </h1>
           <p className="text-sm max-w-xl leading-relaxed" style={{ fontFamily: "var(--j-font-reading)", color: "var(--j-text-secondary)" }}>
-            Engineering knowledge, DSA guides, system architecture, interview preparation, and technical insights from the EduVantix community.
+            Engineering knowledge, DSA guides, system architecture, interview preparation, and technical insights from the Eduvantix community.
           </p>
         </div>
 
@@ -195,6 +193,10 @@ export default async function JournalHomePage() {
 
         {/* Search Bar Input */}
         <form action="/journal/search" method="GET" className="relative w-full md:w-72">
+          {/* Search Icon */}
+          <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none" style={{ color: "var(--j-text-muted)" }}>
+            <Search size={14} strokeWidth={2} />
+          </span>
           <input
             type="text"
             name="q"
@@ -202,14 +204,12 @@ export default async function JournalHomePage() {
             className="w-full pl-9 pr-4 py-2 rounded-full border text-xs outline-none transition-colors focus:border-[var(--j-accent)]"
             style={{
               fontFamily: "var(--j-font-mono)",
+              fontSize: "0.75rem",
               background: "var(--j-bg-card)",
               borderColor: "var(--j-border)",
               color: "var(--j-text)",
             }}
           />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: "var(--j-text-muted)" }}>
-            🔍
-          </span>
         </form>
       </div>
 
@@ -440,5 +440,6 @@ export default async function JournalHomePage() {
         </div>
       </section>
     </div>
+    </JournalGuestGate>
   );
 }

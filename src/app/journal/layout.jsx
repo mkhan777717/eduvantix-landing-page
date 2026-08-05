@@ -1,14 +1,14 @@
-import DashboardLayout from "@/components/DashboardLayout";
+import JournalLayoutWrapper from "@/components/journal/layout/JournalLayoutWrapper";
 
 export const metadata = {
   title: {
-    default: "EduVantix Journal — Engineering Knowledge & Technical Articles",
-    template: "%s | EduVantix Journal",
+    default: "Eduvantix Journal — Engineering Knowledge & Technical Articles",
+    template: "%s | Eduvantix Journal",
   },
   description:
-    "Programming tutorials, DSA guides, interview preparation, AI & ML articles, career advice, placement stories, and engineering blogs from the EduVantix community.",
+    "Programming tutorials, DSA guides, interview preparation, AI & ML articles, career advice, placement stories, and engineering blogs from the Eduvantix community.",
   openGraph: {
-    siteName: "EduVantix Journal",
+    siteName: "Eduvantix Journal",
     type: "website",
     locale: "en_IN",
   },
@@ -21,7 +21,7 @@ export const metadata = {
 
 export default function JournalLayout({ children }) {
   return (
-    <DashboardLayout>
+    <JournalLayoutWrapper>
       <div className="journal-root min-h-screen flex flex-col">
         {/* Skip to content for accessibility */}
         <a
@@ -40,6 +40,6 @@ export default function JournalLayout({ children }) {
           {children}
         </main>
       </div>
-    </DashboardLayout>
+    </JournalLayoutWrapper>
   );
 }

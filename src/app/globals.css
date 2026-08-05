@@ -516,8 +516,8 @@ html.theme-dark .live-chat-sidebar-fullscreen {
 
   /* ── Typography ───────────────────────────── */
   --j-font-heading:     'Fraunces', 'Georgia', serif;
-  --j-font-reading:     'Source Serif 4', 'Georgia', 'Times New Roman', serif;
-  --j-font-mono:        var(--font-sans, 'Inter', sans-serif);
+  --j-font-reading:     'Source Serif 4', 'Georgia', serif;
+  --j-font-mono:        'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --j-font-code:        'IBM Plex Mono', 'Courier New', monospace;
 
   /* ── Terminal Colors ──────────────────────── */
@@ -857,8 +857,8 @@ html.theme-dark select option,
   max-width: var(--j-content-width);
   margin-inline: auto;
   font-family: var(--j-font-reading);
-  font-size: 1.2rem;
-  line-height: 1.9;
+  font-size: 1.0625rem;
+  line-height: 1.75;
   color: var(--j-text);
   -webkit-font-smoothing: antialiased;
 }
@@ -1031,30 +1031,30 @@ html.theme-dark select option,
 
 .j-prose {
   font-family: var(--j-font-reading);
-  font-size: 1.2rem;
-  line-height: 1.9;
+  font-size: 1.0625rem;
+  line-height: 1.75;
   color: var(--j-text);
   max-width: var(--j-content-width);
   margin: 0 auto;
   -webkit-font-smoothing: antialiased;
-  word-spacing: 0.01em;
-  letter-spacing: 0.003em;
+  word-spacing: normal;
+  letter-spacing: normal;
 }
 
 .j-prose p {
-  margin-bottom: 2rem;
-  font-size: 1.2rem;
-  line-height: 1.9;
+  margin-bottom: 1.75rem;
+  font-size: 1.0625rem;
+  line-height: 1.75;
 }
 
 .j-prose h1 {
   font-family: var(--j-font-heading);
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
-  line-height: 1.2;
-  margin-top: 3.5rem;
-  margin-bottom: 1.5rem;
-  letter-spacing: -0.03em;
+  line-height: 1.25;
+  margin-top: 3rem;
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.015em;
   color: var(--j-text);
 }
 
@@ -1139,15 +1139,15 @@ html.theme-dark select option,
   color: inherit;
 }
 
-/* Medium-style blockquote: large italic centered pull-quote */
+/* Blockquote */
 .j-prose blockquote {
-  border-left: 3px solid var(--j-text);
-  padding: 0.25rem 0 0.25rem 1.5rem;
-  margin: 2.5rem 0;
+  border-left: 3px solid var(--j-border);
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  margin: 2rem 0;
   font-style: italic;
-  font-size: 1.3rem;
+  font-size: 1.0625rem;
   line-height: 1.75;
-  color: var(--j-text);
+  color: var(--j-text-secondary);
   font-family: var(--j-font-reading);
 }
 
@@ -1168,9 +1168,9 @@ html.theme-dark select option,
 }
 
 .j-prose li {
-  margin-bottom: 0.6rem;
-  font-size: 1.2rem;
-  line-height: 1.9;
+  margin-bottom: 0.4rem;
+  font-size: 1.0625rem;
+  line-height: 1.75;
 }
 
 /* Medium-style inline images */
