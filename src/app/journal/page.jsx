@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArticleCard } from "@/components/journal/cards/ArticleCards";
 import { TagPill, CategoryBadge } from "@/components/journal/ui/JournalUI";
 import NewsletterForm from "@/components/journal/newsletter/NewsletterForm";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import { getApiBase } from "@/utils/api";
 import JournalHeaderActions from "@/components/journal/ui/JournalHeaderActions";
 
@@ -195,6 +195,10 @@ export default async function JournalHomePage() {
 
         {/* Search Bar Input */}
         <form action="/journal/search" method="GET" className="relative w-full md:w-72">
+          {/* Search Icon */}
+          <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none" style={{ color: "var(--j-text-muted)" }}>
+            <Search size={14} strokeWidth={2} />
+          </span>
           <input
             type="text"
             name="q"
@@ -202,14 +206,12 @@ export default async function JournalHomePage() {
             className="w-full pl-9 pr-4 py-2 rounded-full border text-xs outline-none transition-colors focus:border-[var(--j-accent)]"
             style={{
               fontFamily: "var(--j-font-mono)",
+              fontSize: "0.75rem",
               background: "var(--j-bg-card)",
               borderColor: "var(--j-border)",
               color: "var(--j-text)",
             }}
           />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: "var(--j-text-muted)" }}>
-            🔍
-          </span>
         </form>
       </div>
 

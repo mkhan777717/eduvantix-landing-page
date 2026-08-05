@@ -20,7 +20,7 @@ export default function JournalHeaderActions() {
             color: "var(--j-accent)",
           }}
         >
-          🛡️ Admin Moderation
+          Admin Moderation
         </Link>
       )}
       <Link
@@ -28,7 +28,7 @@ export default function JournalHeaderActions() {
         className="px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 text-white transition-opacity hover:opacity-90 shadow-sm"
         style={{ fontFamily: "var(--j-font-mono)", background: "var(--j-accent)" }}
       >
-        ✏ Write Article
+        Write Article
       </Link>
       <Link
         href="/journal/dashboard"
