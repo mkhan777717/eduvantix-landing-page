@@ -515,8 +515,8 @@ html.theme-dark .live-chat-sidebar-fullscreen {
   --j-warning:          #f59e0b;
 
   /* ── Typography ───────────────────────────── */
-  --j-font-heading:     var(--font-sans, 'Inter', sans-serif);
-  --j-font-reading:     var(--font-sans, 'Inter', sans-serif);
+  --j-font-heading:     'Fraunces', 'Georgia', serif;
+  --j-font-reading:     'Source Serif 4', 'Georgia', 'Times New Roman', serif;
   --j-font-mono:        var(--font-sans, 'Inter', sans-serif);
   --j-font-code:        'IBM Plex Mono', 'Courier New', monospace;
 
@@ -852,45 +852,53 @@ html.theme-dark select option,
   overflow: hidden;
 }
 
-/* ── Prose Reading Width ──────────────────────── */
+/* ── Prose Reading Width ───────────────── */
 .j-prose {
   max-width: var(--j-content-width);
   margin-inline: auto;
   font-family: var(--j-font-reading);
-  font-size: 1.125rem;
-  line-height: 1.8;
+  font-size: 1.2rem;
+  line-height: 1.9;
   color: var(--j-text);
+  -webkit-font-smoothing: antialiased;
 }
 
 .j-prose p {
-  margin-bottom: 1.5rem;
-  position: relative;
+  margin-bottom: 2rem;
 }
 
 .j-prose h2 {
   font-family: var(--j-font-heading);
   font-size: 1.875rem;
-  font-weight: 600;
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 1.25rem;
   letter-spacing: -0.02em;
 }
 
 .j-prose h3 {
   font-family: var(--j-font-heading);
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-top: 2rem;
-  margin-bottom: 0.75rem;
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.01em;
 }
 
 .j-prose a {
-  color: var(--j-accent);
-  text-underline-offset: 3px;
+  color: var(--j-text);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: rgba(0,0,0,0.3);
+  transition: text-decoration-color 0.2s;
+}
+
+.j-prose a:hover {
+  text-decoration-color: var(--j-text);
 }
 
 .j-prose code {
-  font-family: var(--j-font-mono);
+  font-family: var(--j-font-code);
   font-size: 0.875em;
   background: var(--j-bg-secondary);
   border: 1px solid var(--j-border);
@@ -899,11 +907,13 @@ html.theme-dark select option,
 }
 
 .j-prose blockquote {
-  border-left: 3px solid var(--j-border);
+  border-left: 3px solid var(--j-text);
   margin-left: 0;
   padding: 0.25rem 0 0.25rem 1.5rem;
-  color: var(--j-text-secondary);
+  color: var(--j-text);
   font-style: italic;
+  font-size: 1.3rem;
+  line-height: 1.75;
 }
 
 /* ── Reduced motion ───────────────────────────── */
@@ -1021,37 +1031,86 @@ html.theme-dark select option,
 
 .j-prose {
   font-family: var(--j-font-reading);
-  font-size: 1.125rem;
-  line-height: 1.8;
+  font-size: 1.2rem;
+  line-height: 1.9;
   color: var(--j-text);
   max-width: var(--j-content-width);
   margin: 0 auto;
+  -webkit-font-smoothing: antialiased;
+  word-spacing: 0.01em;
+  letter-spacing: 0.003em;
 }
 
 .j-prose p {
-  margin-bottom: 1.75rem;
+  margin-bottom: 2rem;
+  font-size: 1.2rem;
+  line-height: 1.9;
+}
+
+.j-prose h1 {
+  font-family: var(--j-font-heading);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 3.5rem;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.03em;
+  color: var(--j-text);
 }
 
 .j-prose h2 {
   font-family: var(--j-font-heading);
   font-size: 1.875rem;
-  font-weight: 600;
-  font-style: italic;
+  font-weight: 700;
   margin-top: 3rem;
   margin-bottom: 1.25rem;
   line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--j-text);
 }
 
 .j-prose h3 {
   font-family: var(--j-font-heading);
   font-size: 1.375rem;
-  font-weight: 600;
-  margin-top: 2.25rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
   margin-bottom: 1rem;
+  letter-spacing: -0.01em;
+  color: var(--j-text);
+}
+
+.j-prose h4 {
+  font-family: var(--j-font-heading);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: var(--j-text);
+}
+
+.j-prose strong, .j-prose b {
+  font-weight: 700;
+  color: var(--j-text);
+}
+
+.j-prose em, .j-prose i {
+  font-style: italic;
+}
+
+.j-prose a {
+  color: var(--j-text);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: rgba(0,0,0,0.3);
+  transition: text-decoration-color 0.2s;
+}
+
+.j-prose a:hover {
+  text-decoration-color: var(--j-text);
 }
 
 .j-prose code {
-  font-family: var(--j-font-mono);
+  font-family: var(--j-font-code);
   font-size: 0.875em;
   background-color: var(--j-bg-secondary);
   border: 1px solid var(--j-border-subtle);
@@ -1066,7 +1125,7 @@ html.theme-dark select option,
   padding: 1.25rem 1.5rem;
   border-radius: 6px;
   overflow-x: auto;
-  font-family: var(--j-font-mono);
+  font-family: var(--j-font-code);
   font-size: 0.875rem;
   line-height: 1.6;
   margin: 2rem 0;
@@ -1080,21 +1139,69 @@ html.theme-dark select option,
   color: inherit;
 }
 
+/* Medium-style blockquote: large italic centered pull-quote */
 .j-prose blockquote {
-  border-left: 3px solid var(--j-accent);
-  padding-left: 1.25rem;
-  margin: 2rem 0;
+  border-left: 3px solid var(--j-text);
+  padding: 0.25rem 0 0.25rem 1.5rem;
+  margin: 2.5rem 0;
   font-style: italic;
-  color: var(--j-text-secondary);
+  font-size: 1.3rem;
+  line-height: 1.75;
+  color: var(--j-text);
+  font-family: var(--j-font-reading);
 }
 
-.j-prose ul, .j-prose ol {
-  margin-bottom: 1.75rem;
-  padding-left: 1.5rem;
+.j-prose blockquote p {
+  margin-bottom: 0;
+}
+
+.j-prose ul {
+  margin-bottom: 2rem;
+  padding-left: 1.75rem;
+  list-style-type: disc;
+}
+
+.j-prose ol {
+  margin-bottom: 2rem;
+  padding-left: 1.75rem;
+  list-style-type: decimal;
 }
 
 .j-prose li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
+  font-size: 1.2rem;
+  line-height: 1.9;
+}
+
+/* Medium-style inline images */
+.j-prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 2.5rem auto;
+  display: block;
+}
+
+.j-prose figure {
+  margin: 2.5rem 0;
+  text-align: center;
+}
+
+.j-prose figcaption {
+  font-size: 0.85rem;
+  color: var(--j-text-muted);
+  text-align: center;
+  margin-top: 0.75rem;
+  font-style: italic;
+  font-family: var(--j-font-mono);
+}
+
+/* Horizontal rule separator */
+.j-prose hr {
+  border: none;
+  border-top: 1px solid var(--j-border);
+  margin: 3rem auto;
+  width: 50%;
 }
 
 /* ── Interactive EduVantix Widgets & Callouts ────────────────────────────────── */
