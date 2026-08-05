@@ -3,12 +3,17 @@
 import PublicJournalNavbar from "./PublicJournalNavbar";
 import ToastContainer from "@/components/ToastContainer";
 
+import useThemeStore from "@/store/useThemeStore";
+
 export default function PublicJournalLayout({ children }) {
+  const isDark = useThemeStore((state) => state.isDark);
+
   return (
     <div
       className="min-h-screen flex flex-col"
       style={{
-        background: "#ffffff",
+        background: isDark ? "var(--j-bg, #0b0f19)" : "var(--j-bg, #ffffff)",
+        color: "var(--j-text, inherit)",
         fontFamily: "Inter, system-ui, -apple-system, sans-serif",
       }}
     >
