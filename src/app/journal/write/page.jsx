@@ -20,6 +20,13 @@ function JournalEditorContent() {
 
   const isSuperAdmin = user?.role === "SUPER_ADMIN" || user?.role === "ADMIN";
 
+  // Guard: redirect guests to login
+  useEffect(() => {
+    if (!user && !token) {
+      router.replace(`/login?redirect=${encodeURIComponent("/journal/write")}`);
+    }
+  }, [user, token, router]);
+
   // Form State
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
@@ -246,7 +253,7 @@ function JournalEditorContent() {
       {notificationMsg && (
         <div
           className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full shadow-lg text-xs font-semibold text-white transition-all flex items-center gap-2"
-          style={{ background: "var(--j-accent)", fontFamily: "var(--j-font-mono)" }}
+          style={{ background: "var(--j-accent)" }}
         >
           {notificationMsg}
         </div>
@@ -259,10 +266,10 @@ function JournalEditorContent() {
             <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mb-4">
               <Shield size={24} />
             </div>
-            <h3 className="text-xl font-bold mb-2" style={{ fontFamily: "var(--j-font-heading)" }}>
+            <h3 className="text-xl font-bold mb-2" >
               Super Admin Permission Required
             </h3>
-            <p className="text-xs leading-relaxed text-slate-600 mb-6" style={{ fontFamily: "var(--j-font-reading)" }}>
+            <p className="text-xs leading-relaxed text-slate-600 mb-6" >
               Your blog post will be sent as a publishing permission request to the <strong>Super Admin</strong> for editorial review. It will not be visible publicly until the Super Admin approves and publishes it on EduVantix.
             </p>
 
@@ -270,14 +277,13 @@ function JournalEditorContent() {
               <button
                 onClick={() => setShowPermissionModal(false)}
                 className="px-4 py-2 rounded-lg text-xs font-medium border text-slate-600 hover:bg-slate-50"
-                style={{ fontFamily: "var(--j-font-mono)" }}
+
               >
                 Cancel
               </button>
               <button
                 onClick={confirmSubmitPermission}
                 className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 shadow-sm flex items-center gap-1.5"
-                style={{ fontFamily: "var(--j-font-mono)" }}
               >
                 <Shield size={13} /> Send Permission Request
               </button>
@@ -295,7 +301,7 @@ function JournalEditorContent() {
           <Link
             href="/journal/dashboard"
             className="flex items-center gap-1 text-xs hover:text-[var(--j-accent)] transition-colors"
-            style={{ fontFamily: "var(--j-font-mono)", color: "var(--j-text-muted)" }}
+            style={{ color: "var(--j-text-muted)" }}
           >
             <ArrowLeft size={13} /> Dashboard
           </Link>
@@ -322,7 +328,7 @@ function JournalEditorContent() {
             disabled={saving}
             className="px-3.5 py-1.5 rounded text-xs font-medium border flex items-center gap-1.5 transition-colors hover:border-[var(--j-accent)]"
             style={{
-              fontFamily: "var(--j-font-mono)",
+
               borderColor: "var(--j-border)",
               color: "var(--j-text)",
             }}
@@ -334,7 +340,7 @@ function JournalEditorContent() {
             onClick={() => setActiveDrawer(activeDrawer === "blocks" ? null : "blocks")}
             className="px-3 py-1.5 rounded text-xs font-medium border flex items-center gap-1.5 transition-colors"
             style={{
-              fontFamily: "var(--j-font-mono)",
+
               borderColor: "var(--j-border)",
               color: activeDrawer === "blocks" ? "var(--j-accent)" : "var(--j-text-secondary)",
               background: activeDrawer === "blocks" ? "var(--j-accent-light)" : "transparent",
@@ -347,7 +353,7 @@ function JournalEditorContent() {
             onClick={() => setActiveDrawer(activeDrawer === "seo" ? null : "seo")}
             className="px-3 py-1.5 rounded text-xs font-medium border flex items-center gap-1.5 transition-colors"
             style={{
-              fontFamily: "var(--j-font-mono)",
+
               borderColor: "var(--j-border)",
               color: activeDrawer === "seo" ? "var(--j-accent)" : "var(--j-text-secondary)",
               background: activeDrawer === "seo" ? "var(--j-accent-light)" : "transparent",
@@ -359,7 +365,7 @@ function JournalEditorContent() {
           <button
             onClick={() => handleStatusChange("PUBLISHED")}
             className="px-4 py-1.5 rounded text-xs font-medium flex items-center gap-1.5 text-white transition-opacity hover:opacity-90 shadow-sm"
-            style={{ fontFamily: "var(--j-font-mono)", background: isSuperAdmin ? "var(--j-accent)" : "#D97706" }}
+            style={{ background: isSuperAdmin ? "var(--j-accent)" : "#D97706" }}
           >
             {isSuperAdmin ? <Send size={12} /> : <Shield size={12} />}
             {isSuperAdmin ? "Publish Article" : "Request Super Admin Permission"}
@@ -376,7 +382,7 @@ function JournalEditorContent() {
             <Shield size={18} className="text-amber-700 mt-0.5 shrink-0" />
             <div>
               <p className="j-mono text-xs font-bold uppercase tracking-wider text-amber-800">Publishing Permission Requested</p>
-              <p className="text-xs mt-1 text-amber-900" style={{ fontFamily: "var(--j-font-reading)" }}>
+              <p className="text-xs mt-1 text-amber-900" >
                 Your article is currently pending Super Admin permission and review. Once approved, it will automatically go live across the platform.
               </p>
             </div>
@@ -389,7 +395,7 @@ function JournalEditorContent() {
             <AlertCircle size={16} style={{ color: "#C0392B" }} className="mt-0.5 shrink-0" />
             <div>
               <p className="j-mono text-xs font-bold uppercase tracking-wider" style={{ color: "#C0392B" }}>Article Returned for Revision</p>
-              <p className="text-sm mt-1" style={{ fontFamily: "var(--j-font-reading)", color: "var(--j-text)" }}>{rejectionReason}</p>
+              <p className="text-sm mt-1" style={{ color: "var(--j-text)" }}>{rejectionReason}</p>
             </div>
           </div>
         )}
@@ -402,9 +408,7 @@ function JournalEditorContent() {
           placeholder="Article Title..."
           className="w-full text-3xl sm:text-4xl font-semibold bg-transparent outline-none resize-none mb-3"
           style={{
-            fontFamily: "var(--j-font-heading)",
             color: "var(--j-text)",
-            fontStyle: "normal",
             letterSpacing: "-0.03em",
           }}
         />
@@ -416,11 +420,11 @@ function JournalEditorContent() {
           onChange={(e) => setSubtitle(e.target.value)}
           placeholder="Subtitle / One-line summary..."
           className="w-full text-lg bg-transparent outline-none mb-6"
-          style={{ fontFamily: "var(--j-font-reading)", color: "var(--j-text-secondary)" }}
+          style={{ color: "var(--j-text-secondary)" }}
         />
 
         {/* Meta Bar */}
-        <div className="flex flex-wrap items-center gap-4 py-2 border-y mb-8 text-xs" style={{ borderColor: "var(--j-border)", fontFamily: "var(--j-font-mono)" }}>
+        <div className="flex flex-wrap items-center gap-4 py-2 border-y mb-8 text-xs" style={{ borderColor: "var(--j-border)" }}>
           <span style={{ color: "var(--j-text-muted)" }}>{wordCount} words</span>
           <span style={{ color: "var(--j-text-muted)" }}>·</span>
           <span style={{ color: "var(--j-text-muted)" }}>{readTimeMinutes} min read</span>
@@ -459,7 +463,6 @@ function JournalEditorContent() {
           style={{
             borderColor: "var(--j-border)",
             color: "var(--j-text)",
-            fontFamily: "var(--j-font-mono)",
             fontSize: "0.9rem",
           }}
         />
@@ -475,7 +478,7 @@ function JournalEditorContent() {
               onChange={(e) => setInternalSearchQuery(e.target.value)}
               placeholder="Type problem/course name..."
               className="bg-transparent border-b text-xs outline-none flex-1"
-              style={{ fontFamily: "var(--j-font-mono)", color: "var(--j-text)" }}
+              style={{ color: "var(--j-text)" }}
             />
           </div>
 
@@ -489,7 +492,7 @@ function JournalEditorContent() {
                     setInternalSearchQuery("");
                   }}
                   className="block text-left text-xs hover:underline"
-                  style={{ fontFamily: "var(--j-font-mono)", color: "var(--j-accent)" }}
+                  style={{ color: "var(--j-accent)" }}
                 >
                   + Insert Problem Link: {p.title}
                 </button>
@@ -502,7 +505,7 @@ function JournalEditorContent() {
                     setInternalSearchQuery("");
                   }}
                   className="block text-left text-xs hover:underline"
-                  style={{ fontFamily: "var(--j-font-mono)", color: "var(--j-accent)" }}
+                  style={{ color: "var(--j-accent)" }}
                 >
                   + Insert Course Link: {c.title}
                 </button>
@@ -533,7 +536,7 @@ function JournalEditorContent() {
                 style={{ borderColor: "var(--j-border)", background: "var(--j-bg-secondary)" }}
               >
                 <p className="j-mono text-xs font-semibold" style={{ color: "var(--j-text)" }}>{block.name}</p>
-                <p className="text-[11px] mt-0.5" style={{ fontFamily: "var(--j-font-reading)", color: "var(--j-text-muted)" }}>{block.desc}</p>
+                <p className="text-[11px] mt-0.5" style={{ color: "var(--j-text-muted)" }}>{block.desc}</p>
               </button>
             ))}
           </div>
@@ -546,7 +549,7 @@ function JournalEditorContent() {
             <h3 className="j-mono text-sm font-semibold">SEO & Meta Settings</h3>
             <button onClick={() => setActiveDrawer(null)}><X size={14} /></button>
           </div>
-          <div className="space-y-4 text-xs" style={{ fontFamily: "var(--j-font-mono)" }}>
+          <div className="space-y-4 text-xs" >
             <div>
               <label className="block mb-1 text-[11px] text-[var(--j-text-muted)]">Custom URL Slug</label>
               <input
@@ -605,7 +608,7 @@ function JournalEditorContent() {
                 }}
               >
                 <p className="j-mono text-xs font-semibold" style={{ color: status === statusKey ? "var(--j-accent)" : "var(--j-text)" }}>{label}</p>
-                <p className="text-[11px] mt-0.5" style={{ fontFamily: "var(--j-font-reading)", color: "var(--j-text-muted)" }}>{desc}</p>
+                <p className="text-[11px] mt-0.5" style={{ color: "var(--j-text-muted)" }}>{desc}</p>
               </button>
             ))}
           </div>

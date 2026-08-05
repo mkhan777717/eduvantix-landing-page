@@ -5,6 +5,7 @@ import NewsletterForm from "@/components/journal/newsletter/NewsletterForm";
 import { ArrowRight, Search } from "lucide-react";
 import { getApiBase } from "@/utils/api";
 import JournalHeaderActions from "@/components/journal/ui/JournalHeaderActions";
+import JournalGuestGate from "@/components/journal/ui/JournalGuestGate";
 
 const API = getApiBase();
 
@@ -35,7 +36,6 @@ function CategorySection({ title, articles, categorySlug, eyebrow }) {
           <h2
             className="text-2xl font-semibold"
             style={{
-              fontFamily: "var(--j-font-heading)",
               color: "var(--j-text)",
               letterSpacing: "-0.02em",
             }}
@@ -126,6 +126,7 @@ export default async function JournalHomePage() {
   const popular = popularData?.articles || [];
 
   return (
+    <JournalGuestGate>
     <div className="px-5 py-8 max-w-7xl mx-auto">
       {/* ── Platform Page Header Banner (Same layout as Contest Arena & Practice Arena) ── */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-8" style={{ borderColor: "var(--j-border)" }}>
@@ -136,21 +137,18 @@ export default async function JournalHomePage() {
               borderColor: "var(--j-border)",
               color: "var(--j-eyebrow)",
               backgroundColor: "var(--j-bg-secondary)",
-              fontFamily: "var(--j-font-mono)",
             }}
           >
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             EDUVANTIX JOURNAL & BLOG
           </div>
           <h1
-            className="text-3xl sm:text-4xl font-semibold tracking-tight"
+            className="text-4xl font-serif tracking-tight"
             style={{
-              fontFamily: "var(--j-font-heading)",
-              fontStyle: "normal",
               color: "var(--j-text)",
             }}
           >
-            EduVantix Journal
+            Eduvantix Journal
           </h1>
           <p className="text-sm max-w-xl leading-relaxed" style={{ fontFamily: "var(--j-font-reading)", color: "var(--j-text-secondary)" }}>
             Engineering knowledge, DSA guides, system architecture, interview preparation, and technical insights from the EduVantix community.
@@ -442,5 +440,6 @@ export default async function JournalHomePage() {
         </div>
       </section>
     </div>
+    </JournalGuestGate>
   );
 }

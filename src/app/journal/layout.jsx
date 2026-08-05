@@ -1,4 +1,4 @@
-import DashboardLayout from "@/components/DashboardLayout";
+import JournalLayoutWrapper from "@/components/journal/layout/JournalLayoutWrapper";
 
 export const metadata = {
   title: {
@@ -21,7 +21,7 @@ export const metadata = {
 
 export default function JournalLayout({ children }) {
   return (
-    <DashboardLayout>
+    <JournalLayoutWrapper>
       <div className="journal-root min-h-screen flex flex-col">
         {/* Skip to content for accessibility */}
         <a
@@ -40,6 +40,6 @@ export default function JournalLayout({ children }) {
           {children}
         </main>
       </div>
-    </DashboardLayout>
+    </JournalLayoutWrapper>
   );
 }

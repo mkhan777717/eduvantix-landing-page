@@ -99,9 +99,8 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/";
 
-  // Tracks if the login is for a free course redirection
   const [freeCoursePath, setFreeCoursePath] = useState(null);
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(() => searchParams.get("signup") === "1");
 
   useEffect(() => {
     setFreeCoursePath(getFreeCoursePath(redirectTo));
