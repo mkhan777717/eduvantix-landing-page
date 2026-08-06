@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Search, PenLine, Bell, User, ChevronDown, X, BookOpen, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const NAV_ITEMS = [
   { label: "Courses",  href: "/courses" },
@@ -101,6 +102,7 @@ export default function JournalHeader({ onSearchOpen }) {
 
         {/* ── Right Actions ───────────────────── */}
         <div className="flex items-center gap-2 ml-auto">
+          <ThemeToggle />
 
           {/* Search button */}
           <button

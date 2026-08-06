@@ -40,6 +40,7 @@ export default function Navbar({ type = 1 }) {
     return (
       <>
         <div className="fixed top-4 right-6 z-50 flex items-center justify-end gap-3">
+          <ThemeToggle />
           {/* Auth User Panel / Sign In Dropdown */}
           {user ? (
             <div
@@ -146,13 +147,6 @@ export default function Navbar({ type = 1 }) {
 
                     <div className="border-t my-1" style={{ borderColor: "var(--border-primary)" }} />
 
-                    <div className="px-3 py-2 flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Theme</span>
-                      <ThemeToggle />
-                    </div>
-
-                    <div className="border-t my-1" style={{ borderColor: "var(--border-primary)" }} />
-
                     <button
                       onClick={() => {
                         setIsSignInDropdownOpen(false);
@@ -168,20 +162,17 @@ export default function Navbar({ type = 1 }) {
               </AnimatePresence>
             </div>
           ) : (
-            <div className="flex items-center gap-3">
-              <ThemeToggle />
-              <Link
-                href="/login"
-                className="inline-flex items-center space-x-2 rounded-full px-5 py-2.5 text-sm font-semibold text-[var(--text-on-accent)] shadow-md transition-all shrink-0 hover:scale-[1.02] hover:-translate-y-[3px] hover:shadow-xl"
-                style={{
-                  background: "var(--accent-gradient)",
-                  boxShadow: "0px 6px 20px var(--accent-glow)"
-                }}
-              >
-                <span>Sign In</span>
-                <ArrowRight size={14} />
-              </Link>
-            </div>
+            <Link
+              href="/login"
+              className="inline-flex items-center space-x-2 rounded-full px-5 py-2.5 text-sm font-semibold text-[var(--text-on-accent)] shadow-md transition-all shrink-0 hover:scale-[1.02] hover:-translate-y-[3px] hover:shadow-xl"
+              style={{
+                background: "var(--accent-gradient)",
+                boxShadow: "0px 6px 20px var(--accent-glow)"
+              }}
+            >
+              <span>Sign In</span>
+              <ArrowRight size={14} />
+            </Link>
           )}
         </div>
 
@@ -310,6 +301,7 @@ export default function Navbar({ type = 1 }) {
 
             {/* Right: CTA */}
             <div className="hidden md:flex items-center gap-3">
+              <ThemeToggle />
               {/* Auth User Panel / Sign In Dropdown */}
               {user ? (
                 <div
@@ -319,7 +311,6 @@ export default function Navbar({ type = 1 }) {
                 >
                   <button
                     className="relative flex items-center gap-1.5 px-4 py-2 text-sm font-semibold transition-colors outline-none curser-pointer rounded-full border"
-
                     style={{
                       color: isSignInDropdownOpen ? "var(--text-accent)" : "var(--text-secondary)",
                       backgroundColor: "var(--bg-card)",
@@ -417,13 +408,6 @@ export default function Navbar({ type = 1 }) {
 
                         <div className="border-t my-1" style={{ borderColor: "var(--border-primary)" }} />
 
-                        <div className="px-3 py-2 flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Theme</span>
-                          <ThemeToggle />
-                        </div>
-
-                        <div className="border-t my-1" style={{ borderColor: "var(--border-primary)" }} />
-
                         <button
                           onClick={() => {
                             setIsSignInDropdownOpen(false);
@@ -439,31 +423,31 @@ export default function Navbar({ type = 1 }) {
                   </AnimatePresence>
                 </div>
               ) : (
-                <div className="flex items-center gap-3">
-                  <ThemeToggle />
-                  <Link
-                    href="/login"
-                    className="inline-flex items-center space-x-2 rounded-full px-5 py-2.5 text-sm font-semibold text-[var(--text-on-accent)] shadow-md transition-all shrink-0 hover:scale-[1.02] hover:-translate-y-[3px] hover:shadow-xl"
-                    style={{
-                      background: "var(--accent-gradient)",
-                      boxShadow: "0px 6px 20px var(--accent-glow)"
-                    }}
-                  >
-                    <span>Sign In</span>
-                    <ArrowRight size={14} />
-                  </Link>
-                </div>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center space-x-2 rounded-full px-5 py-2.5 text-sm font-semibold text-[var(--text-on-accent)] shadow-md transition-all shrink-0 hover:scale-[1.02] hover:-translate-y-[3px] hover:shadow-xl"
+                  style={{
+                    background: "var(--accent-gradient)",
+                    boxShadow: "0px 6px 20px var(--accent-glow)"
+                  }}
+                >
+                  <span>Sign In</span>
+                  <ArrowRight size={14} />
+                </Link>
               )}
             </div>
 
             {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="block md:hidden rounded-lg p-1 focus:outline-none"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              {isOpen ? <span>X</span> : <span>☰</span>}
-            </button>
+            <div className="flex md:hidden items-center gap-2">
+              <ThemeToggle />
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="rounded-lg p-1 focus:outline-none"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                {isOpen ? <span>X</span> : <span>☰</span>}
+              </button>
+            </div>
           </nav>
         </div>
 

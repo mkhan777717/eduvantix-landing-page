@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { ArrowRight, Menu, X } from "lucide-react";
 import useThemeStore from "@/store/useThemeStore";
 
+import ThemeToggle from "@/components/ThemeToggle";
+
 const NAV_LINKS = [
   { label: "Free Courses", href: "/courses" },
   { label: "Blogs", href: "/journal" },
@@ -95,6 +97,7 @@ export default function PublicJournalNavbar() {
 
         {/* ── Right: Sign In button ── */}
         <div className="hidden md:flex items-center gap-3 ml-auto">
+          <ThemeToggle />
           <Link
             href="/login"
             id="public-journal-signin-btn"
@@ -112,14 +115,17 @@ export default function PublicJournalNavbar() {
         </div>
 
         {/* ── Mobile hamburger ── */}
-        <button
-          className="block md:hidden ml-auto p-1.5 rounded-lg focus:outline-none"
-          style={{ color: "var(--text-secondary, #555)" }}
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        <div className="flex md:hidden items-center gap-2 ml-auto">
+          <ThemeToggle />
+          <button
+            className="p-1.5 rounded-lg focus:outline-none"
+            style={{ color: "var(--text-secondary, #555)" }}
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </header>
 
       {/* Spacer so page content doesn't hide under the fixed navbar */}
