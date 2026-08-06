@@ -554,6 +554,43 @@ function PerksSection({ reduced, stagger, fadeUp }) {
   );
 }
 
+function NoJobsIllustration({ className = "w-36 h-36" }) {
+  return (
+    <svg className={className} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="noJobGradBg" x1="20" y1="20" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#10B981" stopOpacity="0.18" />
+          <stop offset="1" stopColor="#059669" stopOpacity="0.04" />
+        </linearGradient>
+        <linearGradient id="noJobFolder" x1="45" y1="65" x2="155" y2="145" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#10B981" stopOpacity="0.25" />
+          <stop offset="1" stopColor="#047857" stopOpacity="0.08" />
+        </linearGradient>
+      </defs>
+      
+      {/* Outer Glow Circle */}
+      <circle cx="100" cy="100" r="76" fill="url(#noJobGradBg)" />
+      <circle cx="100" cy="100" r="64" stroke="#10B981" strokeWidth="1.5" strokeDasharray="6 6" strokeOpacity="0.4" />
+      
+      {/* Job Card Backdrop */}
+      <rect x="52" y="62" width="96" height="76" rx="16" fill="url(#noJobFolder)" stroke="#10B981" strokeWidth="2" strokeOpacity="0.6" />
+      
+      {/* Skeleton Lines */}
+      <rect x="68" y="80" width="64" height="7" rx="3.5" fill="#10B981" fillOpacity="0.5" />
+      <rect x="68" y="94" width="44" height="6" rx="3" fill="#10B981" fillOpacity="0.3" />
+      <rect x="68" y="107" width="52" height="6" rx="3" fill="#10B981" fillOpacity="0.25" />
+
+      {/* Magnifying Lens */}
+      <circle cx="132" cy="72" r="20" fill="#10B981" fillOpacity="0.15" stroke="#10B981" strokeWidth="2.5" />
+      <path d="M146 86L162 102" stroke="#10B981" strokeWidth="3.5" strokeLinecap="round" />
+      
+      {/* Sparkles */}
+      <path d="M42 64L44.5 70L50.5 72.5L44.5 75L42 81L39.5 75L33.5 72.5L39.5 70L42 64Z" fill="#10B981" />
+      <path d="M152 128L153.5 132L157.5 133.5L153.5 135L152 139L150.5 135L146.5 133.5L150.5 132L152 128Z" fill="#34D399" />
+    </svg>
+  );
+}
+
 function PriorityRolesSection({ reduced, stagger, fadeUp, jobs, setSelectedJob, openApplyModal, setActiveTab }) {
   return (
     <div>
@@ -569,7 +606,9 @@ function PriorityRolesSection({ reduced, stagger, fadeUp, jobs, setSelectedJob, 
             style={{ borderColor: "var(--border-accent)", backgroundColor: "rgba(16, 185, 129, 0.08)" }}
           >
             <Zap size={14} className="text-emerald-500" />
-            <span className="text-[11px] font-bold tracking-wider uppercase text-emerald-500">Priority Hiring Now</span>
+            <span className="text-[11px] font-bold tracking-wider uppercase text-emerald-500">
+              {jobs.length > 0 ? "Priority Hiring Now" : "Current Team Status"}
+            </span>
           </div>
         </motion.div>
         <motion.h2
@@ -577,73 +616,104 @@ function PriorityRolesSection({ reduced, stagger, fadeUp, jobs, setSelectedJob, 
           className="text-3xl md:text-4xl font-black tracking-tight"
           style={{ color: "var(--text-primary)" }}
         >
-          We're actively hiring for these roles...
+          {jobs.length > 0 ? "We're actively hiring for these roles..." : "Explore Opportunities & Culture"}
         </motion.h2>
         <motion.p variants={fadeUp} className="text-lg" style={{ color: "var(--text-secondary)" }}>
-          Apply today — stipend based on your skills, not fixed bands.
+          {jobs.length > 0
+            ? "Apply today — stipend based on your skills, not fixed bands."
+            : "Check back regularly or explore how our engineering and design teams work."}
         </motion.p>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {jobs.slice(0, 6).map((job, i) => (
-          <motion.div
-            key={job.id}
-            initial={reduced ? { opacity: 0 } : { opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 * i, duration: 0.6, ease: EASE_OUT_EXPO }}
-          >
-            <TiltCard
-              className="p-6 rounded-2xl border group h-full cursor-pointer"
-              style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}
+      {jobs.length === 0 ? (
+        <div className="py-14 px-8 rounded-3xl border border-gray-200/80 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md max-w-xl mx-auto text-center space-y-5 shadow-xl">
+          <div className="flex justify-center">
+            <NoJobsIllustration className="w-36 h-36" />
+          </div>
+          <div className="space-y-2">
+            <span className="px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 inline-block">
+              Fully Staffed Right Now
+            </span>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Currently No Job Openings
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-zinc-400 max-w-md mx-auto leading-relaxed">
+              We don't have any open roles right now. We regularly post positions for software engineers, designers, and growth roles — check back soon!
+            </p>
+          </div>
+          <div className="pt-2 flex justify-center">
+            <button
+              onClick={() => setActiveTab("how-we-work")}
+              className="px-6 py-2.5 rounded-full text-xs font-bold text-gray-800 dark:text-zinc-200 bg-gray-100 dark:bg-zinc-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all cursor-pointer border border-transparent hover:border-emerald-500/30"
             >
-              <div onClick={() => setSelectedJob(job)} className="space-y-4">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                      {TYPE_LABEL[job.type]}
-                    </span>
-                    {job.isHot && <span className="ml-2 text-[10px] font-bold text-red-500">🔥 Priority</span>}
+              Explore How We Work & Perks →
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {jobs.slice(0, 6).map((job, i) => (
+              <motion.div
+                key={job.id}
+                initial={reduced ? { opacity: 0 } : { opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 * i, duration: 0.6, ease: EASE_OUT_EXPO }}
+              >
+                <TiltCard
+                  className="p-6 rounded-2xl border group h-full cursor-pointer"
+                  style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}
+                >
+                  <div onClick={() => setSelectedJob(job)} className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                          {TYPE_LABEL[job.type]}
+                        </span>
+                        {job.isHot && <span className="ml-2 text-[10px] font-bold text-red-500">🔥 Priority</span>}
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold mb-1" style={{ color: "var(--text-primary)" }}>{job.title}</h3>
+                      <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{job.department} · {job.location}</p>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {job.skills.slice(0, 3).map((skill, sIdx) => (
+                        <span key={sIdx} className="px-2 py-0.5 rounded text-[10px] font-semibold" style={{ backgroundColor: "var(--bg-secondary)", color: "var(--text-muted)" }}>
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="pt-3 border-t flex items-center justify-between" style={{ borderColor: "var(--border-primary)" }}>
+                      <span className="text-[11px] font-bold text-emerald-500 flex items-center gap-1">
+                        <DollarSign size={11} /> Skill-Based Pay
+                      </span>
+                      <motion.button
+                        onClick={(e) => { e.stopPropagation(); openApplyModal(job); }}
+                        className="px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all cursor-pointer"
+                        whileHover={{ scale: 1.04 }}
+                        whileTap={{ scale: 0.96 }}
+                      >
+                        Apply Now
+                      </motion.button>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <h3 className="text-base font-bold mb-1" style={{ color: "var(--text-primary)" }}>{job.title}</h3>
-                  <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{job.department} · {job.location}</p>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {job.skills.slice(0, 3).map((skill, sIdx) => (
-                    <span key={sIdx} className="px-2 py-0.5 rounded text-[10px] font-semibold" style={{ backgroundColor: "var(--bg-secondary)", color: "var(--text-muted)" }}>
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-                <div className="pt-3 border-t flex items-center justify-between" style={{ borderColor: "var(--border-primary)" }}>
-                  <span className="text-[11px] font-bold text-emerald-500 flex items-center gap-1">
-                    <DollarSign size={11} /> Skill-Based Pay
-                  </span>
-                  <motion.button
-                    onClick={(e) => { e.stopPropagation(); openApplyModal(job); }}
-                    className="px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all cursor-pointer"
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.96 }}
-                  >
-                    Apply Now
-                  </motion.button>
-                </div>
-              </div>
-            </TiltCard>
-          </motion.div>
-        ))}
-      </div>
+                </TiltCard>
+              </motion.div>
+            ))}
+          </div>
 
-      <div className="text-center mt-10">
-        <MagneticButton
-          onClick={() => setActiveTab("jobs")}
-          className="px-8 py-4 rounded-xl font-bold border flex items-center gap-2 hover:border-emerald-500/40 transition-colors duration-500 cursor-pointer mx-auto"
-          style={{ color: "var(--text-primary)", borderColor: "var(--border-primary)" }}
-        >
-          View All {jobs.length} Open Roles <ArrowRight size={18} />
-        </MagneticButton>
-      </div>
+          <div className="text-center mt-10">
+            <MagneticButton
+              onClick={() => setActiveTab("jobs")}
+              className="px-8 py-4 rounded-xl font-bold border flex items-center gap-2 hover:border-emerald-500/40 transition-colors duration-500 cursor-pointer mx-auto"
+              style={{ color: "var(--text-primary)", borderColor: "var(--border-primary)" }}
+            >
+              View All {jobs.length} Open Roles <ArrowRight size={18} />
+            </MagneticButton>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -1290,16 +1360,33 @@ export default function CareersClient({ standalone = true }) {
               <div data-lenis-prevent className="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-zinc-900/30">
                 <div className="max-w-3xl mx-auto py-6 px-6 space-y-4">
                   {filteredJobs.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
-                      <Search size={32} className="text-gray-300 dark:text-zinc-700" />
-                      <p className="text-base font-semibold text-gray-500 dark:text-zinc-400">No roles match your search</p>
-                      <button
-                        onClick={() => { setSearchRole(""); setSearchLocation(""); setFilterType("ALL"); }}
-                        className="text-sm text-emerald-600 hover:underline cursor-pointer"
-                      >
-                        Clear filters
-                      </button>
-                    </div>
+                    jobs.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-16 px-6 text-center space-y-4 bg-white dark:bg-zinc-900 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-sm my-4">
+                        <NoJobsIllustration className="w-36 h-36" />
+                        <div className="space-y-1.5 max-w-md">
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Currently No Job Openings</h3>
+                          <p className="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed">
+                            We have no open positions at this moment. Please check back later or explore our team culture and benefits!
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-16 px-6 text-center space-y-4 bg-white dark:bg-zinc-900 rounded-3xl border border-gray-200 dark:border-zinc-800 shadow-sm my-4">
+                        <NoJobsIllustration className="w-36 h-36 opacity-70" />
+                        <div className="space-y-1.5 max-w-md">
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">No Roles Match Your Search</h3>
+                          <p className="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed">
+                            We couldn't find any job openings matching your current search terms or filters.
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => { setSearchRole(""); setSearchLocation(""); setFilterType("ALL"); }}
+                          className="px-5 py-2 rounded-full text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all cursor-pointer shadow-sm"
+                        >
+                          Clear All Filters
+                        </button>
+                      </div>
+                    )
                   ) : (
                     filteredJobs.map((job) => {
                       const isApplied = myApplications.some((a) => a.jobId === job.id);
