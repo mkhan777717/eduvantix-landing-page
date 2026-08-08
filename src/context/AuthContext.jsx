@@ -224,6 +224,14 @@ export function AuthProvider({ children }) {
   }, []);
 
   // ---------------------------------------------------------------------------
+  const updateUser = (updates) => {
+    setUser(prev => {
+      const updated = { ...prev, ...updates };
+      localStorage.setItem("eduvantix_auth_user", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const login = async (email, password, captchaToken = "") => {
     //1. Try real backend
     try {
@@ -452,7 +460,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, sendRegistrationOtp, verifyRegistrationOtp, logout, API_BASE, activeSession, setActiveSession, isInstituteBlocked, setIsInstituteBlocked, forgotPassword, resetPassword, loginWithGoogle }}>
+    <AuthContext.Provider value={{ user, updateUser, token, loading, login, register, sendRegistrationOtp, verifyRegistrationOtp, logout, API_BASE, activeSession, setActiveSession, isInstituteBlocked, setIsInstituteBlocked, forgotPassword, resetPassword, loginWithGoogle }}>
       {children}
 
       {/* Cross-Device Single Session Countdown Overlay */}

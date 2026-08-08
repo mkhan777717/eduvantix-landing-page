@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { getApiBase, buildAuthHeaders } from "@/utils/api";
+
+import VerifiedBadge from "@/components/VerifiedBadge";
 import { Activity, Award, Zap, User, X, Save, RefreshCw, CheckCircle2, Crown, Clock, CalendarDays, Target } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -396,7 +399,10 @@ export default function StudentProfile() {
                 </div>
               )}
               <div>
-                <h2 className="text-2xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>{user?.fullName || user?.username}</h2>
+                <h2 className="text-2xl font-black tracking-tight flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+                  {user?.fullName || user?.username}
+                  {user?.isVerified && <VerifiedBadge tier={user.verifiedBadgeTier} />}
+                </h2>
                 <p className="text-[11px] font-bold tracking-widest mt-1" style={{ color: "var(--text-muted)" }}>@{user?.username}</p>
                 <div className="flex items-center gap-3 mt-4">
                   {user?.githubUrl && (
