@@ -7,18 +7,19 @@ import {
   LayoutDashboard, Trophy, LogOut,
   Menu, X, ChevronLeft, ChevronRight, BookOpen, ArrowLeftRight,
   Code, Brain, Radio, AlertTriangle, FileText, Gamepad2, FileCheck, Activity, Settings, Paintbrush,
-  ShieldAlert, Layers, Users, PlusCircle, List, Bell, BellDot, CheckCircle2, Check, MessageSquare, Crown, HeartHandshake, ClipboardList, Target, Briefcase, CalendarDays, Newspaper, Database
+  ShieldAlert, ShieldCheck, Layers, Users, PlusCircle, List, Bell, BellDot, CheckCircle2, Check, MessageSquare, Crown, HeartHandshake, ClipboardList, Target, Briefcase, CalendarDays, Newspaper, Database
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/context/AuthContext";
 import ToastContainer from "@/components/ToastContainer";
 import useThemeStore from "@/store/useThemeStore";
 import GiftCoupon from "@/components/GiftCoupon";
+import VerifiedBadge from "@/components/VerifiedBadge";
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { logout, user, token, API_BASE, activeSession, setActiveSession, loading } = useAuth();
+  const { logout, user, token, API_BASE, activeSession, setActiveSession, loading, updateUser } = useAuth();
 
   const inst = user?.institute;
   const isInstituteAffiliated = !!user?.instituteId;
@@ -62,16 +63,7 @@ export default function DashboardLayout({ children }) {
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(() => {
-    if (typeof window !== "undefined") {
-      const hasSession = localStorage.getItem("synapse_student_session") === "true" ||
-                         localStorage.getItem("synapse_admin_session") === "true" ||
-                         localStorage.getItem("synapse_mentor_session") === "true" ||
-                         !!localStorage.getItem("eduvantix_auth_token");
-      return !hasSession;
-    }
-    return true;
-  });
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const [dashboardUser, setDashboardUser] = useState(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -86,6 +78,25 @@ export default function DashboardLayout({ children }) {
   useEffect(() => {
     setIsMounted(true);
     initTheme();
+
+    // Client-side initialization of local storage states
+    if (typeof window !== "undefined") {
+      try {
+        const reqStored = localStorage.getItem("eduvantix_dismissed_notifications");
+        if (reqStored) setDismissedRequests(JSON.parse(reqStored));
+        
+        const notiStored = localStorage.getItem("eduvantix_dismissed_noti_ids");
+        if (notiStored) setDismissedNotiIds(JSON.parse(notiStored));
+        
+        const hasSession = localStorage.getItem("synapse_student_session") === "true" ||
+                           localStorage.getItem("synapse_admin_session") === "true" ||
+                           localStorage.getItem("synapse_mentor_session") === "true" ||
+                           !!localStorage.getItem("eduvantix_auth_token");
+        setCheckingAuth(!hasSession);
+      } catch (e) {
+        console.error("Error loading local storage", e);
+      }
+    }
   }, [initTheme]);
 
   const effectiveRole = user?.role;
@@ -100,17 +111,7 @@ export default function DashboardLayout({ children }) {
   const isMentorSession = isMentor;
   const isLoginRoute = pathname === "/student" || pathname === "/admin" || pathname === "/mentor";
   const [premiumRequests, setPremiumRequests] = useState([]);
-  const [dismissedRequests, setDismissedRequests] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem("eduvantix_dismissed_notifications");
-        return stored ? JSON.parse(stored) : [];
-      } catch {
-        return [];
-      }
-    }
-    return [];
-  });
+  const [dismissedRequests, setDismissedRequests] = useState([]);
 
   const handleDismiss = (id) => {
     setDismissedRequests(prev => {
@@ -180,15 +181,7 @@ export default function DashboardLayout({ children }) {
   // ── In-app Notifications ────────────────────────────────────────────────────
   const [notifications, setNotifications] = useState([]);
   const [isNotiOpen, setIsNotiOpen] = useState(false);
-  const [dismissedNotiIds, setDismissedNotiIds] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem("eduvantix_dismissed_noti_ids");
-        return stored ? JSON.parse(stored) : [];
-      } catch { return []; }
-    }
-    return [];
-  });
+  const [dismissedNotiIds, setDismissedNotiIds] = useState([]);
 
   const visibleNotifications = notifications.filter(
     (n) => !dismissedNotiIds.includes(n.id) && !n.isRead
@@ -219,6 +212,17 @@ export default function DashboardLayout({ children }) {
       const data = await res.json();
       if (data.success) {
         setNotifications(data.notifications || []);
+        
+        const hasApprovalNotif = data.notifications?.find(n => 
+          n.title?.includes("Verified Badge Granted!")
+        );
+        if (hasApprovalNotif && user && !user.isVerified) {
+          let tier = "STUDENT";
+          if (hasApprovalNotif.body?.includes("EDUCATOR")) tier = "EDUCATOR";
+          if (hasApprovalNotif.body?.includes("ORGANIZATION")) tier = "ORGANIZATION";
+          
+          updateUser({ isVerified: true, verifiedBadgeTier: tier });
+        }
       }
     } catch (err) {
       console.error("Failed to fetch notifications", err);
@@ -371,7 +375,15 @@ export default function DashboardLayout({ children }) {
         else if (isInstAdmin) displayRole = "Institute Admin";
         else if (isBatchMgr) displayRole = "Batch Manager";
 
-        setDashboardUser({ name, email, role: displayRole, initials, avatarUrl });
+        setDashboardUser({ 
+          name, 
+          email, 
+          role: displayRole, 
+          initials, 
+          avatarUrl,
+          isVerified: user.isVerified,
+          verifiedBadgeTier: user.verifiedBadgeTier
+        });
         setCheckingAuth(false);
       } else {
         setCheckingAuth(false);
@@ -477,6 +489,7 @@ export default function DashboardLayout({ children }) {
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && { label: "Exam Center", href: "/exams", icon: FileText },
       isSuperAdmin && { label: "Live Users", href: "/admin/live-users", icon: Users },
       isSuperAdmin && { label: "Institutes", href: "/admin/institutes", icon: ShieldAlert },
+      isSuperAdmin && { label: "Verifications", href: "/admin/verification", icon: ShieldCheck },
       isInstAdmin && { label: "Manage Batches", href: "/admin/batches", icon: Layers, featureFlag: "allowedManageBatches" },
       isInstAdmin && { label: "Manage People", href: "/admin/people", icon: Users, featureFlag: "allowedManagePeople" },
       isBatchMgr && canShowFeature("allowedManageBatches") && { label: "My Batches", href: "/admin/batch-manager", icon: Layers, featureFlag: "allowedManageBatches" },
@@ -900,7 +913,10 @@ export default function DashboardLayout({ children }) {
                     </div>
                   )}
                   <div className="hidden sm:block text-left">
-                    <div className="text-[11px] font-semibold" style={{ color: "var(--text-primary)" }}>{dashboardUser.name}</div>
+                    <div className="text-[11px] font-semibold flex items-center gap-1.5" style={{ color: "var(--text-primary)" }}>
+                      {dashboardUser.name}
+                      {dashboardUser.isVerified && <VerifiedBadge tier={dashboardUser.verifiedBadgeTier} size="sm" showTooltip={false} />}
+                    </div>
                     <div className="text-[9px]" style={{ color: "var(--text-muted)" }}>{dashboardUser.role}</div>
                   </div>
                 </button>
@@ -923,32 +939,57 @@ export default function DashboardLayout({ children }) {
                             </div>
                           )}
                           <div>
-                            <div className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>{dashboardUser.name}</div>
+                            <div className="text-sm font-bold flex items-center gap-1.5" style={{ color: "var(--text-primary)" }}>
+                              {dashboardUser.name}
+                              {dashboardUser.isVerified && <VerifiedBadge tier={dashboardUser.verifiedBadgeTier} size="sm" showTooltip={false} />}
+                            </div>
                             <div className="text-[10px]" style={{ color: "var(--text-muted)" }}>{dashboardUser.role}</div>
                           </div>
                         </div>
                       </div>
 
-                      {isStudentSession && (
-                        <div className="grid grid-cols-3 gap-1 p-2 border-b" style={{ borderColor: "var(--border-primary)" }}>
-                          {[
-                            { label: "My Lists", href: "/student/lists", icon: <BookOpen size={14} /> },
-                            { label: "Notebook", href: "/student/notebook", icon: <FileText size={14} /> },
-                            { label: "Profile", href: "/student/profile", icon: <Activity size={14} /> },
-                            { label: "Settings", href: "/settings/ai-providers", icon: <Settings size={14} /> },
-                          ].map(item => (
-                            <Link key={item.href} href={item.href} onClick={() => setIsProfileMenuOpen(false)}
+                      <div className="grid grid-cols-3 gap-1 p-2 border-b" style={{ borderColor: "var(--border-primary)" }}>
+                        {isStudentSession && (
+                          <>
+                            <Link href="/student/lists" onClick={() => setIsProfileMenuOpen(false)}
                               className="flex flex-col items-center gap-1.5 p-2.5 rounded-lg transition-colors text-center"
                               style={{ color: "var(--text-secondary)" }}
                               onMouseEnter={e => e.currentTarget.style.backgroundColor = "var(--bg-hover)"}
                               onMouseLeave={e => e.currentTarget.style.backgroundColor = "transparent"}
                             >
-                              <span style={{ color: "var(--accent-primary)" }}>{item.icon}</span>
-                              <span className="text-[9px] font-medium">{item.label}</span>
+                              <span style={{ color: "var(--accent-primary)" }}><BookOpen size={14} /></span>
+                              <span className="text-[9px] font-medium">My Lists</span>
                             </Link>
-                          ))}
-                        </div>
-                      )}
+                            <Link href="/student/notebook" onClick={() => setIsProfileMenuOpen(false)}
+                              className="flex flex-col items-center gap-1.5 p-2.5 rounded-lg transition-colors text-center"
+                              style={{ color: "var(--text-secondary)" }}
+                              onMouseEnter={e => e.currentTarget.style.backgroundColor = "var(--bg-hover)"}
+                              onMouseLeave={e => e.currentTarget.style.backgroundColor = "transparent"}
+                            >
+                              <span style={{ color: "var(--accent-primary)" }}><FileText size={14} /></span>
+                              <span className="text-[9px] font-medium">Notebook</span>
+                            </Link>
+                            <Link href="/student/profile" onClick={() => setIsProfileMenuOpen(false)}
+                              className="flex flex-col items-center gap-1.5 p-2.5 rounded-lg transition-colors text-center"
+                              style={{ color: "var(--text-secondary)" }}
+                              onMouseEnter={e => e.currentTarget.style.backgroundColor = "var(--bg-hover)"}
+                              onMouseLeave={e => e.currentTarget.style.backgroundColor = "transparent"}
+                            >
+                              <span style={{ color: "var(--accent-primary)" }}><Activity size={14} /></span>
+                              <span className="text-[9px] font-medium">Profile</span>
+                            </Link>
+                          </>
+                        )}
+                        <Link href="/settings/ai-providers" onClick={() => setIsProfileMenuOpen(false)}
+                          className="flex flex-col items-center gap-1.5 p-2.5 rounded-lg transition-colors text-center"
+                          style={{ color: "var(--text-secondary)" }}
+                          onMouseEnter={e => e.currentTarget.style.backgroundColor = "var(--bg-hover)"}
+                          onMouseLeave={e => e.currentTarget.style.backgroundColor = "transparent"}
+                        >
+                          <span style={{ color: "var(--accent-primary)" }}><Settings size={14} /></span>
+                          <span className="text-[9px] font-medium">Settings</span>
+                        </Link>
+                      </div>
 
                       <div className="flex items-center justify-between px-3 py-2.5 border-b" style={{ borderColor: "var(--border-primary)" }}>
                         <div className="flex items-center gap-2 text-xs" style={{ color: "var(--text-secondary)" }}>
