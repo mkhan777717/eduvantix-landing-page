@@ -88,7 +88,20 @@ function GoogleLoginSection({ onSuccess, onError, loading, setErrorMsg }) {
 
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
-      <GoogleLoginButton onSuccess={onSuccess} onError={onError} loading={loading} />
+      <div className="space-y-2">
+        <GoogleLoginButton onSuccess={onSuccess} onError={onError} loading={loading} />
+        <p className="text-[11px] text-center leading-relaxed" style={{ color: "var(--text-muted)" }}>
+          By continuing with Google, you agree to our{" "}
+          <a href="/terms-of-service" target="_blank" className="underline hover:text-[var(--text-primary)]">
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a href="/privacy-policy" target="_blank" className="underline hover:text-[var(--text-primary)]">
+            Privacy Policy
+          </a>
+          . We access your name, email, and profile picture strictly for authentication and account creation.
+        </p>
+      </div>
     </GoogleOAuthProvider>
   );
 }
