@@ -293,11 +293,6 @@ export default function ResumeBuilderPage() {
       {/* Header - Hidden when printing */}
       <section className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 border-b pb-6 shrink-0 mb-8 print:hidden" style={{ borderColor: "var(--border-primary)" }}>
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
-            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-            <Sparkles size={12} className="text-violet-500 animate-pulse" />
-            RESUME BUILDER
-          </div>
           <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
             Resume Builder
           </h1>

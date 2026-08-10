@@ -195,15 +195,10 @@ export default function PracticeCatalogPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8"
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative"
             style={{ borderColor: "var(--border-primary)" }}
           >
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
-                style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-                <Zap size={12} className="text-violet-500 animate-pulse" />
-                INTERACTIVE PRACTICE SANDBOX
-              </div>
               <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
                 Interactive Code Zone
               </h1>

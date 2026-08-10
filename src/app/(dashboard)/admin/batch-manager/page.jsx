@@ -219,13 +219,8 @@ export default function BatchManagerDashboard() {
       {activeView === "list" ? (
         <>
           {/* Header section */}
-          <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8 relative" style={{ borderColor: "var(--border-primary)" }}>
+          <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
-                style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-                <Layers size={12} className="text-violet-500 animate-pulse" />
-                BATCH MANAGER DASHBOARD
-              </div>
               <h1 className="text-4xl font-serif tracking-tight">
                 My Assigned Batches
               </h1>
@@ -312,7 +307,7 @@ export default function BatchManagerDashboard() {
         /* Full Page Management View */
         <div className="flex-1 flex flex-col min-h-0 space-y-6">
           {/* Header section with back link */}
-          <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0" style={{ borderColor: "var(--border-primary)" }}>
+          <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
             <div className="space-y-2">
               <button
                 onClick={() => {

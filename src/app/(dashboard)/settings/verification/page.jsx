@@ -99,15 +99,34 @@ export default function VerificationPage() {
   const fetchMyApplications = useCallback(async () => {
     setAppsLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/verification/my-application`, { headers });
+      const res = await fetch(`${API_BASE}/api/verification/my-application`, { 
+        headers,
+        cache: 'no-store'
+      });
       const data = await res.json();
       if (data.success) {
         setMyApplications(data.applications || []);
         setMyBadge(data.badge || null);
-        if ((data.applications || []).length > 0) setStep(4);
+        if ((data.applications || []).length > 0) {
+          setStep(4);
+        } else {
+          // Auto-select tier and jump to eligibility (Step 2)
+          let tierId = "STUDENT";
+          if (user?.role === "INSTITUTE_ADMIN") tierId = "ORGANIZATION";
+          if (user?.role === "MENTOR" || user?.role === "BATCH_MANAGER") tierId = "EDUCATOR";
+          const tier = TIERS.find(t => t.id === tierId);
+          if (tier) {
+            setSelectedTier(tier);
+            setStep(2);
+            runEligibilityCheck(tier.id);
+          }
+        }
         
-        if (data.badge?.isVerified && !user?.isVerified) {
-          updateUser({ isVerified: true, verifiedBadgeTier: data.badge.verifiedBadgeTier });
+        if (data.badge) {
+          updateUser({ 
+            isVerified: Boolean(data.badge.isVerified), 
+            verifiedBadgeTier: data.badge.verifiedBadgeTier 
+          });
         }
       }
     } catch (err) {
@@ -180,10 +199,7 @@ export default function VerificationPage() {
       const data = await res.json();
       if (data.success) {
         showToast("Application withdrawn.");
-        fetchMyApplications();
-        setStep(1);
-        setSelectedTier(null);
-        setEligibility(null);
+        await fetchMyApplications();
       } else {
         showToast(data.message || "Failed to withdraw.", "error");
       }
@@ -266,12 +282,6 @@ export default function VerificationPage() {
               <motion.div key="step4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                   <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Your Applications</h2>
-                  <button
-                    onClick={() => { setStep(1); setSelectedTier(null); setEligibility(null); }}
-                    style={{ background: "var(--bg-hover)", border: "1px solid rgba(59,130,246,0.3)", color: "#93c5fd", borderRadius: 10, padding: "8px 16px", cursor: "pointer", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}
-                  >
-                    <Shield size={14} /> Apply for Another
-                  </button>
                 </div>
 
                 {myApplications.map((app) => {
@@ -343,51 +353,57 @@ export default function VerificationPage() {
                           <Trash2 size={13} /> Withdraw Application
                         </button>
                       )}
+
+                      {/* Reapply button */}
+                      {["REJECTED", "REVOKED"].includes(app.status) && (() => {
+                        const canReapply = !app.canReApplyAt || new Date() >= new Date(app.canReApplyAt);
+                        return (
+                          <button
+                            disabled={!canReapply}
+                            onClick={() => { 
+                              if (!canReapply) return;
+                              let tierId = "STUDENT";
+                              if (user?.role === "INSTITUTE_ADMIN") tierId = "ORGANIZATION";
+                              if (user?.role === "MENTOR" || user?.role === "BATCH_MANAGER") tierId = "EDUCATOR";
+                              const tier = TIERS.find(t => t.id === tierId);
+                              if (tier) {
+                                setSelectedTier(tier);
+                                setStep(2);
+                                runEligibilityCheck(tier.id);
+                                setForm({ reason: "", linkedinUrl: "", websiteUrl: "" });
+                              }
+                            }}
+                            style={{ 
+                              marginTop: 14, 
+                              background: "rgba(59,130,246,0.1)", 
+                              border: "1px solid rgba(59,130,246,0.25)", 
+                              color: "#3b82f6", 
+                              borderRadius: 8, 
+                              padding: "7px 14px", 
+                              cursor: canReapply ? "pointer" : "not-allowed", 
+                              opacity: canReapply ? 1 : 0.5,
+                              fontSize: 12, 
+                              fontWeight: 600, 
+                              display: "flex", 
+                              alignItems: "center", 
+                              gap: 6 
+                            }}
+                          >
+                            <RefreshCw size={13} /> Reapply for Badge
+                          </button>
+                        );
+                      })()}
                     </motion.div>
                   );
                 })}
               </motion.div>
             )}
 
-            {/* ── STEP 1: Choose Tier ── */}
-            {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Choose a Badge Tier</h2>
-                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                  {TIERS.map((tier) => {
-                    const TierIcon = tier.icon;
-                    return (
-                      <motion.button
-                        key={tier.id}
-                        whileHover={{ scale: 1.01, x: 4 }}
-                        whileTap={{ scale: 0.99 }}
-                        onClick={() => handleTierSelect(tier)}
-                        style={{ background: tier.bg, border: `1px solid ${tier.border}`, borderRadius: 16, padding: "20px 24px", cursor: "pointer", textAlign: "left", color: "inherit", display: "flex", alignItems: "center", gap: 18, transition: "all 0.2s" }}
-                      >
-                        <div style={{ background: `${tier.color}20`, borderRadius: 12, padding: 12, flexShrink: 0 }}>
-                          <TierIcon size={24} color={tier.color} />
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-                            <span style={{ fontWeight: 700, fontSize: 16 }}>{tier.name}</span>
-                            <VerifiedBadge tier={tier.id} size="sm" showTooltip={false} />
-                          </div>
-                          <p style={{ margin: 0, fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>{tier.description}</p>
-                        </div>
-                        <ChevronRight size={20} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
-                      </motion.button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
+
 
             {/* ── STEP 2: Eligibility Check ── */}
             {step === 2 && selectedTier && (
               <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <button onClick={() => setStep(1)} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, marginBottom: 20, fontSize: 13 }}>
-                  <ChevronLeft size={16} /> Back to tiers
-                </button>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
                   <VerifiedBadge tier={selectedTier.id} size="md" showTooltip={false} />
