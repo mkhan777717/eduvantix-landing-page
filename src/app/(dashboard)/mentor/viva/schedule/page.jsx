@@ -165,11 +165,7 @@ export default function ScheduleVivaPage() {
         {/* Header */}
         <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b pb-6" style={{ borderColor: "var(--border-primary)" }}>
           <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3"
-              style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "var(--accent-primary)" }} />
-              Viva Administration
-            </div>
+
             <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
               Scheduling & Management
             </h1>

@@ -129,19 +129,8 @@ export default async function JournalHomePage() {
     <JournalGuestGate>
     <div className="px-5 py-8 max-w-7xl mx-auto">
       {/* ── Platform Page Header Banner (Same layout as Contest Arena & Practice Arena) ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-8" style={{ borderColor: "var(--j-border)" }}>
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--j-border)" }}>
         <div className="space-y-2">
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--j-border)] w-fit"
-            style={{
-              borderColor: "var(--j-border)",
-              color: "var(--j-eyebrow)",
-              backgroundColor: "var(--j-bg-secondary)",
-            }}
-          >
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            EDUVANTIX JOURNAL & BLOG
-          </div>
           <h1
             className="text-4xl font-serif tracking-tight"
             style={{
@@ -157,7 +146,7 @@ export default async function JournalHomePage() {
 
         {/* Action buttons */}
         <JournalHeaderActions />
-      </div>
+      </section>
 
       {/* ── Category Pill Filter Bar + Search ─────────────────────────────── */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
