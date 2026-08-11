@@ -505,6 +505,7 @@ export default function DashboardLayout({ children }) {
       isSuperAdmin && { label: "User Feedbacks", href: "/admin/feedback", icon: ClipboardList },
       isSuperAdmin && { label: "Job Assistance", href: "/admin/job-assistance", icon: Briefcase },
       isSuperAdmin && { label: "Careers Portal", href: "/admin/careers", icon: Briefcase },
+      isSuperAdmin && { label: "Campus Ambassadors", href: "/admin/campus-ambassadors", icon: Users },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedContest") && { label: "Contests", href: "/admin/contests", icon: Trophy, featureFlag: "allowedContest" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedProblems") && { label: "Problems", href: "/admin/problems", icon: Code, featureFlag: "allowedProblems" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedGoLive") && { label: "Live Sessions", href: "/admin/live", icon: Radio, featureFlag: "allowedGoLive" },
