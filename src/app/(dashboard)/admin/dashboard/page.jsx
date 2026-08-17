@@ -253,13 +253,8 @@ export default function AdminDashboard() {
   return (
     <div className="w-full animate-fade-in space-y-8 pb-12">
       {/* Welcome Hero Banner */}
-      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 shrink-0 mb-8 relative" style={{ borderColor: "var(--border-primary)" }}>
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
-            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-            <span className="w-1.5 h-1.5 rounded-full animate-ping" style={{ backgroundColor: "var(--accent-primary)" }} />
-            EDUVANTIX CORE CONSOLE
-          </div>
           <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
             Welcome back, {user?.username || "Administrator"}
           </h1>

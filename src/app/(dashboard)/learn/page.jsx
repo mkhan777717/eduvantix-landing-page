@@ -183,22 +183,15 @@ export default function LearnCatalogPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-16">
       {/* Hero Banner */}
-      <section className="relative overflow-hidden rounded-3xl p-8 border border-[var(--border-primary)]"
-        style={{ background: "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%)" }}>
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle, var(--text-primary) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
-        </div>
-        <div className="relative z-10 space-y-4 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-bold border border-[var(--border-accent)] text-[var(--text-accent)] bg-[var(--accent-glow)]">
-            <Sparkles size={11} /> Eduvantix Learning
-          </div>
-          <h1 className="text-3xl font-bold leading-tight" style={{ color: "var(--text-primary)" }}>
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="space-y-2">
+          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
             Learn, Practice, Excel
           </h1>
-          <p style={{ color: "var(--text-secondary)" }} className="text-sm max-w-lg leading-relaxed">
+          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
             Master programming concepts with interactive lessons, MCQ quizzes, and real coding challenges.
           </p>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 pt-2">
             <div className="flex -space-x-2">
               {[..."ABCDE"].map(l => (
                 <div key={l} className="w-7 h-7 rounded-full border-2 border-[var(--bg-primary)] flex items-center justify-center text-[10px] font-bold text-white" style={{ backgroundColor: "var(--accent-primary)" }}>{l}</div>
@@ -206,14 +199,6 @@ export default function LearnCatalogPage() {
             </div>
             <p className="text-xs" style={{ color: "var(--text-secondary)" }}><strong style={{ color: "var(--text-primary)" }}>2000+</strong> learners already enrolled</p>
           </div>
-        </div>
-        <div className="absolute right-8 top-1/2 -translate-y-1/2 hidden lg:flex flex-col gap-3 opacity-60">
-          {[Code2, FileQuestion, BookOpen, Trophy].map((Icon, i) => (
-            <motion.div key={i} animate={{ y: [0, -6, 0] }} transition={{ repeat: Infinity, duration: 3, delay: i * 0.4 }}
-              className="w-10 h-10 rounded-xl bg-[var(--bg-card)] border border-[var(--border-primary)] flex items-center justify-center">
-              <Icon size={18} style={{ color: "var(--text-accent)" }} />
-            </motion.div>
-          ))}
         </div>
       </section>
 

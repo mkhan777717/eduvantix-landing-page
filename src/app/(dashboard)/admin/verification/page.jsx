@@ -77,7 +77,10 @@ export default function AdminVerificationPage() {
       if (tierFilter) params.set("tier", tierFilter);
       if (search) params.set("search", search);
 
-      const res = await fetch(`${API_BASE}/api/verification/admin?${params}`, { headers });
+      const res = await fetch(`${API_BASE}/api/verification/admin?${params}`, { 
+        headers,
+        cache: 'no-store'
+      });
       const data = await res.json();
       if (data.success) {
         setApplications(data.applications || []);
@@ -102,7 +105,10 @@ export default function AdminVerificationPage() {
     setRejectionReason("");
     setCustomRejection("");
     try {
-      const res = await fetch(`${API_BASE}/api/verification/admin/${app.id}`, { headers });
+      const res = await fetch(`${API_BASE}/api/verification/admin/${app.id}`, { 
+        headers,
+        cache: 'no-store'
+      });
       const data = await res.json();
       if (data.success) setSelectedApp(data.application);
     } catch (err) {

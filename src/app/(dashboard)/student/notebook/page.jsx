@@ -13,11 +13,6 @@ export default function NotebookPage() {
     <div className="max-w-6xl mx-auto space-y-6 animate-fade-in px-0 sm:px-6 pb-12">
       <section className="flex flex-col gap-2 border-b pb-6 shrink-0" style={{ borderColor: "var(--border-primary)" }}>
         <div className="flex items-center justify-between">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
-            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-            <FileText size={12} className="text-violet-500" />
-            Notebook
-          </div>
           <button className="flex items-center space-x-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-[var(--text-on-accent)] transition-transform hover:-translate-y-0.5 shadow-md"
             style={{ background: "var(--accent-primary)" }}>
             <Plus size={16} />

@@ -92,11 +92,6 @@ export default function StudentDailyChallenge() {
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500 pb-12">
       {/* Page Header */}
       <section className="flex flex-col gap-2 border-b pb-6 shrink-0" style={{ borderColor: "var(--border-primary)" }}>
-        <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[var(--border-primary)] mb-3 w-fit"
-          style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)" }}>
-          <Target size={12} className="text-amber-500" />
-          Daily Challenge
-        </div>
         <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>Question of the Day</h1>
         <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
           Solve the daily challenge to earn points and increase your streak!

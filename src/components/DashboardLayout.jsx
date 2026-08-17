@@ -213,15 +213,18 @@ export default function DashboardLayout({ children }) {
       if (data.success) {
         setNotifications(data.notifications || []);
         
-        const hasApprovalNotif = data.notifications?.find(n => 
-          n.title?.includes("Verified Badge Granted!")
+        const latestStatusNotif = data.notifications?.find(n => 
+          n.title?.includes("Verified Badge Granted!") || n.title?.includes("Verified Badge Revoked")
         );
-        if (hasApprovalNotif && user && !user.isVerified) {
-          let tier = "STUDENT";
-          if (hasApprovalNotif.body?.includes("EDUCATOR")) tier = "EDUCATOR";
-          if (hasApprovalNotif.body?.includes("ORGANIZATION")) tier = "ORGANIZATION";
-          
-          updateUser({ isVerified: true, verifiedBadgeTier: tier });
+        if (latestStatusNotif && user) {
+          if (latestStatusNotif.title.includes("Verified Badge Granted!") && !user.isVerified) {
+            let tier = "STUDENT";
+            if (latestStatusNotif.body?.includes("EDUCATOR")) tier = "EDUCATOR";
+            if (latestStatusNotif.body?.includes("ORGANIZATION")) tier = "ORGANIZATION";
+            updateUser({ isVerified: true, verifiedBadgeTier: tier });
+          } else if (latestStatusNotif.title.includes("Verified Badge Revoked") && user.isVerified) {
+            updateUser({ isVerified: false, verifiedBadgeTier: null });
+          }
         }
       }
     } catch (err) {
@@ -502,6 +505,7 @@ export default function DashboardLayout({ children }) {
       isSuperAdmin && { label: "User Feedbacks", href: "/admin/feedback", icon: ClipboardList },
       isSuperAdmin && { label: "Job Assistance", href: "/admin/job-assistance", icon: Briefcase },
       isSuperAdmin && { label: "Careers Portal", href: "/admin/careers", icon: Briefcase },
+      isSuperAdmin && { label: "Campus Ambassadors", href: "/admin/campus-ambassadors", icon: Users },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedContest") && { label: "Contests", href: "/admin/contests", icon: Trophy, featureFlag: "allowedContest" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedProblems") && { label: "Problems", href: "/admin/problems", icon: Code, featureFlag: "allowedProblems" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedGoLive") && { label: "Live Sessions", href: "/admin/live", icon: Radio, featureFlag: "allowedGoLive" },

@@ -469,7 +469,7 @@ const TYPE_LABEL = { FULL_TIME: "Full-time", INTERNSHIP: "Internship", PART_TIME
 const TOP_TABS = [
   { key: "home", label: "Home", icon: Home },
   { key: "jobs", label: "Jobs", icon: Briefcase },
-  { key: "students", label: "Students", icon: GraduationCap },
+  { key: "students", label: "Campus Ambassadors", icon: GraduationCap },
   { key: "how-we-work", label: "How we work", icon: Globe },
   { key: "how-we-hire", label: "How we hire", icon: Wrench },
   { key: "my-applications", label: "My Applications", icon: User },
@@ -810,6 +810,723 @@ function HiringProcessSection({ reduced, jobs, openApplyModal, setActiveTab }) {
           </TiltCard>
         </motion.div>
       </div>
+    </div>
+  );
+}
+
+
+// ─── Campus Ambassador Section ────────────────────────────────────────────────
+const CA_FAQS = [
+  { q: "Who can apply?", a: "Any currently enrolled university or college student in India can apply. You must be an active Eduvantix user to register." },
+  { q: "How do I earn cash?", a: "You earn a commission every time a new user purchases a premium Eduvantix subscription using your referral link, AND every time an educational institution partners with us through your introduction." },
+  { q: "What is the Welcome Kit?", a: "Accepted ambassadors receive an exclusive Eduvantix branded welcome kit — including a t-shirt, tote bag, and special merchandise — shipped directly to your address." },
+  { q: "How many students from one college can be selected?", a: "We typically select 1–3 ambassadors per college depending on the institution's size and the quality of applications received." },
+  { q: "Is there a fixed monthly salary?", a: "There is no fixed salary. Your earnings are purely commission-based — the more students you onboard and institutions you bring on board, the more you earn. Top ambassadors have earned ₹10,000+ per month." },
+  { q: "How long does the review process take?", a: "Our team reviews applications promptly. You'll receive an email with the decision soon." },
+  { q: "What happens after I get accepted?", a: "You'll receive a dedicated Ambassador Portal link and credentials on your registered email within 24–48 hours of acceptance. Your onboarding kit and all tracking tools will be accessible there." },
+];
+
+function CampusAmbassadorSection({ user, token, API_BASE, reduced, router, isDark }) {
+  const [openFaq, setOpenFaq] = useState(null);
+  const [showRegModal, setShowRegModal] = useState(false);
+  const [existingStatus, setExistingStatus] = useState(null); // null | {applied, status}
+  const [checkingStatus, setCheckingStatus] = useState(false);
+
+  // Registration form state
+  const [regForm, setRegForm] = useState({
+    fullName: "",
+    phone: "",
+    collegeName: "",
+    city: "",
+    yearOfStudy: "",
+    degree: "",
+    linkedinUrl: "",
+    instagramHandle: "",
+    whyJoin: "",
+  });
+  const [regLoading, setRegLoading] = useState(false);
+  const [regError, setRegError] = useState("");
+  const [regSuccess, setRegSuccess] = useState(false);
+
+  // Clear any legacy localStorage key to prevent cross-account status leak
+  useEffect(() => {
+    try { localStorage.removeItem("eduvantix_ca_status"); } catch {}
+  }, []);
+
+  // Fetch application status strictly for the authenticated user from the database
+  useEffect(() => {
+    if (user && token) {
+      const emailQuery = user.email ? `?email=${encodeURIComponent(user.email)}` : "";
+      fetch(`${API_BASE}/api/campus-ambassador/check-status${emailQuery}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.applied) {
+            setExistingStatus({ applied: true, status: data.status });
+          } else {
+            setExistingStatus(null);
+          }
+        })
+        .catch(() => { setExistingStatus(null); });
+    } else {
+      setExistingStatus(null);
+    }
+  }, [user, token, API_BASE]);
+
+  // Auto-close modal if user has already applied (status is shown directly on page)
+  useEffect(() => {
+    if (existingStatus?.applied) {
+      setShowRegModal(false);
+    }
+  }, [existingStatus]);
+
+  // Check if user already applied when modal opens
+  const openModal = async () => {
+    if (!user || !token) {
+      router.push("/login?redirect=/careers");
+      return;
+    }
+    if (existingStatus?.applied) {
+      return; // Already applied, status is displayed directly on the page!
+    }
+    setShowRegModal(true);
+  };
+
+  // Pre-fill name from user profile
+  useEffect(() => {
+    if (user?.fullName || user?.username) {
+      setRegForm(f => ({ ...f, fullName: f.fullName || user.fullName || user.username }));
+    }
+  }, [user]);
+
+  const handleRegSubmit = async (e) => {
+    e.preventDefault();
+    if (!regForm.whyJoin.trim() || regForm.whyJoin.trim().length < 30) {
+      setRegError("Please write at least 30 characters in the 'Why join' field.");
+      return;
+    }
+    setRegLoading(true);
+    setRegError("");
+    try {
+      const res = await fetch(`${API_BASE}/api/campus-ambassador/register`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(regForm),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setRegSuccess(true);
+        setExistingStatus({ applied: true, status: "PENDING" });
+      } else if (data.alreadyApplied) {
+        setExistingStatus({ applied: true, status: data.status });
+      } else {
+        setRegError(data.message || "Failed to submit. Please try again.");
+      }
+    } catch {
+      setRegError("Network error. Please try again.");
+    } finally {
+      setRegLoading(false);
+    }
+  };
+
+  const YEAR_OPTIONS = ["1st Year", "2nd Year", "3rd Year", "4th Year", "5th Year", "Postgraduate"];
+  const DEGREE_OPTIONS = ["B.Tech / B.E.", "BCA", "B.Sc", "B.Com / BBA", "M.Tech / M.E.", "MCA", "MBA / PGDM", "M.Sc", "Diploma / Other"];
+
+  const statusConfig = {
+    PENDING: { label: "Application Under Review", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20", icon: Clock, desc: "Our team is reviewing your application. You'll hear from us soon!" },
+    ACCEPTED: { label: "You've Been Accepted! 🎉", color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", icon: CheckCircle2, desc: "Congratulations! Check your email for portal credentials and onboarding details." },
+    REJECTED: { label: "Application Not Selected", color: "text-red-500 dark:text-red-400", bg: "bg-red-500/10", border: "border-red-500/20", icon: X, desc: "We couldn't proceed with your application this time. Watch out for the next cohort!" },
+  };
+
+  const heroRef = useRef(null);
+  const isHeroInView = useInView(heroRef, { once: true });
+
+  const heroBg = isDark
+    ? "linear-gradient(135deg, #0a1a0f 0%, #0d1f1a 40%, #061610 100%)"
+    : "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 40%, #ecfdf5 100%)";
+
+  const heroOrb1 = isDark
+    ? "radial-gradient(circle, rgba(16,185,129,0.18) 0%, transparent 70%)"
+    : "radial-gradient(circle, rgba(16,185,129,0.25) 0%, transparent 70%)";
+
+  const heroOrb2 = isDark
+    ? "radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%)"
+    : "radial-gradient(circle, rgba(5,150,105,0.18) 0%, transparent 70%)";
+
+  const heroDotColor = isDark ? "#10b981" : "#10b981";
+  const heroDotOpacity = isDark ? "0.06" : "0.12";
+
+  return (
+    <div className="flex flex-col">
+      {/* ── HERO ─────────────────────────────────────────────────────────── */}
+      <section
+        ref={heroRef}
+        className="relative overflow-hidden"
+        style={{ background: heroBg, minHeight: 480 }}
+      >
+        {/* Animated background orbs */}
+        <motion.div
+          className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full pointer-events-none"
+          style={{ background: heroOrb1, filter: "blur(60px)" }}
+          animate={reduced ? {} : { scale: [1, 1.15, 1], opacity: [0.5, 0.9, 0.5] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-[-15%] left-[-8%] w-[350px] h-[350px] rounded-full pointer-events-none"
+          style={{ background: heroOrb2, filter: "blur(50px)" }}
+          animate={reduced ? {} : { scale: [1, 1.1, 1] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+
+        {/* Dot grid */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `radial-gradient(circle, ${heroDotColor} 1px, transparent 1px)`,
+            backgroundSize: "32px 32px",
+            opacity: heroDotOpacity,
+          }}
+        />
+
+        <div className="relative z-10 max-w-5xl mx-auto px-6 md:px-12 py-16 md:py-24 flex flex-col items-center text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+            className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border mb-6 ${isDark ? "border-emerald-500/30 bg-emerald-500/10" : "border-emerald-600/30 bg-emerald-600/10"}`}
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className={`text-xs font-bold tracking-wider uppercase ${isDark ? "text-emerald-400" : "text-emerald-700"}`}>Now Recruiting • Batch 2026</span>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className={`text-4xl md:text-6xl font-black leading-tight tracking-tight mb-4 ${isDark ? "text-white" : "text-gray-900"}`}
+          >
+            Become an{" "}
+            <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg, #10b981, #34d399)" }}>
+              Eduvantix
+            </span>
+            <br />Campus Ambassador
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className={`text-lg max-w-2xl leading-relaxed mb-10 ${isDark ? "text-zinc-300" : "text-gray-600"}`}
+          >
+            Represent Eduvantix at your campus, earn real cash commissions, and receive exclusive branded merchandise. Be the face of the future of education.
+          </motion.p>
+
+          {existingStatus?.applied ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className={`w-full max-w-xl mx-auto p-6 rounded-3xl border shadow-xl backdrop-blur-md ${
+                existingStatus.status === "ACCEPTED"
+                  ? isDark
+                    ? "border-emerald-500/40 bg-emerald-950/60 text-white"
+                    : "border-emerald-500/40 bg-emerald-50 text-gray-900"
+                  : existingStatus.status === "REJECTED"
+                  ? isDark
+                    ? "border-red-500/30 bg-red-950/40 text-white"
+                    : "border-red-500/30 bg-red-50 text-gray-900"
+                  : isDark
+                  ? "border-amber-500/40 bg-amber-950/50 text-white"
+                  : "border-amber-500/40 bg-amber-50 text-gray-900"
+              }`}
+            >
+              <div className="flex items-center gap-4 text-left">
+                <div
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                    existingStatus.status === "ACCEPTED"
+                      ? "bg-emerald-500/20 text-emerald-400"
+                      : existingStatus.status === "REJECTED"
+                      ? "bg-red-500/20 text-red-400"
+                      : "bg-amber-500/20 text-amber-400"
+                  }`}
+                >
+                  {existingStatus.status === "ACCEPTED" ? (
+                    <CheckCircle2 size={26} />
+                  ) : existingStatus.status === "REJECTED" ? (
+                    <X size={26} />
+                  ) : (
+                    <Clock size={26} />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-base font-extrabold">
+                      {existingStatus.status === "ACCEPTED"
+                        ? "You've Been Accepted! 🎉"
+                        : existingStatus.status === "REJECTED"
+                        ? "Application Update"
+                        : "Application Submitted & Under Review"}
+                    </h3>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                        existingStatus.status === "ACCEPTED"
+                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                          : existingStatus.status === "REJECTED"
+                          ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                          : "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                      }`}
+                    >
+                      {existingStatus.status || "PENDING"}
+                    </span>
+                  </div>
+                  <p
+                    className={`text-xs mt-1.5 leading-relaxed ${
+                      isDark ? "text-zinc-300" : "text-gray-600"
+                    }`}
+                  >
+                    {existingStatus.status === "ACCEPTED"
+                      ? "Congratulations! You are officially an Eduvantix Campus Ambassador. Check your email for portal credentials and onboarding details."
+                      : existingStatus.status === "REJECTED"
+                      ? "Thank you for applying. We were unable to select your application for Batch 2026. Keep building with Eduvantix and watch out for the next cohort!"
+                      : "Thank you for registering! Our team is reviewing your profile and motivation. You will hear from us soon via email."}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={isHeroInView ? { opacity: 1, scale: 1 } : {}}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              onClick={openModal}
+              className="px-10 py-4 rounded-2xl font-bold text-white text-sm shadow-[0_0_40px_rgba(16,185,129,0.4)] cursor-pointer"
+              style={{ background: "linear-gradient(135deg, #10b981, #059669)" }}
+            >
+              {user ? "Apply Now — Free Registration" : "Login to Apply"}
+            </motion.button>
+          )}
+
+          {/* Stats row */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.45 }}
+            className="mt-14 grid grid-cols-3 gap-8"
+          >
+            {[
+              { value: "₹10k+", label: "Monthly Earnings (Top Ambassadors)" },
+              { value: "100%", label: "Commission Based" },
+              { value: "🎁", label: "Welcome Kit Included" },
+            ].map((s, i) => (
+              <div key={i} className="text-center">
+                <div className={`text-2xl md:text-3xl font-black ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>{s.value}</div>
+                <div className={`text-[11px] mt-1 leading-tight ${isDark ? "text-zinc-400" : "text-gray-500"}`}>{s.label}</div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      <div className="p-4 md:p-8 space-y-16 max-w-5xl mx-auto w-full">
+
+        {/* ── HOW YOU EARN ────────────────────────────────────────────────── */}
+        <section>
+          <div className="text-center mb-10 space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/8 mb-2">
+              <DollarSign size={13} className="text-emerald-500" />
+              <span className="text-[11px] font-bold tracking-wider uppercase text-emerald-500">Your Earnings</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight">Two Ways to Earn Cash</h2>
+            <p className="text-gray-500 dark:text-zinc-400 text-sm max-w-xl mx-auto">
+              Your referral link tracks every conversion. Get paid every time someone you referred makes a purchase or signs a deal.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              {
+                icon: "💰",
+                title: "Premium Subscription Commissions",
+                desc: "Every time a student or user purchases an Eduvantix Premium plan using your referral code or link, you earn a cash commission. The more users you bring on board, the more you earn — no cap.",
+                highlight: "Earn per premium purchase",
+                tag: "User Referrals",
+              },
+              {
+                icon: "🏛️",
+                title: "Institution Partnership Bonus",
+                desc: "When an educational institution — college, university, or coaching center — signs a partnership agreement with Eduvantix through your introduction, you receive a significant one-time bonus.",
+                highlight: "Bonus per institution signed",
+                tag: "B2B Referrals",
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={reduced ? { opacity: 0 } : { opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.6 }}
+                className="p-7 rounded-3xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-4 hover:border-emerald-500/40 transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-4xl">{item.icon}</span>
+                  <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">{item.tag}</span>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{item.title}</h3>
+                <p className="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed">{item.desc}</p>
+                <div className="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-zinc-800">
+                  <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
+                  <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{item.highlight}</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── PERKS ───────────────────────────────────────────────────────── */}
+        <section>
+          <div className="text-center mb-10 space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/8 mb-2">
+              <Gift size={13} className="text-amber-500" />
+              <span className="text-[11px] font-bold tracking-wider uppercase text-amber-500">Perks & Benefits</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight">What You Get</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              { icon: "👕", title: "Welcome Kit", desc: "Eduvantix branded t-shirt, tote bag, and exclusive merchandise shipped directly to your doorstep upon acceptance.", accent: "emerald" },
+              { icon: "💵", title: "Cash Commissions", desc: "Earn real money for every premium subscription and institution partnership you bring in. No upper limit.", accent: "green" },
+              { icon: "📜", title: "Official Certificate", desc: "Get a verified Eduvantix Campus Ambassador certificate — a powerful addition to your resume and LinkedIn.", accent: "blue" },
+              { icon: "🌐", title: "Network & Feature", desc: "Join our national ambassador network, get featured on our platform, and get direct access to Eduvantix leadership.", accent: "purple" },
+            ].map((perk, i) => (
+              <motion.div
+                key={i}
+                initial={reduced ? { opacity: 0 } : { opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08, duration: 0.5 }}
+                className="p-6 rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-3 text-center hover:border-emerald-500/30 transition-all"
+              >
+                <div className="text-4xl mb-2">{perk.icon}</div>
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white">{perk.title}</h3>
+                <p className="text-xs text-gray-500 dark:text-zinc-400 leading-relaxed">{perk.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── HOW IT WORKS ────────────────────────────────────────────────── */}
+        <section>
+          <div className="text-center mb-10 space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/8 mb-2">
+              <Rocket size={13} className="text-emerald-500" />
+              <span className="text-[11px] font-bold tracking-wider uppercase text-emerald-500">Process</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight">How It Works</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+            {[
+              { step: "01", icon: "📝", title: "Register", desc: "Fill in the campus ambassador registration form with your details and motivation." },
+              { step: "02", icon: "🔍", title: "We Review", desc: "Our team reviews your application and evaluates your potential." },
+              { step: "03", icon: "✅", title: "Get Accepted", desc: "Accepted ambassadors receive a confirmation email and portal credentials within 24–48 hrs." },
+              { step: "04", icon: "🚀", title: "Start Earning", desc: "Use your unique referral link to onboard users & institutions and track your earnings live." },
+            ].map((step, i) => (
+              <motion.div
+                key={i}
+                initial={reduced ? { opacity: 0 } : { opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.55 }}
+                className="relative p-6 rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-3"
+              >
+                <span className="text-3xl font-black text-emerald-500/20 dark:text-emerald-500/30 absolute top-4 right-5">{step.step}</span>
+                <div className="text-3xl">{step.icon}</div>
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white">{step.title}</h3>
+                <p className="text-xs text-gray-500 dark:text-zinc-400 leading-relaxed">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            {existingStatus?.applied ? (
+              <div
+                className={`inline-flex items-center gap-2 px-6 py-3 rounded-2xl border font-bold text-xs ${
+                  existingStatus.status === "ACCEPTED"
+                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                    : existingStatus.status === "REJECTED"
+                    ? "border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400"
+                    : "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                }`}
+              >
+                {existingStatus.status === "ACCEPTED" ? (
+                  <>
+                    <CheckCircle2 size={16} /> Application Accepted! 🎉 Check your email for portal credentials
+                  </>
+                ) : existingStatus.status === "REJECTED" ? (
+                  <>
+                    <X size={16} /> Application Update — Watch out for future program cohorts
+                  </>
+                ) : (
+                  <>
+                    <Clock size={16} /> Application Submitted &amp; Under Review — Our team will reach out soon!
+                  </>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={openModal}
+                className="px-8 py-4 rounded-2xl font-bold text-white text-sm shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all duration-300 cursor-pointer inline-flex items-center gap-2 hover:scale-105"
+                style={{ background: "linear-gradient(135deg, #10b981, #059669)" }}
+              >
+                <Sparkles size={16} /> Apply Now — It's Free
+              </button>
+            )}
+          </div>
+        </section>
+
+        {/* ── FAQ ─────────────────────────────────────────────────────────── */}
+        <section className="max-w-3xl mx-auto w-full">
+          <div className="text-center mb-8 space-y-2">
+            <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight">Frequently Asked Questions</h2>
+          </div>
+          <div className="space-y-3">
+            {CA_FAQS.map((faq, i) => (
+              <motion.div
+                key={i}
+                initial={reduced ? { opacity: 0 } : { opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05, duration: 0.4 }}
+                className="border border-gray-200 dark:border-zinc-800 rounded-2xl bg-white dark:bg-zinc-900 overflow-hidden"
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer"
+                >
+                  <span className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                    <span className="text-xs font-black text-emerald-500 font-mono w-6 shrink-0">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    {faq.q}
+                  </span>
+                  <motion.div
+                    animate={{ rotate: openFaq === i ? 180 : 0 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <ChevronDown size={16} className="text-gray-400 shrink-0" />
+                  </motion.div>
+                </button>
+                <AnimatePresence>
+                  {openFaq === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <p className="px-5 pb-5 text-sm text-gray-600 dark:text-zinc-400 leading-relaxed border-t border-gray-100 dark:border-zinc-800 pt-3">
+                        {faq.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      {/* ── REGISTRATION MODAL ───────────────────────────────────────────── */}
+      <AnimatePresence>
+        {showRegModal && !existingStatus?.applied && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/65 backdrop-blur-sm p-4"
+            onClick={() => { if (!regLoading) { setShowRegModal(false); setRegSuccess(false); setRegError(""); } }}
+          >
+            <motion.div
+              initial={{ scale: 0.93, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.93, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 28 }}
+              className="w-full max-w-lg rounded-3xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-2xl overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800"
+                style={{ background: "linear-gradient(135deg, rgba(16,185,129,0.06), transparent)" }}>
+                <div>
+                  <h3 className="text-base font-bold text-gray-900 dark:text-white">Campus Ambassador Registration</h3>
+                  <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Applying as: {user?.email}</p>
+                </div>
+                <button
+                  onClick={() => { setShowRegModal(false); setRegSuccess(false); setRegError(""); }}
+                  className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-400 cursor-pointer transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div className="overflow-y-auto max-h-[75vh]" data-lenis-prevent>
+                {regSuccess ? (
+                  /* Success State */
+                  <div className="p-8 text-center space-y-5">
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 200, damping: 18 }}
+                      className="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto"
+                    >
+                      <CheckCircle2 size={36} className="text-emerald-500" />
+                    </motion.div>
+                    <div>
+                      <h4 className="text-xl font-bold text-gray-900 dark:text-white">Application Submitted! 🎉</h4>
+                      <p className="text-sm text-gray-500 dark:text-zinc-400 mt-2 leading-relaxed max-w-sm mx-auto">
+                        Your campus ambassador application has been received. Our team will review it and reach out to you at <strong className="text-gray-700 dark:text-zinc-200">{user?.email}</strong> soon!
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => { setShowRegModal(false); setRegSuccess(false); }}
+                      className="px-8 py-3 rounded-full text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 cursor-pointer transition-all shadow-md"
+                    >
+                      Done
+                    </button>
+                  </div>
+                ) : (
+                  /* Registration Form */
+                  <form onSubmit={handleRegSubmit} className="p-6 space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="col-span-2">
+                        <label className="text-xs font-semibold text-gray-600 dark:text-zinc-400 block mb-1">Full Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={regForm.fullName}
+                          onChange={e => setRegForm(f => ({ ...f, fullName: e.target.value }))}
+                          placeholder="Your full name"
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-gray-600 dark:text-zinc-400 block mb-1">Phone Number *</label>
+                        <input
+                          type="tel"
+                          required
+                          value={regForm.phone}
+                          onChange={e => setRegForm(f => ({ ...f, phone: e.target.value }))}
+                          placeholder="+91 98765 43210"
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-gray-600 dark:text-zinc-400 block mb-1">Year of Study *</label>
+                        <select
+                          required
+                          value={regForm.yearOfStudy}
+                          onChange={e => setRegForm(f => ({ ...f, yearOfStudy: e.target.value }))}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
+                        >
+                          <option value="">Select year</option>
+                          {YEAR_OPTIONS.map(y => <option key={y} value={y}>{y}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-gray-600 dark:text-zinc-400 block mb-1">Degree / Program *</label>
+                        <select
+                          required
+                          value={regForm.degree}
+                          onChange={e => setRegForm(f => ({ ...f, degree: e.target.value }))}
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
+                        >
+                          <option value="">Select degree</option>
+                          {DEGREE_OPTIONS.map(d => <option key={d} value={d}>{d}</option>)}
+                        </select>
+                      </div>
+                      <div className="col-span-2">
+                        <label className="text-xs font-semibold text-gray-600 dark:text-zinc-400 block mb-1">College / University Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={regForm.collegeName}
+                          onChange={e => setRegForm(f => ({ ...f, collegeName: e.target.value }))}
+                          placeholder="e.g. VIT Vellore, IIT Bombay, DU..."
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-gray-600 dark:text-zinc-400 block mb-1">City *</label>
+                        <input
+                          type="text"
+                          required
+                          value={regForm.city}
+                          onChange={e => setRegForm(f => ({ ...f, city: e.target.value }))}
+                          placeholder="e.g. Mumbai, Delhi..."
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-gray-600 dark:text-zinc-400 block mb-1">LinkedIn URL</label>
+                        <input
+                          type="url"
+                          value={regForm.linkedinUrl}
+                          onChange={e => setRegForm(f => ({ ...f, linkedinUrl: e.target.value }))}
+                          placeholder="linkedin.com/in/..."
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="text-xs font-semibold text-gray-600 dark:text-zinc-400 block mb-1">Instagram Handle</label>
+                        <input
+                          type="text"
+                          value={regForm.instagramHandle}
+                          onChange={e => setRegForm(f => ({ ...f, instagramHandle: e.target.value }))}
+                          placeholder="@yourhandle"
+                          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="text-xs font-semibold text-gray-600 dark:text-zinc-400 block mb-1">
+                          Why do you want to be an Eduvantix Campus Ambassador? * <span className="text-gray-400 font-normal">(min. 30 chars)</span>
+                        </label>
+                        <textarea
+                          required
+                          rows={4}
+                          value={regForm.whyJoin}
+                          onChange={e => setRegForm(f => ({ ...f, whyJoin: e.target.value }))}
+                          placeholder="Tell us about yourself, your network on campus, and why you'd be a great ambassador for Eduvantix..."
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-emerald-500 resize-none"
+                        />
+                        <div className="text-right text-[10px] text-gray-400 mt-1">{regForm.whyJoin.length} / 30 min</div>
+                      </div>
+                    </div>
+
+                    {regError && (
+                      <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold">
+                        <AlertTriangle size={14} /> {regError}
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={regLoading}
+                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-xs uppercase tracking-wider text-white transition-all hover:opacity-90 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                      style={{ background: "linear-gradient(135deg, #10b981, #059669)" }}
+                    >
+                      {regLoading ? <><Loader2 size={14} className="animate-spin" /> Submitting...</> : <><Send size={14} /> Submit Application</>}
+                    </button>
+                    <p className="text-center text-[10px] text-gray-400">
+                      ✉️ A confirmation email will be sent to <strong>{user?.email}</strong>
+                    </p>
+                  </form>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -1228,7 +1945,7 @@ export default function CareersClient({ standalone = true }) {
                         className="grid grid-cols-3 gap-6 p-8 rounded-2xl border backdrop-blur-sm"
                         style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}
                       >
-                        <AnimatedCounter value="4" label="Priority Roles Open" />
+                        <AnimatedCounter value={jobs.filter(j => j.isActive !== false).length === 0 ? "No" : String(jobs.filter(j => j.isActive !== false).length)} label={jobs.filter(j => j.isActive !== false).length === 1 ? "Priority Role Open" : "Priority Roles Open"} />
                         <AnimatedCounter value="LOR" label="For Top Performers" />
                         <AnimatedCounter value="100%" label="Skill-Based Pay" />
                       </div>
@@ -1502,33 +2219,14 @@ export default function CareersClient({ standalone = true }) {
           )}
 
           {activeTab === "students" && (
-            <div className="p-4 md:p-8 space-y-12">
-              <div className="text-center max-w-2xl mx-auto space-y-3">
-                <h1 className="text-4xl font-serif font-bold text-gray-900 dark:text-white">Eduvantix for Students</h1>
-                <p className="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
-                  We empower university students & early-career engineers through hands-on learning, mentorship, and entry-level career opportunities.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                  { icon: GraduationCap, title: "Internship Programs", desc: "Gain real-world production engineering experience working directly on scalable products." },
-                  { icon: Laptop, title: "Hands-on Projects", desc: "Build industry-standard AI and full-stack software applications mentored by senior engineers." },
-                  { icon: Award, title: "Fast-Track Hiring", desc: "Top performing interns and students are offered direct full-time role offers upon graduation." },
-                ].map((card, i) => {
-                  const Icon = card.icon;
-                  return (
-                    <div key={i} className="p-8 rounded-3xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 space-y-4">
-                      <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                        <Icon size={24} />
-                      </div>
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">{card.title}</h3>
-                      <p className="text-xs text-gray-600 dark:text-zinc-400 leading-relaxed">{card.desc}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            <CampusAmbassadorSection
+              user={user}
+              token={token}
+              API_BASE={API_BASE}
+              reduced={reduced}
+              router={router}
+              isDark={isDark}
+            />
           )}
 
           {/* ── TAB 4: HOW WE WORK ── */}
