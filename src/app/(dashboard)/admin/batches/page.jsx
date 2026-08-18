@@ -516,7 +516,7 @@ export default function ManageBatchesPage() {
           {/* Header section */}
           <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
             <div className="space-y-2">
-              <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
                 Manage Batches
               </h1>
               <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
@@ -629,7 +629,7 @@ export default function ManageBatchesPage() {
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="space-y-1">
-                          <h3 className="text-xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+                          <h3 className="text-lg font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
                             {batch.name}
                           </h3>
                           <p className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>
@@ -702,7 +702,7 @@ export default function ManageBatchesPage() {
                 <ArrowLeft size={12} />
                 <span>Back to batches</span>
               </button>
-              <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
                 Batch: {selectedBatchDetails?.name}
               </h1>
               <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>

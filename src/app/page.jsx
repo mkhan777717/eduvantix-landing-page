@@ -1,12 +1,14 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-// ── World-Class Redesigned Landing Sections (Apple x Stripe x Linear x OpenAI Aesthetic) ──
+// ── World-Class Redesigned Landing Sections ──
 import LandingHeroNew from "@/components/landing/LandingHeroNew";
 import LandingProblemNew from "@/components/landing/LandingProblemNew";
 import LandingHowItWorksNew from "@/components/landing/LandingHowItWorksNew";
-import LandingFeaturesNew from "@/components/landing/LandingFeaturesNew";
 import LandingPlatformPreview from "@/components/landing/LandingPlatformPreview";
+import LandingPricingTiers from "@/components/landing/LandingPricingTiers";
+import LandingProExperience from "@/components/landing/LandingProExperience";
+import LandingInstituteTeaser from "@/components/landing/LandingInstituteTeaser";
 import LandingForWho from "@/components/landing/LandingForWho";
 import LandingComparisonNew from "@/components/landing/LandingComparisonNew";
 import LandingSocialProof from "@/components/landing/LandingSocialProof";
@@ -97,28 +99,34 @@ export default function Home() {
         {/* S3: How It Works */}
         <LandingHowItWorksNew />
 
-        {/* S4: Features */}
-        <LandingFeaturesNew />
-
         {/* S5: Platform Preview */}
         <LandingPlatformPreview />
 
-        {/* S6: For Students & Institutes */}
+        {/* S6: Individual Pricing Tiers (Free / Premium / Pro) */}
+        <LandingPricingTiers />
+
+        {/* S7: Eduvantix Pro Experience (AI Career Journey) */}
+        <LandingProExperience />
+
+        {/* S8: Eduvantix for Institutes — teaser CTA to /institutes */}
+        <LandingInstituteTeaser />
+
+        {/* S9: For Students & Institutes */}
         <LandingForWho />
 
-        {/* S7: Comparison Table */}
+        {/* S10: Comparison Table */}
         <LandingComparisonNew />
 
-        {/* S8: Social Proof */}
+        {/* S11: Social Proof */}
         <LandingSocialProof />
 
-        {/* S9: Testimonials */}
+        {/* S12: Testimonials */}
         <LandingTestimonialsNew />
 
-        {/* S10: FAQ */}
+        {/* S13: FAQ */}
         <LandingFAQ />
 
-        {/* S11: Final CTA */}
+        {/* S14: Unified Final CTA */}
         <LandingFinalCTANew />
       </main>
 

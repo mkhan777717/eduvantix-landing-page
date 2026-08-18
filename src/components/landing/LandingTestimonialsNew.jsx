@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import useThemeStore from "@/store/useThemeStore";
 
@@ -10,6 +11,7 @@ const TESTIMONIALS = [
     role: "Full Stack Engineer",
     company: "Swiggy",
     tag: "Placed in 3 Months",
+    initials: "RS",
   },
   {
     quote: "Our institution onboarding time dropped from 3 weeks to 2 days. The AI diagnostic accurately surfaces skill gaps across 400+ students instantly.",
@@ -17,6 +19,7 @@ const TESTIMONIALS = [
     role: "Head of Computer Science",
     company: "IIT Delhi Partner Program",
     tag: "500+ Students Onboarded",
+    initials: "AV",
   },
   {
     quote: "As a hiring manager, pre-verified candidate portfolios save us over 20 hours per engineering hire. The code quality matches production standards.",
@@ -24,8 +27,68 @@ const TESTIMONIALS = [
     role: "VP of Engineering",
     company: "Razorpay",
     tag: "Hiring Partner",
+    initials: "VM",
+  },
+  {
+    quote: "I went from no internship offers to three within a month. The AI mock interviews with live feedback changed how I explain technical problems completely.",
+    author: "Priya Nair",
+    role: "Software Engineer Intern",
+    company: "Zepto",
+    tag: "Offer in 28 Days",
+    initials: "PN",
+  },
+  {
+    quote: "Eduvantix gave our bootcamp a full operating system. Attendance, coding labs, exams, and placement tracking — all in one dashboard.",
+    author: "Rajiv Menon",
+    role: "Director of Academics",
+    company: "TechBridge Academy",
+    tag: "300+ Students Managed",
+    initials: "RM",
+  },
+  {
+    quote: "The ATS-optimized resume generator created a resume that got me callbacks from companies that previously ghosted me for months.",
+    author: "Ishaan Kapoor",
+    role: "Backend Engineer",
+    company: "Meesho",
+    tag: "3 Offers Received",
+    initials: "IK",
   },
 ];
+
+function TestimonialCard({ t, isDark, text, secondary, border, cardBg }) {
+  return (
+    <div
+      className="flex-shrink-0 w-[340px] sm:w-[380px] p-7 rounded-2xl border flex flex-col justify-between select-none"
+      style={{ backgroundColor: cardBg, borderColor: border }}
+    >
+      <div>
+        <span
+          className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4 inline-block"
+        >
+          {t.tag}
+        </span>
+        <p className="text-sm leading-relaxed mb-6" style={{ color: secondary }}>
+          &ldquo;{t.quote}&rdquo;
+        </p>
+      </div>
+
+      <div className="pt-4 border-t flex items-center gap-3" style={{ borderColor: border }}>
+        <div
+          className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+          style={{ backgroundColor: "rgba(16,185,129,0.12)", color: "#10b981" }}
+        >
+          {t.initials}
+        </div>
+        <div>
+          <div className="text-sm font-bold" style={{ color: text }}>{t.author}</div>
+          <div className="text-xs" style={{ color: secondary }}>
+            {t.role} · <span style={{ color: text }}>{t.company}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function LandingTestimonialsNew() {
   const isDark = useThemeStore((s) => s.isDark);
@@ -35,9 +98,39 @@ export default function LandingTestimonialsNew() {
   const border = isDark ? "#1C1C1C" : "#ECECEC";
   const cardBg = isDark ? "#000000" : "#FFFFFF";
 
+  const trackRef = useRef(null);
+  const animRef = useRef(null);
+  const posRef = useRef(0);
+  const pausedRef = useRef(false);
+  const SPEED = 0.6; // px per frame
+
+  // Duplicate for seamless loop
+  const items = [...TESTIMONIALS, ...TESTIMONIALS];
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const singleWidth = track.scrollWidth / 2;
+
+    const tick = () => {
+      if (!pausedRef.current) {
+        posRef.current += SPEED;
+        if (posRef.current >= singleWidth) {
+          posRef.current -= singleWidth;
+        }
+        track.style.transform = `translateX(-${posRef.current}px)`;
+      }
+      animRef.current = requestAnimationFrame(tick);
+    };
+
+    animRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animRef.current);
+  }, []);
+
   return (
-    <section className="px-6 sm:px-10 py-28" style={{ backgroundColor: bg }}>
-      <div className="max-w-6xl mx-auto">
+    <section className="py-28 overflow-hidden" style={{ backgroundColor: bg }}>
+      <div className="max-w-6xl mx-auto px-6 sm:px-10">
         {/* Header */}
         <div className="max-w-2xl mb-16">
           <motion.span
@@ -68,34 +161,43 @@ export default function LandingTestimonialsNew() {
             Trusted by candidates, institutes &amp; employers.
           </motion.h2>
         </div>
+      </div>
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {TESTIMONIALS.map((t, i) => (
-            <motion.div
-              key={t.author}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="p-7 rounded-2xl border flex flex-col justify-between"
-              style={{ backgroundColor: cardBg, borderColor: border }}
-            >
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4 inline-block">
-                  {t.tag}
-                </span>
-                <p className="text-sm leading-relaxed mb-6" style={{ color: secondary }}>
-                  "{t.quote}"
-                </p>
-              </div>
+      {/* Carousel */}
+      <div
+        className="relative"
+        onMouseEnter={() => { pausedRef.current = true; }}
+        onMouseLeave={() => { pausedRef.current = false; }}
+      >
+        {/* Left fade */}
+        <div
+          className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
+          style={{ background: `linear-gradient(to right, ${bg}, transparent)` }}
+        />
+        {/* Right fade */}
+        <div
+          className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
+          style={{ background: `linear-gradient(to left, ${bg}, transparent)` }}
+        />
 
-              <div className="pt-4 border-t" style={{ borderColor: border }}>
-                <div className="text-sm font-bold" style={{ color: text }}>{t.author}</div>
-                <div className="text-xs" style={{ color: secondary }}>{t.role} • <span style={{ color: text }}>{t.company}</span></div>
-              </div>
-            </motion.div>
-          ))}
+        <div className="overflow-hidden">
+          <div
+            ref={trackRef}
+            className="flex gap-5 will-change-transform"
+            style={{ width: "max-content" }}
+          >
+            {items.map((t, i) => (
+              <TestimonialCard
+                key={i}
+                t={t}
+                isDark={isDark}
+                text={text}
+                secondary={secondary}
+                border={border}
+                cardBg={cardBg}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -34,7 +34,7 @@ export default function JournalHeaderActions() {
         </Link>
       )}
 
-      {/* Write Article — blocked for guests */}
+      {/* Write Blog — blocked for guests */}
       <Link
         href={user ? "/journal/write" : "/login?redirect=/journal/write"}
         onClick={(e) => handleGuestClick(e, "/journal/write")}
@@ -45,9 +45,9 @@ export default function JournalHeaderActions() {
           opacity: user ? 1 : 0.75,
           cursor: user ? "pointer" : "pointer",
         }}
-        title={!user ? "Sign in to write an article" : undefined}
+        title={!user ? "Sign in to write a blog" : undefined}
       >
-        Write Article
+        Write Blog
       </Link>
 
       {/* Author Dashboard — blocked for guests */}

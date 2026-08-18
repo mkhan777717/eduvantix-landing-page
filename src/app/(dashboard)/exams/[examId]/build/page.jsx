@@ -675,13 +675,16 @@ export default function ExamBuilderWorkspace() {
             <ArrowLeft size={18} />
           </button>
           <div>
-            <h1 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-              {exam?.title}
-              <span className="text-2xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 uppercase">
-                {exam?.status} (v{exam?.version})
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                {exam?.title || "Untitled Assessment"}
+              </h1>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                {exam?.status || "Draft"} · v{exam?.version || 1}
               </span>
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Tenant Scoped Draft Workspace</p>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Workspace · Auto-saves changes in real time</p>
           </div>
         </div>
 
@@ -793,93 +796,124 @@ export default function ExamBuilderWorkspace() {
           </div>
 
           <div className="space-y-6">
-            {sections.map((section, idx) => (
-              <div 
-                key={section.id} 
-                className="rounded-3xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/40 p-6 space-y-4 relative shadow-sm"
-              >
-                <div className="flex justify-between items-start">
-                  <div className="space-y-1">
-                    <input
-                      type="text"
-                      value={section.title}
-                      onChange={(e) => handleUpdateSection(section.id, e.target.value, section.description)}
-                      className="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-white/20 focus:border-indigo-500 font-extrabold text-slate-900 dark:text-white text-base focus:outline-none py-0.5 transition-colors"
-                    />
-                    <p className="text-2xs font-extrabold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">{section.type} Section</p>
-                  </div>
-
-                  <div className="flex gap-1.5">
-                    <button
-                      onClick={() => handleReorderSection(idx, "up")}
-                      disabled={idx === 0}
-                      className="p-2 rounded-xl bg-slate-100 dark:bg-slate-950/40 border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 transition-colors"
-                    >
-                      <ChevronUp size={14} />
-                    </button>
-                    <button
-                      onClick={() => handleReorderSection(idx, "down")}
-                      disabled={idx === sections.length - 1}
-                      className="p-2 rounded-xl bg-slate-100 dark:bg-slate-950/40 border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 transition-colors"
-                    >
-                      <ChevronDown size={14} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteSection(section.id)}
-                      className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition-colors"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
+            {sections.length === 0 ? (
+              <div className="rounded-3xl border-2 border-dashed border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-slate-900/30 p-12 text-center space-y-4 shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto border border-indigo-500/20 shadow-inner">
+                  <BookOpen size={26} />
                 </div>
-
-                {/* Question List inside Section */}
-                <div className="space-y-3">
-                  {section.questions?.length === 0 ? (
-                    <div className="p-8 text-center rounded-2xl border border-dashed border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-950/10 text-slate-500 text-xs">
-                      No questions added to this section. Create one below or link from Question Bank.
+                <div className="max-w-md mx-auto space-y-1.5">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                    Your selected questions will be displayed here
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Get started by adding an MCQ, Coding, or Essay section above, or import questions directly from your Question Bank.
+                  </p>
+                </div>
+                <div className="flex items-center justify-center gap-2.5 pt-2 flex-wrap">
+                  <button
+                    onClick={() => handleAddSection("MCQ")}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition-all shadow-md shadow-indigo-600/20"
+                  >
+                    <Plus size={14} /> Add MCQ Section
+                  </button>
+                  <button
+                    onClick={() => setShowBank(true)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900 px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm"
+                  >
+                    <FolderOpen size={14} className="text-indigo-500" /> Browse Question Bank
+                  </button>
+                </div>
+              </div>
+            ) : (
+              sections.map((section, idx) => (
+                <div 
+                  key={section.id} 
+                  className="rounded-3xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/40 p-6 space-y-4 relative shadow-sm"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <input
+                        type="text"
+                        value={section.title}
+                        onChange={(e) => handleUpdateSection(section.id, e.target.value, section.description)}
+                        className="bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-white/20 focus:border-indigo-500 font-extrabold text-slate-900 dark:text-white text-base focus:outline-none py-0.5 transition-colors"
+                      />
+                      <p className="text-2xs font-extrabold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">{section.type} Section</p>
                     </div>
-                  ) : (
-                    section.questions?.map((sq) => {
-                      const q = sq.question;
-                      return (
-                        <div 
-                          key={sq.questionId} 
-                          onClick={() => openQuestionEditor(q, section.id)}
-                          className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/30 border border-slate-200 dark:border-white/5 space-y-2.5 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-950/60 transition-colors shadow-2xs"
-                        >
-                          <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                              {q.type === "CODING" ? <Code size={14} className="text-emerald-500" /> : q.type === "DESCRIPTIVE" ? <FileText size={14} className="text-amber-500" /> : <CheckSquare size={14} className="text-indigo-500" />}
-                              <span className="text-xs font-bold text-slate-900 dark:text-white">{q.title}</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <span className="text-2xs font-extrabold text-slate-500 dark:text-slate-400">{q.marks} Marks</span>
+
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={() => handleReorderSection(idx, "up")}
+                        disabled={idx === 0}
+                        className="p-2 rounded-xl bg-slate-100 dark:bg-slate-950/40 border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 transition-colors"
+                      >
+                        <ChevronUp size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleReorderSection(idx, "down")}
+                        disabled={idx === sections.length - 1}
+                        className="p-2 rounded-xl bg-slate-100 dark:bg-slate-950/40 border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 transition-colors"
+                      >
+                        <ChevronDown size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSection(section.id)}
+                        className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition-colors"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Question List inside Section */}
+                  <div className="space-y-3">
+                    {section.questions?.length === 0 ? (
+                      <div className="p-8 text-center rounded-2xl border border-dashed border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-slate-950/10 text-slate-500 text-xs">
+                        No questions added to this section. Create one below or link from Question Bank.
+                      </div>
+                    ) : (
+                      section.questions?.map((sq) => {
+                        const q = sq.question;
+                        return (
+                          <div 
+                            key={sq.questionId} 
+                            onClick={() => openQuestionEditor(q, section.id)}
+                            className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/30 border border-slate-200 dark:border-white/5 space-y-2.5 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-950/60 transition-colors shadow-2xs"
+                          >
+                            <div className="flex justify-between items-start">
+                              <span className="text-2xs font-extrabold uppercase px-2 py-0.5 rounded-md bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-300">
+                                {q?.type} · {q?.marks} marks
+                              </span>
                               <button
-                                onClick={(e) => { e.stopPropagation(); handleDeleteQuestion(section.id, q.id); }}
-                                className="text-slate-400 hover:text-rose-500 transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveQuestion(section.id, sq.questionId);
+                                }}
+                                className="text-slate-400 hover:text-rose-500 transition-colors p-1"
                               >
-                                <Trash2 size={13} />
+                                <X size={14} />
                               </button>
                             </div>
+                            <h4 className="text-xs font-bold text-slate-900 dark:text-white line-clamp-2">
+                              {q?.title}
+                            </h4>
                           </div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 italic line-clamp-1">{q.text}</p>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
+                        );
+                      })
+                    )}
+                  </div>
 
-                {/* Add question inline button */}
-                <button
-                  onClick={() => handleCreateQuestion(section.id, section.type)}
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-3 rounded-2xl border border-dashed border-slate-300 dark:border-white/10 hover:border-indigo-500 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors"
-                >
-                  <Plus size={14} />
-                  Add New {section.type} Question
-                </button>
-              </div>
-            ))}
+                  {/* Add question inline button */}
+                  <button
+                    onClick={() => handleCreateQuestion(section.id, section.type)}
+                    className="w-full inline-flex items-center justify-center gap-1.5 py-3 rounded-2xl border border-dashed border-slate-300 dark:border-white/10 hover:border-indigo-500 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors"
+                  >
+                    <Plus size={14} />
+                    Add New {section.type} Question
+                  </button>
+                </div>
+              ))
+            )}
           </div>
 
         </div>

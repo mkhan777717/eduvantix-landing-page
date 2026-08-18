@@ -11,11 +11,11 @@ export default function ArticleHeader({ article }) {
       {/* Back nav */}
       <Link
         href="/journal"
-        className="inline-flex items-center gap-1.5 mb-8 text-xs transition-colors hover:text-[var(--j-accent)]"
+        className="inline-flex items-center gap-1.5 mb-8 text-xs font-semibold transition-colors hover:text-[var(--j-accent)]"
         style={{ fontFamily: "var(--j-font-mono)", color: "var(--j-text-muted)" }}
-        aria-label="Back to Journal"
+        aria-label="Back to Blogs"
       >
-        ← Back to Journal
+        ← Back to Blogs
       </Link>
 
 

@@ -54,7 +54,10 @@
     --dot-color: rgba(17, 17, 16, 0.08);
 
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-serif: serif;
+    --font-desc: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-title: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    --font-heading: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    --font-serif: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
   }
 
   /* ---- DARK THEME ---- */
@@ -101,7 +104,10 @@
     --dot-color: rgba(237, 237, 236, 0.05);
 
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-serif: serif;
+    --font-desc: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-title: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    --font-heading: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    --font-serif: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
   }
 
   body {
@@ -122,16 +128,25 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-serif);
+    font-family: var(--font-title);
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.1;
   }
 
-  /* Serif display utility */
+  .font-title,
+  .font-heading {
+    font-family: var(--font-title);
+  }
+
+  .font-desc,
+  .font-description {
+    font-family: var(--font-desc);
+  }
+
+  /* Serif display utility override to title font */
   .font-serif-display {
-    font-family: var(--font-serif);
-    font-style: italic;
+    font-family: var(--font-title);
     letter-spacing: -0.01em;
   }
 }
@@ -231,6 +246,112 @@ html {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* =============================================
+   DASHBOARD & ADMIN UNIFORM UTILITIES
+   ============================================= */
+.admin-page-container {
+  width: 100%;
+  animation: fadeIn 0.3s ease-in-out;
+  padding-bottom: 3rem;
+}
+
+.admin-header-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--border-primary);
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  flex-shrink: 0;
+}
+@media (min-width: 640px) {
+  .admin-header-section {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.admin-page-heading {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  font-family: var(--font-title);
+  color: var(--text-primary);
+}
+@media (min-width: 768px) {
+  .admin-page-heading {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
+
+.admin-page-subheading {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  max-width: 36rem;
+  color: var(--text-secondary);
+}
+
+.admin-card-base {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 1rem;
+}
+
+.admin-input-base {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  border-radius: 0.75rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease;
+}
+.admin-input-base:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.admin-btn-primary {
+  background-color: var(--accent-primary);
+  color: var(--text-on-accent);
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.admin-btn-primary:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.admin-btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  border-radius: 0.75rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.admin-btn-secondary:hover {
+  background-color: var(--bg-hover);
 }
 
 /* =============================================

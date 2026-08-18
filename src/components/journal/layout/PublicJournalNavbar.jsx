@@ -66,21 +66,18 @@ export default function PublicJournalNavbar() {
           {NAV_LINKS.map((item) => {
             const isActive =
               pathname === item.href ||
-              (item.href !== "/journal" &&
-                pathname?.startsWith(item.href + "/"));
+              (item.href !== "/" && pathname?.startsWith(item.href));
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-3 py-2 text-sm font-medium transition-colors duration-200 rounded-full"
+                className="px-3 py-2 text-sm font-medium transition-colors duration-200 relative cursor-pointer"
                 style={{
                   fontFamily: "Inter, system-ui, sans-serif",
                   color: isActive
-                    ? "var(--accent-primary, #059669)"
+                    ? "var(--text-primary, #111)"
                     : "var(--text-secondary, #555)",
-                  background: isActive
-                    ? "rgba(16,185,129,0.08)"
-                    : "transparent",
+                  fontWeight: isActive ? 600 : 500,
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) e.currentTarget.style.color = "var(--text-primary, #111)";
@@ -89,7 +86,13 @@ export default function PublicJournalNavbar() {
                   if (!isActive) e.currentTarget.style.color = "var(--text-secondary, #555)";
                 }}
               >
-                {item.label}
+                <span>{item.label}</span>
+                {isActive && (
+                  <span
+                    className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full"
+                    style={{ backgroundColor: "var(--accent-primary, #10b981)" }}
+                  />
+                )}
               </Link>
             );
           })}

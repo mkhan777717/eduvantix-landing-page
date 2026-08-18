@@ -7,7 +7,8 @@ import Footer from "@/components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, BookOpen, Clock, Layers, Server, Cpu, Database, Code, Sparkles, Globe,
-  ArrowRight, BookMarked, Compass, Star, Users, ChevronRight, Zap, Trophy, Play
+  ArrowRight, BookMarked, Compass, Star, Users, ChevronRight, Zap, Trophy, Play,
+  LayoutGrid, List
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -26,11 +27,11 @@ const categories = [
 ];
 
 const CATEGORY_META = {
-  "All Courses":                  { emoji: "✦", color: "#10b981" },
-  "Web & Mobile Development":     { emoji: "🌐", color: "#6366f1" },
-  "Data & AI":                    { emoji: "🤖", color: "#f59e0b" },
-  "Cloud & DevOps":               { emoji: "☁️",  color: "#0ea5e9" },
-  "Creative Tech":                { emoji: "🎨", color: "#ec4899" },
+  "All Courses":                  { icon: Layers,   color: "#10b981" },
+  "Web & Mobile Development":     { icon: Globe,    color: "#6366f1" },
+  "Data & AI":                    { icon: Cpu,      color: "#f59e0b" },
+  "Cloud & DevOps":               { icon: Server,   color: "#0ea5e9" },
+  "Creative Tech":                { icon: Sparkles, color: "#ec4899" },
 };
 
 const DIFF_META = {
@@ -190,18 +191,6 @@ export default function CoursesCatalogPage() {
         <motion.section
           className="relative z-10 w-full flex flex-col items-center justify-center text-center px-6 py-28 md:py-32"
         >
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border mb-6"
-            style={{ borderColor: "var(--border-primary)", color: "var(--text-muted)", backgroundColor: "var(--bg-card)" }}
-          >
-            <Compass size={11} style={{ color: "var(--accent-primary)" }} />
-            Level up with Free Courses
-          </motion.div>
-
           {/* Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -272,6 +261,7 @@ export default function CoursesCatalogPage() {
               <div className="flex flex-wrap gap-2">
                 {categories.map(cat => {
                   const meta = CATEGORY_META[cat];
+                  const Icon = meta.icon;
                   const isActive = selectedCategory === cat;
                   return (
                     <button
@@ -286,7 +276,7 @@ export default function CoursesCatalogPage() {
                         transform: isActive ? "scale(1.03)" : "scale(1)",
                       }}
                     >
-                      <span>{meta.emoji}</span>
+                      <Icon size={14} style={{ color: isActive ? "#fff" : meta.color }} />
                       <span>{cat === "All Courses" ? "All Tracks" : cat}</span>
                       {isActive && (
                         <motion.div
@@ -311,13 +301,14 @@ export default function CoursesCatalogPage() {
                     <button
                       key={mode}
                       onClick={() => setViewMode(mode)}
-                      className="px-3 py-2 text-xs font-bold transition-all cursor-pointer"
+                      className="px-3 py-2 text-xs font-bold transition-all cursor-pointer flex items-center justify-center"
                       style={{
                         backgroundColor: viewMode === mode ? "var(--accent-primary)" : "var(--bg-card)",
                         color: viewMode === mode ? "#fff" : "var(--text-muted)",
                       }}
+                      title={mode === "grid" ? "Grid view" : "List view"}
                     >
-                      {mode === "grid" ? "⊞" : "☰"}
+                      {mode === "grid" ? <LayoutGrid size={14} /> : <List size={14} />}
                     </button>
                   ))}
                 </div>

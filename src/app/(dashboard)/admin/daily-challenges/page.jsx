@@ -97,7 +97,7 @@ export default function AdminDailyChallenges() {
       {/* Header section */}
       <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
         <div className="space-y-2">
-          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
             Daily Challenges
           </h1>
           <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>

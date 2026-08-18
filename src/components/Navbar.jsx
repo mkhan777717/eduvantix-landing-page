@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ChevronDown, User, GraduationCap, ShieldAlert, LogOut, AlertTriangle } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
@@ -11,11 +11,13 @@ import useThemeStore from "@/store/useThemeStore";
 
 const navItems = [
   { name: "Free Courses", href: "/courses" },
-  { name: "Blogs", href: "/journal" }
+  { name: "Blogs", href: "/journal" },
+  { name: "Careers", href: "/careers" },
 ];
 
 export default function Navbar({ type = 1 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, logout } = useAuth();
   const [isSignInDropdownOpen, setIsSignInDropdownOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -283,20 +285,33 @@ export default function Navbar({ type = 1 }) {
             </Link>
 
             <ul className="hidden md:flex items-center gap-1">
-              {navItems.map((item, index) => (
-                <li key={item.name} className="relative">
-                  <a
-                    href={item.href}
-                    className="block px-3 py-2 text-sm font-medium transition-colors duration-200 underline-draw cursor-pointer"
-
-                    style={{ color: "var(--text-secondary)" }}
-                    onMouseEnter={e => e.currentTarget.style.color = "var(--text-primary)"}
-                    onMouseLeave={e => e.currentTarget.style.color = "var(--text-secondary)"}
-                  >
-                    {item.name}
-                  </a>
-                </li>
-              ))}
+              {navItems.map((item) => {
+                const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
+                return (
+                  <li key={item.name} className="relative">
+                    <Link
+                      href={item.href}
+                      className="block px-3 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer relative"
+                      style={{
+                        color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
+                        fontWeight: isActive ? 600 : 500,
+                      }}
+                      onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = "var(--text-primary)"; }}
+                      onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = "var(--text-secondary)"; }}
+                    >
+                      <span>{item.name}</span>
+                      {isActive && (
+                        <motion.div
+                          layoutId="nav-active-underline"
+                          className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full"
+                          style={{ backgroundColor: "var(--accent-primary, #10b981)" }}
+                          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                        />
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
 
             {/* Right: CTA */}
@@ -467,18 +482,30 @@ export default function Navbar({ type = 1 }) {
               }}
             >
               <ul className="flex flex-col space-y-4">
-                {navItems.map((item) => (
-                  <li key={item.name}>
-                    <a
-                      href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className="block text-base font-semibold transition-colors"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
-                      {item.name}
-                    </a>
-                  </li>
-                ))}
+                {navItems.map((item) => {
+                  const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
+                  return (
+                    <li key={item.name}>
+                      <Link
+                        href={item.href}
+                        onClick={() => setIsOpen(false)}
+                        className="inline-flex items-center text-base transition-colors relative pb-1"
+                        style={{
+                          color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
+                          fontWeight: isActive ? 700 : 600,
+                        }}
+                      >
+                        <span>{item.name}</span>
+                        {isActive && (
+                          <span
+                            className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full"
+                            style={{ backgroundColor: "var(--accent-primary, #10b981)" }}
+                          />
+                        )}
+                      </Link>
+                    </li>
+                  );
+                })}
 
                 {user ? (
                   <>
