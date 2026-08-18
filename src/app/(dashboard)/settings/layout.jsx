@@ -3,10 +3,14 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Settings, Shield, Brain } from "lucide-react";
+import { Settings, Shield, Brain, Palette } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SettingsLayout({ children }) {
   const pathname = usePathname();
+  const { user } = useAuth();
+
+  const isInstAdmin = user?.role === "INSTITUTE_ADMIN";
 
   const navItems = [
     {
@@ -19,6 +23,12 @@ export default function SettingsLayout({ children }) {
       href: "/settings/verification",
       icon: <Shield size={16} />,
     },
+    // Only Institute Admins see the Branding tab
+    ...(isInstAdmin ? [{
+      label: "Branding",
+      href: "/settings/branding",
+      icon: <Palette size={16} />,
+    }] : []),
   ];
 
   return (
