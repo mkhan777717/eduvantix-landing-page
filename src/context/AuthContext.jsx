@@ -414,13 +414,29 @@ export function AuthProvider({ children }) {
   };
 
   // ---------------------------------------------------------------------------
-  const loginWithGoogle = async (credentialOrTokenObj) => {
+  // ---------------------------------------------------------------------------
+  const loginWithGoogle = async (credentialOrTokenObj, referralCode) => {
     try {
-      // Support both ID token (credential string) and access_token object (useGoogleLogin implicit flow)
-      const isAccessToken = typeof credentialOrTokenObj === 'object' && credentialOrTokenObj?.access_token;
-      const body = isAccessToken
-        ? { access_token: credentialOrTokenObj.access_token }
-        : { credential: credentialOrTokenObj };
+      // Support both ID token (credential string) and access_token (useGoogleLogin implicit flow)
+      const body = {};
+
+      if (typeof credentialOrTokenObj === "object" && credentialOrTokenObj !== null) {
+        if (credentialOrTokenObj.access_token) {
+          body.access_token = credentialOrTokenObj.access_token;
+        } else if (credentialOrTokenObj.credential) {
+          body.credential = credentialOrTokenObj.credential;
+        }
+      } else if (typeof credentialOrTokenObj === "string") {
+        if (credentialOrTokenObj.startsWith("ya29.") || !credentialOrTokenObj.includes(".")) {
+          body.access_token = credentialOrTokenObj;
+        } else {
+          body.credential = credentialOrTokenObj;
+        }
+      }
+
+      if (referralCode) {
+        body.referralCode = referralCode;
+      }
 
       const res = await fetch(`${API_BASE}/api/auth/google`, {
         method: "POST",

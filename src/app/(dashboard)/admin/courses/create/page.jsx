@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   BookOpen, ChevronLeft, Plus, X, Save, Eye, Globe, Building2,
-  Tag, Clock, DollarSign, Trophy, Lock, CheckCircle, Upload
+  Tag, Clock, DollarSign, IndianRupee, Trophy, Lock, CheckCircle, Upload
 } from "lucide-react";
 
 function IconPickerField({ value, onChange }) {
@@ -311,14 +311,14 @@ export default function CreateCoursePage() {
               <CheckCircle size={14} /> Free
             </button>
             <button type="button" onClick={() => set("isFree", false)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold border transition-all cursor-pointer ${!form.isFree ? "border-amber-500/50 bg-amber-500/10 text-amber-400" : "border-[var(--border-primary)] hover:bg-[var(--bg-hover)]"}`}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold border transition-all cursor-pointer ${!form.isFree ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-500" : "border-[var(--border-primary)] hover:bg-[var(--bg-hover)]"}`}
               style={{ color: !form.isFree ? undefined : "var(--text-secondary)" }}>
-              <DollarSign size={14} /> Paid
+              <IndianRupee size={14} /> Paid
             </button>
           </div>
           {!form.isFree && (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="grid grid-cols-2 gap-4">
-              <FormField label="Original Price (₹)">
+              <FormField label="Original Price (₹)" sublabel="Standard listing price (MRP)">
                 <Input type="number" min={0} value={form.price} onChange={e => set("price", parseFloat(e.target.value) || 0)} placeholder="999" />
               </FormField>
               <FormField label="Offer Price (₹)" sublabel="Discounted price shown to students">

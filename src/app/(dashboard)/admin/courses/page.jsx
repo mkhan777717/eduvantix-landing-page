@@ -338,26 +338,26 @@ export default function AdminCoursesPage() {
       {/* Header */}
       <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
         <div className="space-y-2">
-          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
             Courses
           </h1>
           <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
             Create and manage dynamic learning courses with chapters, steps, MCQs, videos, and coding challenges.
           </p>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 shrink-0 self-start sm:self-auto">
           {pendingCount > 0 && (
             <button onClick={() => router.push("/admin/courses/purchase-requests")}
-              className="relative px-4 py-2.5 rounded-xl font-semibold text-xs border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition-colors flex items-center gap-2 text-amber-400 cursor-pointer">
+              className="relative px-4 py-2.5 rounded-xl font-semibold text-xs border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition-colors flex items-center gap-2 text-amber-500 cursor-pointer">
               <ShoppingBag size={14} />
               Access Requests
               <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-amber-500 text-[9px] font-bold flex items-center justify-center text-white">{pendingCount}</span>
             </button>
           )}
           <button onClick={handleCreateCourse}
-            className="px-5 py-2.5 rounded-xl font-bold text-xs text-white flex items-center gap-2 cursor-pointer shadow-lg hover:opacity-90 transition-opacity"
-            style={{ background: "var(--accent-gradient)" }}>
-            <Plus size={14} /> Create Course
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-white text-xs font-semibold transition-transform hover:-translate-y-0.5 cursor-pointer shadow-md"
+            style={{ background: "var(--accent-primary)" }}>
+            <Plus size={14} /> <span>Create Course</span>
           </button>
         </div>
       </section>

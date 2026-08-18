@@ -255,7 +255,7 @@ export default function AdminDashboard() {
       {/* Welcome Hero Banner */}
       <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
         <div className="space-y-2">
-          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
             Welcome back, {user?.username || "Administrator"}
           </h1>
           <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
@@ -282,7 +282,7 @@ export default function AdminDashboard() {
       </section>
 
       {/* Grid statistics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, idx) => {
           const IconComponent = stat.icon;
           return (
@@ -291,24 +291,22 @@ export default function AdminDashboard() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: idx * 0.05 }}
-              className="p-6 rounded-2xl border border-[var(--border-primary)] flex flex-col justify-between space-y-4 group transition-colors"
+              className="p-5 rounded-2xl border flex flex-col justify-between space-y-4 group transition-all hover:shadow-md"
               style={{
-                backgroundColor: "var(--bg-primary)",
+                backgroundColor: "var(--bg-card)",
                 borderColor: "var(--border-primary)"
               }}
-              onMouseEnter={e => e.currentTarget.style.backgroundColor = "var(--bg-secondary)"}
-              onMouseLeave={e => e.currentTarget.style.backgroundColor = "var(--bg-primary)"}
             >
               <div className="flex justify-between items-start">
                 <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
                   {stat.title}
                 </span>
-                <div className="p-2 rounded-xl transition-transform group-hover:scale-110" style={{ backgroundColor: "var(--bg-secondary)", color: "var(--text-primary)" }}>
+                <div className="p-2 rounded-xl" style={{ backgroundColor: "var(--bg-secondary)", color: "var(--text-primary)" }}>
                   <IconComponent size={16} />
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-3xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+                <div className="text-2xl sm:text-3xl font-black tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
                   {stat.value}
                 </div>
                 <div className="text-[11px] font-medium" style={{ color: "var(--text-secondary)" }}>
@@ -321,73 +319,75 @@ export default function AdminDashboard() {
       </div>
 
       {/* Split details layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left: Live Submissions Feed & Participation Reports Switcher */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="flex items-center justify-between border-b pb-4" style={{ borderColor: "var(--border-primary)" }}>
-            <div className="flex space-x-6">
+        <div className="lg:col-span-2 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1 p-1 rounded-xl border w-fit" style={{ borderColor: "var(--border-primary)", backgroundColor: "var(--bg-secondary)" }}>
               <button
                 onClick={() => setActiveLeftTab("submissions")}
-                className={`text-sm font-semibold pb-4 relative transition-colors cursor-pointer ${activeLeftTab === "submissions" ? "text-[var(--text-primary)]" : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"}`}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                style={{
+                  backgroundColor: activeLeftTab === "submissions" ? "var(--accent-primary)" : "transparent",
+                  color: activeLeftTab === "submissions" ? "#ffffff" : "var(--text-secondary)",
+                }}
               >
                 <span>Live Submissions Feed</span>
-                {activeLeftTab === "submissions" && (
-                  <motion.div layoutId="adminLeftTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--text-primary)]" />
-                )}
               </button>
               <button
                 onClick={() => setActiveLeftTab("reports")}
-                className={`text-sm font-semibold pb-4 relative transition-colors cursor-pointer ${activeLeftTab === "reports" ? "text-[var(--text-primary)]" : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"}`}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                style={{
+                  backgroundColor: activeLeftTab === "reports" ? "var(--accent-primary)" : "transparent",
+                  color: activeLeftTab === "reports" ? "#ffffff" : "var(--text-secondary)",
+                }}
               >
                 <span>Contest Participation Reports</span>
-                {activeLeftTab === "reports" && (
-                  <motion.div layoutId="adminLeftTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--text-primary)]" />
-                )}
               </button>
             </div>
             {activeLeftTab === "submissions" && (
-              <span className="inline-flex items-center space-x-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-500 border border-[var(--border-primary)] border-emerald-500/20 px-2 py-0.5 rounded bg-emerald-500/10">
+              <span className="inline-flex items-center space-x-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-500 border border-emerald-500/20 px-2.5 py-1 rounded-lg bg-emerald-500/10">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
                 <span>Real-time</span>
               </span>
             )}
           </div>
 
-          <div className="border border-[var(--border-primary)] rounded-2xl overflow-hidden" style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border-primary)" }}>
+          <div className="border rounded-2xl overflow-hidden shadow-xs" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
             {activeLeftTab === "submissions" ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
                     <tr className="bg-[var(--bg-secondary)] border-b" style={{ borderColor: "var(--border-primary)" }}>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Developer</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Problem</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Lang</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>Verdict</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>Points</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-right" style={{ color: "var(--text-muted)" }}>Time</th>
+                      <th className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Developer</th>
+                      <th className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Problem</th>
+                      <th className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Lang</th>
+                      <th className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>Verdict</th>
+                      <th className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>Points</th>
+                      <th className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-right" style={{ color: "var(--text-muted)" }}>Time</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y" style={{ divideColor: "var(--border-primary)", color: "var(--text-secondary)" }}>
                     {submissionsFeed.length === 0 ? (
                       <tr>
-                        <td colSpan="6" className="px-6 py-12 text-center" style={{ color: "var(--text-muted)" }}>
+                        <td colSpan="6" className="px-6 py-12 text-center text-xs" style={{ color: "var(--text-muted)" }}>
                           No recent submissions.
                         </td>
                       </tr>
                     ) : submissionsFeed.map((sub, idx) => (
                       <tr key={sub.id ? `sub-${sub.id}-${idx}` : `sub-${idx}`} className="hover:bg-[var(--bg-secondary)] transition-colors">
-                        <td className="px-6 py-4 font-semibold" style={{ color: "var(--text-primary)" }}>
+                        <td className="px-6 py-3.5 font-semibold text-xs" style={{ color: "var(--text-primary)" }}>
                           {sub.user}
                         </td>
-                        <td className="px-6 py-4 font-medium">
+                        <td className="px-6 py-3.5 font-medium text-xs">
                           {sub.problem}
                         </td>
-                        <td className="px-6 py-4 font-mono text-[10px]">
+                        <td className="px-6 py-3.5 font-mono text-[10px]">
                           {sub.lang}
                         </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md border border-[var(--border-primary)] ${
+                        <td className="px-6 py-3.5 text-center">
+                          <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
                             sub.verdict === "AC" ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/20" :
                             sub.verdict === "TLE" ? "text-amber-500 bg-amber-500/10 border-amber-500/20" :
                             "text-rose-500 bg-rose-500/10 border-rose-500/20"
@@ -395,10 +395,10 @@ export default function AdminDashboard() {
                             {sub.verdict}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-center font-bold" style={{ color: sub.score > 0 ? "var(--text-primary)" : "var(--text-muted)" }}>
+                        <td className="px-6 py-3.5 text-center font-bold text-xs" style={{ color: sub.score > 0 ? "var(--text-primary)" : "var(--text-muted)" }}>
                           {sub.score}
                         </td>
-                        <td className="px-6 py-4 text-right text-xs" style={{ color: "var(--text-muted)" }}>
+                        <td className="px-6 py-3.5 text-right text-xs" style={{ color: "var(--text-muted)" }}>
                           {sub.time}
                         </td>
                       </tr>
@@ -411,49 +411,49 @@ export default function AdminDashboard() {
                 <table className="w-full text-left border-collapse text-sm">
                   <thead>
                     <tr className="bg-[var(--bg-secondary)] border-b" style={{ borderColor: "var(--border-primary)" }}>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Student</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Contest</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>Status</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>Score</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>Time Spent</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>Survey</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-right" style={{ color: "var(--text-muted)" }}>Date</th>
+                      <th className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Student</th>
+                      <th className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Contest</th>
+                      <th className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>Status</th>
+                      <th className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>Score</th>
+                      <th className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>Time Spent</th>
+                      <th className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-center" style={{ color: "var(--text-muted)" }}>Survey</th>
+                      <th className="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-right" style={{ color: "var(--text-muted)" }}>Date</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y" style={{ divideColor: "var(--border-primary)", color: "var(--text-secondary)" }}>
                     {participationReports.length === 0 ? (
                       <tr>
-                        <td colSpan="7" className="px-6 py-12 text-center" style={{ color: "var(--text-muted)" }}>
+                        <td colSpan="7" className="px-6 py-12 text-center text-xs" style={{ color: "var(--text-muted)" }}>
                           No participation reports found.
                         </td>
                       </tr>
                     ) : (
                       participationReports.map((report, idx) => (
                         <tr key={report.id ? `report-${report.id}-${idx}` : `report-${idx}`} className="hover:bg-[var(--bg-secondary)] transition-colors">
-                          <td className="px-6 py-4 font-semibold" style={{ color: "var(--text-primary)" }}>
+                          <td className="px-6 py-3.5 font-semibold text-xs" style={{ color: "var(--text-primary)" }}>
                             {report.user?.username || "N/A"}
                           </td>
-                          <td className="px-6 py-4 font-medium">
+                          <td className="px-6 py-3.5 font-medium text-xs">
                             {report.contest?.title || `Contest #${report.contestId}`}
                           </td>
-                          <td className="px-6 py-4 text-center">
-                            <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md border border-[var(--border-primary)] ${
+                          <td className="px-6 py-3.5 text-center">
+                            <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
                               report.completed ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/20" : "text-amber-500 bg-amber-500/10 border-amber-500/20"
                             }`}>
                               {report.completed ? "Completed" : "In Progress"}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-center font-bold" style={{ color: "var(--text-primary)" }}>
+                          <td className="px-6 py-3.5 text-center font-bold text-xs" style={{ color: "var(--text-primary)" }}>
                             {report.score ?? 0} pts
                           </td>
-                          <td className="px-6 py-4 text-center text-xs" style={{ color: "var(--text-muted)" }}>
+                          <td className="px-6 py-3.5 text-center text-xs" style={{ color: "var(--text-muted)" }}>
                             {report.timeSpent || "—"}
                           </td>
-                          <td className="px-6 py-4 text-center">
+                          <td className="px-6 py-3.5 text-center">
                             {report.employmentStatus ? (
                               <button
                                 onClick={() => setSelectedSurveyReport(report)}
-                                className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-[var(--border-primary)] hover:bg-[var(--bg-secondary)] transition-colors cursor-pointer"
+                                className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-[var(--border-primary)] hover:bg-[var(--bg-secondary)] transition-colors cursor-pointer"
                                 style={{ borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
                               >
                                 View
@@ -462,7 +462,7 @@ export default function AdminDashboard() {
                               <span className="text-[10px] font-semibold" style={{ color: "var(--text-muted)" }}>—</span>
                             )}
                           </td>
-                          <td className="px-6 py-4 text-right text-xs" style={{ color: "var(--text-muted)" }}>
+                          <td className="px-6 py-3.5 text-right text-xs" style={{ color: "var(--text-muted)" }}>
                             {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : "—"}
                           </td>
                         </tr>
@@ -476,15 +476,15 @@ export default function AdminDashboard() {
         </div>
 
         {/* Right: Contest status list */}
-        <div className="space-y-6">
-          <div className="flex justify-between items-center border-b pb-4" style={{ borderColor: "var(--border-primary)" }}>
-            <h2 className="text-xl font-serif" style={{ color: "var(--text-primary)" }}>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center h-[42px] border-b pb-2" style={{ borderColor: "var(--border-primary)" }}>
+            <h2 className="text-base font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
               Contest Timeline
             </h2>
             <Calendar size={16} style={{ color: "var(--text-muted)" }} />
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {allContests.slice(0, 4).map((contest, idx) => {
               const isActive = contest.status === "active";
               const isUpcoming = contest.status === "upcoming";
@@ -492,15 +492,15 @@ export default function AdminDashboard() {
               return (
                 <div
                   key={contest.id ? `contest-${contest.id}-${idx}` : `contest-${idx}`}
-                  className="p-5 rounded-2xl border border-[var(--border-primary)] space-y-4 transition-colors hover:shadow-lg"
+                  className="p-4 rounded-2xl border space-y-3 transition-all hover:shadow-md"
                   style={{
-                    backgroundColor: "var(--bg-primary)",
+                    backgroundColor: "var(--bg-card)",
                     borderColor: "var(--border-primary)"
                   }}
                 >
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                      <h3 className="text-base font-serif" style={{ color: "var(--text-primary)" }}>
+                      <h3 className="text-sm font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
                         {contest.title}
                       </h3>
                       <p className="text-xs line-clamp-1" style={{ color: "var(--text-secondary)" }}>
@@ -524,7 +524,7 @@ export default function AdminDashboard() {
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-center pt-3 border-t" style={{ borderColor: "var(--border-primary)" }}>
+                  <div className="flex justify-between items-center pt-2.5 border-t" style={{ borderColor: "var(--border-primary)" }}>
                     <div className="flex items-center space-x-1.5 text-xs" style={{ color: "var(--text-muted)" }}>
                       <Clock size={12} />
                       <span>{contest.durationMins} mins</span>
@@ -548,8 +548,18 @@ export default function AdminDashboard() {
             })}
             
             {allContests.length === 0 && (
-              <div className="text-center py-6 border border-[var(--border-primary)] border-dashed rounded-2xl" style={{ borderColor: "var(--border-primary)", color: "var(--text-muted)" }}>
-                <p className="text-xs">No contests available.</p>
+              <div className="flex flex-col items-center justify-center p-8 rounded-2xl border border-dashed text-center space-y-2"
+                style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
+                <Calendar size={28} className="text-[var(--text-muted)] opacity-40 mb-1" />
+                <p className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>No contests available</p>
+                <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>Schedule a new contest to view timeline events.</p>
+                <button
+                  onClick={() => router.push("/admin/contests/new")}
+                  className="mt-2 px-3 py-1.5 rounded-xl text-xs font-bold text-white cursor-pointer hover:opacity-90 transition-all"
+                  style={{ background: "var(--accent-primary)" }}
+                >
+                  + Create Contest
+                </button>
               </div>
             )}
           </div>
@@ -568,7 +578,7 @@ export default function AdminDashboard() {
               >
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
-                    <h3 className="text-2xl font-serif text-[var(--text-primary)]">Survey Report</h3>
+                    <h3 className="text-2xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>Survey Report</h3>
                     <p className="text-xs text-[var(--text-secondary)] font-medium">
                       User: {selectedSurveyReport.user?.username} ({selectedSurveyReport.user?.email})
                     </p>

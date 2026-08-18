@@ -1,7 +1,7 @@
 "use client";
 
-import PublicJournalNavbar from "./PublicJournalNavbar";
-import JournalFooter from "./JournalFooter";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import ToastContainer from "@/components/ToastContainer";
 
 import useThemeStore from "@/store/useThemeStore";
@@ -11,23 +11,23 @@ export default function PublicJournalLayout({ children }) {
 
   return (
     <div
-      className="journal-root min-h-screen flex flex-col"
+      className="journal-root min-h-screen flex flex-col pt-20 md:pt-24"
       style={{
         background: "var(--j-bg)",
         color: "var(--j-text)",
         fontFamily: "Inter, system-ui, -apple-system, sans-serif",
       }}
     >
-      {/* Floating Pill Navbar */}
-      <PublicJournalNavbar />
+      {/* Common Global Navbar */}
+      <Navbar />
 
-      {/* Page content — spacer is rendered inside PublicJournalNavbar */}
+      {/* Page content */}
       <main className="flex-1">
         {children}
       </main>
 
-      {/* Journal Footer with official social links */}
-      <JournalFooter />
+      {/* Main Platform Footer */}
+      <Footer />
 
       <ToastContainer />
     </div>

@@ -366,7 +366,10 @@ function DashboardLayoutInner({ children }) {
 
       const hasSession = isStudentSession || isAdminSession || isMentorSession;
 
-      if (!hasSession) {
+      // Public routes that don't require authentication
+      const isPublicRoute = pathname === "/courses" || pathname.startsWith("/courses/");
+
+      if (!hasSession && !isPublicRoute) {
         router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
         return;
       }
@@ -479,7 +482,7 @@ function DashboardLayoutInner({ children }) {
       { label: "Contest Arena", href: "/contest", icon: Trophy },
       { label: "Exam Center", href: "/exams", icon: FileText },
       { label: "Discuss Forum", href: "/discuss", icon: MessageSquare },
-      { label: "Journal / Blog", href: "/journal", icon: Newspaper },
+      { label: "Blogs", href: "/journal", icon: Newspaper },
       { label: "AI Viva", href: "/student/viva", icon: Brain },
       { label: "AI Agents", href: "/student/ai-agents", icon: Brain },
       { label: "Live Sessions", href: "/live-classes", icon: Radio },
@@ -507,7 +510,7 @@ function DashboardLayoutInner({ children }) {
       isInstAdmin && { label: "Manage People", href: "/admin/people", icon: Users, featureFlag: "allowedManagePeople" },
       isBatchMgr && canShowFeature("allowedManageBatches") && { label: "My Batches", href: "/admin/batch-manager", icon: Layers, featureFlag: "allowedManageBatches" },
       { label: "Discuss Forum", href: "/discuss", icon: MessageSquare },
-      { label: "Journal / Blog", href: "/journal", icon: Newspaper },
+      { label: "Blogs", href: "/journal", icon: Newspaper },
       (isBatchMgr || isInstAdmin || isMentor) && canShowFeature("allowedAiViva") && { label: "AI Viva", href: "/mentor/viva/questions", icon: Brain, featureFlag: "allowedAiViva" },
       (isBatchMgr || isInstAdmin || isMentor) && canShowFeature("allowedStudyMaterial") && { label: "Study Materials", href: "/mentor/viva/materials", icon: FileText, featureFlag: "allowedStudyMaterial" },
       isSuperAdmin && { label: "AI Viva", href: "/admin/viva/ai-settings", icon: Brain },

@@ -31,13 +31,17 @@ export default {
         },
       },
       fontFamily: {
-        sans:       ["var(--font-sans)", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
-        serif:      ["var(--font-serif)", "Georgia", "serif"],
-        display:    ["var(--font-sans)", "sans-serif"],
+        sans:        ["var(--font-sans)", "Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        desc:        ["var(--font-desc)", "Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        description: ["var(--font-desc)", "Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        title:       ["var(--font-title)", "-apple-system", "BlinkMacSystemFont", "Inter", "sans-serif"],
+        heading:     ["var(--font-title)", "-apple-system", "BlinkMacSystemFont", "Inter", "sans-serif"],
+        display:     ["var(--font-title)", "-apple-system", "BlinkMacSystemFont", "Inter", "sans-serif"],
+        serif:       ["var(--font-serif)", "-apple-system", "BlinkMacSystemFont", "Inter", "sans-serif"],
         // Journal fonts
-        fraunces:   ["Fraunces", "Georgia", "serif"],
-        sourceSerif:["Source Serif 4", "Georgia", "serif"],
-        ibmMono:    ["IBM Plex Mono", "Courier New", "monospace"],
+        fraunces:    ["Fraunces", "Georgia", "serif"],
+        sourceSerif: ["Source Serif 4", "Georgia", "serif"],
+        ibmMono:     ["IBM Plex Mono", "Courier New", "monospace"],
       },
       animation: {
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",

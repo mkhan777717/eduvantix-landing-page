@@ -171,13 +171,17 @@ export default function AdminVerificationPage() {
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div style={{ minHeight: "100vh", background: "transparent", color: "var(--text-primary)", fontFamily: "Inter, sans-serif", padding: "24px 20px" }}>
-
+    <div className="w-full animate-fade-in space-y-8 pb-12">
       {/* Toast */}
       <AnimatePresence>
         {toast && (
           <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }}
-            style={{ position: "fixed", top: 20, right: 20, zIndex: 9999, background: toast.type === "error" ? "#ef4444" : "#22c55e", border: "none", borderRadius: 12, padding: "12px 20px", backdropFilter: "blur(12px)", boxShadow: "0 10px 40px rgba(0,0,0,0.15)", display: "flex", alignItems: "center", gap: 10, color: "white", fontWeight: 600, fontSize: 14 }}
+            className={`fixed top-5 right-5 z-[99999] flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-2xl border text-sm font-semibold ${
+              toast.type === "error"
+                ? "bg-rose-500/10 border-rose-500/20 text-rose-500"
+                : "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+            }`}
+            style={{ backgroundColor: "var(--bg-card)" }}
           >
             {toast.type === "error" ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
             {toast.msg}
@@ -185,62 +189,91 @@ export default function AdminVerificationPage() {
         )}
       </AnimatePresence>
 
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
-          <div style={{ background: "linear-gradient(135deg,#3b82f6,#8b5cf6)", borderRadius: 12, padding: 10, display: "flex" }}>
-            <Shield size={22} color="white" />
-          </div>
-          <div>
-            <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Verification Applications</h1>
-            <p style={{ fontSize: 13, color: "var(--text-muted)", margin: 0 }}>Review and manage badge verification requests</p>
-          </div>
-          <div style={{ marginLeft: "auto", background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)", borderRadius: 20, padding: "6px 16px", fontSize: 14, fontWeight: 700, color: "#93c5fd" }}>
+      {/* Header */}
+      <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="space-y-2">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
+            Verification Applications
+          </h1>
+          <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
+            Review, evaluate credentials, and assign verified profile badges to students, educators, and partner organizations.
+          </p>
+        </div>
+        <div className="flex items-center gap-3 shrink-0 self-start sm:self-auto">
+          <button
+            onClick={fetchApplications}
+            disabled={loading}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all hover:bg-[var(--bg-hover)] cursor-pointer shadow-xs"
+            style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
+          >
+            <RefreshCw size={13} className={loading ? "animate-spin text-[var(--accent-primary)]" : ""} /> Refresh
+          </button>
+          <div className="px-4 py-2 rounded-xl border text-xs font-bold" style={{ borderColor: "var(--border-primary)", backgroundColor: "var(--bg-card)", color: "var(--text-primary)" }}>
             {total} total
           </div>
         </div>
+      </section>
 
-        {/* Stats row */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12, marginBottom: 24 }}>
-          {["PENDING", "UNDER_REVIEW", "APPROVED", "REJECTED"].map(s => {
-            const cfg = STATUS_CONFIG[s];
-            const StatusIcon = cfg.icon;
-            return (
-              <motion.button key={s} whileHover={{ scale: 1.02 }} onClick={() => { setStatusFilter(statusFilter === s ? "" : s); setPage(1); }}
-                style={{ background: statusFilter === s ? cfg.bg : "var(--bg-card)", border: `1px solid ${statusFilter === s ? cfg.color : "var(--border-primary)"}`, borderRadius: 14, padding: "14px 16px", cursor: "pointer", textAlign: "left", transition: "all 0.2s" }}
-              >
-                <StatusIcon size={16} color={cfg.color} />
-                <div style={{ fontSize: 12, color: cfg.color, fontWeight: 600, marginTop: 6 }}>{cfg.label}</div>
-              </motion.button>
-            );
-          })}
+      {/* Stats row */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {["PENDING", "UNDER_REVIEW", "APPROVED", "REJECTED"].map(s => {
+          const cfg = STATUS_CONFIG[s];
+          const StatusIcon = cfg.icon;
+          return (
+            <motion.button
+              key={s}
+              whileHover={{ scale: 1.02 }}
+              onClick={() => { setStatusFilter(statusFilter === s ? "" : s); setPage(1); }}
+              className="p-4 rounded-2xl border flex items-center justify-between shadow-xs transition-all cursor-pointer text-left"
+              style={{
+                background: statusFilter === s ? cfg.bg : "var(--bg-card)",
+                borderColor: statusFilter === s ? cfg.color : "var(--border-primary)"
+              }}
+            >
+              <div>
+                <div className="text-xs font-semibold" style={{ color: cfg.color }}>{cfg.label}</div>
+              </div>
+              <StatusIcon size={18} color={cfg.color} />
+            </motion.button>
+          );
+        })}
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3 items-center justify-between">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }} />
+          <input
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(1); }}
+            placeholder="Search by name or email…"
+            className="w-full pl-9 pr-4 py-2 rounded-xl border text-sm font-medium focus:outline-none focus:border-[var(--accent-primary)] transition-colors"
+            style={{
+              backgroundColor: "var(--bg-input)",
+              borderColor: "var(--border-primary)",
+              color: "var(--text-primary)"
+            }}
+          />
         </div>
+        <select
+          value={tierFilter}
+          onChange={e => { setTierFilter(e.target.value); setPage(1); }}
+          className="px-4 py-2 rounded-xl border text-xs font-semibold outline-none cursor-pointer"
+          style={{
+            backgroundColor: "var(--bg-input)",
+            borderColor: "var(--border-primary)",
+            color: "var(--text-secondary)"
+          }}
+        >
+          <option value="">All Tiers</option>
+          <option value="STUDENT">Student</option>
+          <option value="EDUCATOR">Educator</option>
+          <option value="ORGANIZATION">Organization</option>
+        </select>
+      </div>
 
-        {/* Filters */}
-        <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
-          <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-            <Search size={15} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-            <input
-              value={search}
-              onChange={e => { setSearch(e.target.value); setPage(1); }}
-              placeholder="Search by name or email…"
-              style={{ width: "100%", paddingLeft: 36, background: "var(--bg-hover)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px 10px 36px", color: "inherit", fontSize: 13, outline: "none", boxSizing: "border-box" }}
-            />
-          </div>
-          <select
-            value={tierFilter}
-            onChange={e => { setTierFilter(e.target.value); setPage(1); }}
-            style={{ background: "var(--bg-hover)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", color: "inherit", fontSize: 13, outline: "none" }}
-          >
-            <option value="">All Tiers</option>
-            <option value="STUDENT">Student</option>
-            <option value="EDUCATOR">Educator</option>
-            <option value="ORGANIZATION">Organization</option>
-          </select>
-        </div>
-
-        {/* Table */}
-        <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-primary)", borderRadius: 16, overflow: "hidden" }}>
+      {/* Table */}
+      <div className="rounded-2xl border overflow-hidden" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
           {loading ? (
             <div style={{ display: "flex", justifyContent: "center", padding: "60px 0" }}>
               <Loader2 size={28} color="#3b82f6" style={{ animation: "spin 1s linear infinite" }} />
@@ -324,19 +357,28 @@ export default function AdminVerificationPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginTop: 20 }}>
-            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-              style={{ background: "var(--bg-hover)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "8px 14px", cursor: page === 1 ? "not-allowed" : "pointer", color: page === 1 ? "#475569" : "#e2e8f0", display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
-              <ChevronLeft size={14} /> Prev
+          <div className="flex justify-center items-center gap-3 pt-2">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="p-2 rounded-xl border hover:bg-[var(--bg-hover)] transition-all cursor-pointer disabled:opacity-40"
+              style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
+            >
+              <ChevronLeft size={16} />
             </button>
-            <span style={{ fontSize: 13, color: "var(--text-muted)" }}>Page {page} of {totalPages}</span>
-            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-              style={{ background: "var(--bg-hover)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "8px 14px", cursor: page === totalPages ? "not-allowed" : "pointer", color: page === totalPages ? "#475569" : "#e2e8f0", display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
-              Next <ChevronRight size={14} />
+            <span className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
+              Page {page} of {totalPages}
+            </span>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="p-2 rounded-xl border hover:bg-[var(--bg-hover)] transition-all cursor-pointer disabled:opacity-40"
+              style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
+            >
+              <ChevronRight size={16} />
             </button>
           </div>
         )}
-      </div>
 
       {/* ── Application Detail Slide-Over Panel ── */}
       <AnimatePresence>

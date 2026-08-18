@@ -28,19 +28,12 @@
     --text-muted: #475569;
     --text-accent: #059669;
     --text-accent2: #047857;
-    --text-accent: #059669;
-    --text-accent2: #047857;
 
     --border-primary: #e2e8f0;
-    --border-accent: #059669;
     --border-accent: #059669;
     --border-card: #e2e8f0;
     --border-subtle: #f1f5f9;
 
-    --accent-primary: #059669;
-    --accent-secondary: #047857;
-    --accent-gradient: linear-gradient(135deg, #059669 0%, #047857 100%);
-    --accent-glow: rgba(5, 150, 105, 0.15);
     --accent-primary: #059669;
     --accent-secondary: #047857;
     --accent-gradient: linear-gradient(135deg, #059669 0%, #047857 100%);
@@ -61,7 +54,10 @@
     --dot-color: rgba(17, 17, 16, 0.08);
 
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-serif: serif;
+    --font-desc: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-title: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    --font-heading: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    --font-serif: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
   }
 
   /* ---- DARK THEME ---- */
@@ -82,20 +78,16 @@
     --text-muted: #64748b;
     --text-accent: #10b981;
     --text-accent2: #34d399;
-    --text-accent: #10b981;
-    --text-accent2: #34d399;
 
     --border-primary: #222222;
-    --border-accent: #10b981;
     --border-accent: #10b981;
     --border-card: #222222;
     --border-subtle: #111111;
 
     --accent-primary: #10b981;
     --accent-secondary: #34d399;
-    --accent-gradient: #10b981;
+    --accent-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
     --accent-glow: rgba(16, 185, 129, 0.15);
-    --text-on-accent: #022c22;
     --text-on-accent: #ffffff;
 
     --glass-bg: rgba(0, 0, 0, 0.7);
@@ -112,7 +104,10 @@
     --dot-color: rgba(237, 237, 236, 0.05);
 
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-serif: serif;
+    --font-desc: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-title: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    --font-heading: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    --font-serif: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
   }
 
   body {
@@ -133,16 +128,25 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-serif);
+    font-family: var(--font-title);
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.1;
   }
 
-  /* Serif display utility */
+  .font-title,
+  .font-heading {
+    font-family: var(--font-title);
+  }
+
+  .font-desc,
+  .font-description {
+    font-family: var(--font-desc);
+  }
+
+  /* Serif display utility override to title font */
   .font-serif-display {
-    font-family: var(--font-serif);
-    font-style: italic;
+    font-family: var(--font-title);
     letter-spacing: -0.01em;
   }
 }
@@ -242,6 +246,112 @@ html {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* =============================================
+   DASHBOARD & ADMIN UNIFORM UTILITIES
+   ============================================= */
+.admin-page-container {
+  width: 100%;
+  animation: fadeIn 0.3s ease-in-out;
+  padding-bottom: 3rem;
+}
+
+.admin-header-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--border-primary);
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  flex-shrink: 0;
+}
+@media (min-width: 640px) {
+  .admin-header-section {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.admin-page-heading {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  font-family: var(--font-title);
+  color: var(--text-primary);
+}
+@media (min-width: 768px) {
+  .admin-page-heading {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
+
+.admin-page-subheading {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  max-width: 36rem;
+  color: var(--text-secondary);
+}
+
+.admin-card-base {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 1rem;
+}
+
+.admin-input-base {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  border-radius: 0.75rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease;
+}
+.admin-input-base:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.admin-btn-primary {
+  background-color: var(--accent-primary);
+  color: var(--text-on-accent);
+  border-radius: 0.75rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.admin-btn-primary:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.admin-btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  border-radius: 0.75rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.admin-btn-secondary:hover {
+  background-color: var(--bg-hover);
 }
 
 /* =============================================
@@ -1498,3 +1608,81 @@ html.theme-dark select option,
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
   overflow: hidden;
 }
+
+/* =============================================
+   LANDING PAGE — STORYTELLING ANIMATION UTILS
+   ============================================= */
+
+/* Gentle float for background orbs */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-14px) scale(1.02); }
+}
+
+/* Gradient shimmer on text */
+@keyframes shimmer-text {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Heartbeat pulse for live indicators */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25); opacity: 0.7; }
+}
+
+/* Slow spin for decorative rings */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Fade-in-up for sequential reveals */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide-in-right for timeline items */
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Soft breathing glow for CTA buttons */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.6); }
+}
+
+/* Utility classes */
+.animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
+.animate-float-slow-delay { animation: float-slow 6s ease-in-out infinite 2s; }
+.animate-heartbeat { animation: heartbeat 1.5s ease-in-out infinite; }
+.animate-spin-slow { animation: spin-slow 12s linear infinite; }
+.animate-fade-in-up { animation: fade-in-up 0.6s ease-out both; }
+.animate-slide-in-right { animation: slide-in-right 0.5s ease-out both; }
+.animate-glow-pulse { animation: glow-pulse 2.5s ease-in-out infinite; }
+
+/* Shimmer gradient text */
+.text-shimmer {
+  background: linear-gradient(90deg, #10b981, #34d399, #10b981);
+  background-size: 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-text 3s linear infinite;
+}
+
+/* Premium card hover lift */
+.card-hover {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(16, 185, 129, 0.15);
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }

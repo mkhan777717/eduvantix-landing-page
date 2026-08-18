@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import JournalHeader from "@/components/journal/layout/JournalHeader";
-import JournalFooter from "@/components/journal/layout/JournalFooter";
+import Footer from "@/components/Footer";
 import GlobalSearchModal from "@/components/journal/search/GlobalSearchModal";
 
 export default function JournalShell({ children }) {
@@ -14,7 +14,7 @@ export default function JournalShell({ children }) {
       <main id="main-content" tabIndex={-1}>
         {children}
       </main>
-      <JournalFooter />
+      <Footer />
       <GlobalSearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );

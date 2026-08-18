@@ -95,12 +95,14 @@ function AISettingsPanel() {
   const isHealthy = health?.available && health?.modelAvailable;
 
   return (
-    <div className="space-y-6 animate-fade-in pb-12 w-full mt-16 pt-12 border-t" style={{ borderColor: "var(--border-primary)" }}>
+    <div className="space-y-6 animate-fade-in pb-12 w-full mt-12 pt-8 border-t" style={{ borderColor: "var(--border-primary)" }}>
       {/* Section Header */}
       <section className="flex flex-col gap-2 shrink-0">
-        <h2 className="text-3xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>AI Settings</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
+          AI LLM Engine Settings
+        </h2>
         <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
-          Configure the local LLM used for answer evaluation and session summaries.
+          Configure the local or remote LLM model used for automatic answer evaluation and live viva assessments.
         </p>
       </section>
 

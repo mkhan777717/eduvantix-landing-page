@@ -1207,28 +1207,41 @@ export default function AIAllInOneVivaPage({ children }) {
         </section>
 
         {/* Tab Switcher: Question Bank vs Schedule Viva vs Settings */}
-        <div className="flex space-x-1 p-1 bg-[var(--bg-card)] border border-[var(--border-primary)] rounded-xl w-fit min-w-[300px]">
+        <div className="flex items-center gap-1 p-1 rounded-xl border w-fit"
+          style={{ borderColor: "var(--border-primary)", backgroundColor: "var(--bg-secondary)" }}>
           <button
             type="button"
             onClick={() => setSubSectionTab("bank")}
-            className={`flex-1 py-2 px-4 rounded-lg font-bold text-xs transition-all cursor-pointer ${subSectionTab === "bank" ? "bg-[var(--accent-primary)] text-[var(--text-on-accent)]" : "text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"}`}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer"
+            style={{
+              backgroundColor: subSectionTab === "bank" ? "var(--accent-primary)" : "transparent",
+              color: subSectionTab === "bank" ? "#ffffff" : "var(--text-secondary)",
+            }}
           >
-            Question Bank
+            <span>Question Bank</span>
           </button>
           <button
             type="button"
             onClick={() => setSubSectionTab("schedule")}
-            className={`flex-1 py-2 px-4 rounded-lg font-bold text-xs transition-all cursor-pointer ${subSectionTab === "schedule" ? "bg-[var(--accent-primary)] text-[var(--text-on-accent)]" : "text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"}`}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer"
+            style={{
+              backgroundColor: subSectionTab === "schedule" ? "var(--accent-primary)" : "transparent",
+              color: subSectionTab === "schedule" ? "#ffffff" : "var(--text-secondary)",
+            }}
           >
-            Schedule Viva
+            <span>Schedule Viva</span>
           </button>
           {children && (
             <button
               type="button"
               onClick={() => setSubSectionTab("settings")}
-              className={`flex-1 py-2 px-4 rounded-lg font-bold text-xs transition-all cursor-pointer ${subSectionTab === "settings" ? "bg-[var(--accent-primary)] text-[var(--text-on-accent)]" : "text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]"}`}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer"
+              style={{
+                backgroundColor: subSectionTab === "settings" ? "var(--accent-primary)" : "transparent",
+                color: subSectionTab === "settings" ? "#ffffff" : "var(--text-secondary)",
+              }}
             >
-              AI Settings
+              <span>AI Settings</span>
             </button>
           )}
         </div>
