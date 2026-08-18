@@ -221,7 +221,7 @@ export default function BatchManagerDashboard() {
           {/* Header section */}
           <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
             <div className="space-y-2">
-              <h1 className="text-4xl font-serif tracking-tight">
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
                 My Assigned Batches
               </h1>
               <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
@@ -283,7 +283,7 @@ export default function BatchManagerDashboard() {
                           </span>
                           <ChevronRight size={16} className="transition-transform group-hover:translate-x-1" style={{ color: "var(--text-muted)" }} />
                         </div>
-                        <h3 className="text-xl font-serif">{batch.name}</h3>
+                        <h3 className="text-lg font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>{batch.name}</h3>
                       </div>
 
                       <div className="flex items-center gap-6 pt-4 border-t text-xs font-medium" style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}>
@@ -320,7 +320,7 @@ export default function BatchManagerDashboard() {
                 <ArrowLeft size={12} />
                 <span>Back to batches</span>
               </button>
-              <h1 className="text-4xl font-serif tracking-tight">
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
                 Batch: {selectedBatch?.name}
               </h1>
               <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>

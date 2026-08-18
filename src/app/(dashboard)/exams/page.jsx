@@ -216,11 +216,11 @@ export default function ExamsDashboard() {
   }
 
   return (
-    <div className="min-h-screen text-slate-900 dark:text-slate-100 p-6 space-y-8 font-sans">
+    <div className="w-full animate-fade-in space-y-8 pb-12" style={{ color: "var(--text-primary)" }}>
       {/* Header section */}
       <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
         <div className="space-y-2">
-          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
             {isTeacher ? "Mentor Exam Manager" : isBatchManager ? "Batch Schedule Manager" : "Student Examination Portal"}
           </h1>
           <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
@@ -245,27 +245,30 @@ export default function ExamsDashboard() {
       </section>
 
       {/* Tabs list filtering */}
-      <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-4">
-        <div className="flex gap-2 p-1 rounded-xl bg-slate-100 dark:bg-slate-950/40 border border-slate-200 dark:border-white/5">
-          {tabsToRender.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
-                activeTab === tab.id 
-                  ? "bg-white dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-indigo-500/20 font-bold shadow-sm" 
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-transparent"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+      <div className="flex items-center justify-between border-b pb-4" style={{ borderColor: "var(--border-primary)" }}>
+        <div className="flex items-center gap-1 p-1 rounded-xl border w-fit" style={{ borderColor: "var(--border-primary)", backgroundColor: "var(--bg-secondary)" }}>
+          {tabsToRender.map(tab => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                style={{
+                  backgroundColor: isActive ? "var(--accent-primary)" : "transparent",
+                  color: isActive ? "#ffffff" : "var(--text-secondary)",
+                }}
+              >
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Error state */}
       {error && (
-        <div className="flex items-center gap-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm text-rose-600 dark:text-rose-400">
+        <div className="flex items-center gap-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm text-rose-500">
           <AlertCircle size={20} className="shrink-0" />
           <span>{error}</span>
         </div>
@@ -273,12 +276,25 @@ export default function ExamsDashboard() {
 
       {/* Empty State */}
       {!loading && filteredExams.length === 0 && (
-        <div className="flex flex-col items-center justify-center p-12 text-center rounded-3xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/20">
-          <FileText size={48} className="text-slate-400 dark:text-slate-600 mb-4" />
-          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-300">No exams found</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-500 max-w-sm mt-2">
-            There are currently no exams under the &quot;{activeTab}&quot; tab.
+        <div className="flex flex-col items-center justify-center p-12 text-center rounded-3xl border border-dashed"
+          style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
+            style={{ backgroundColor: "var(--bg-secondary)", color: "var(--text-muted)" }}>
+            <FileText size={28} />
+          </div>
+          <h3 className="text-base font-bold" style={{ color: "var(--text-primary)" }}>No exams found</h3>
+          <p className="text-xs max-w-sm mt-1.5 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+            There are currently no examinations under the &quot;{activeTab}&quot; category.
           </p>
+          {isTeacher && (
+            <button
+              onClick={() => router.push("/exams/create")}
+              className="mt-5 flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md hover:scale-[1.02] transition-all cursor-pointer"
+              style={{ background: "var(--accent-primary)" }}
+            >
+              <Plus size={14} /> Create First Assessment
+            </button>
+          )}
         </div>
       )}
 
@@ -286,7 +302,8 @@ export default function ExamsDashboard() {
       {loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-48 rounded-3xl border border-slate-200 dark:border-white/5 bg-slate-100 dark:bg-slate-900/40 animate-pulse" />
+            <div key={i} className="h-48 rounded-3xl border animate-pulse"
+              style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }} />
           ))}
         </div>
       )}
@@ -300,73 +317,79 @@ export default function ExamsDashboard() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="group relative overflow-hidden rounded-3xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/30 p-6 backdrop-blur-md transition-all hover:border-slate-300 dark:hover:border-white/10 hover:shadow-xl dark:hover:bg-slate-900/50 shadow-sm"
+              className="group relative overflow-hidden rounded-3xl border p-6 backdrop-blur-md transition-all hover:shadow-xl shadow-sm flex flex-col justify-between"
+              style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}
             >
-              <div className="flex justify-between items-start mb-4">
-                <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-2xs font-extrabold uppercase tracking-wide border ${
-                  exam.status === "PUBLISHED" 
-                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" 
-                    : exam.status === "DRAFT"
-                    ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
-                    : "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20"
-                }`}>
-                  {exam.status}
-                </span>
+              <div>
+                <div className="flex justify-between items-start mb-4">
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-2xs font-extrabold uppercase tracking-wide border ${
+                    exam.status === "PUBLISHED" 
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" 
+                      : exam.status === "DRAFT"
+                      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+                      : "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20"
+                  }`}>
+                    {exam.status}
+                  </span>
 
-                <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {isTeacher && (
-                    <>
-                      <button
-                        onClick={(e) => handleDuplicate(exam.id, e)}
-                        title="Duplicate Exam"
-                        className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-950/40 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200 dark:border-white/5"
-                      >
-                        <Award size={14} />
-                      </button>
-                      <button
-                        onClick={(e) => handleDelete(exam.id, e)}
-                        title="Delete Exam"
-                        className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-950/40 text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-500 border border-slate-200 dark:border-white/5"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </>
-                  )}
+                  <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {isTeacher && (
+                      <>
+                        <button
+                          onClick={(e) => handleDuplicate(exam.id, e)}
+                          title="Duplicate Exam"
+                          className="p-1.5 rounded-lg border transition-colors hover:border-indigo-500/40"
+                          style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
+                        >
+                          <Award size={14} />
+                        </button>
+                        <button
+                          onClick={(e) => handleDelete(exam.id, e)}
+                          title="Delete Exam"
+                          className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-500 hover:bg-rose-500/20 transition-colors"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white line-clamp-1 mb-2">
-                {exam.title}
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mb-4 h-8 leading-relaxed">
-                {exam.description || "No description provided."}
-              </p>
+                <h3 className="text-base font-bold tracking-tight line-clamp-1 mb-2" style={{ color: "var(--text-primary)" }}>
+                  {exam.title}
+                </h3>
+                <p className="text-xs line-clamp-2 mb-4 h-8 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                  {exam.description || "No description provided."}
+                </p>
 
-              <div className="space-y-2 mb-6 border-t border-slate-100 dark:border-white/5 pt-4 text-xs text-slate-600 dark:text-slate-400">
-                <div className="flex items-center gap-2">
-                  <Calendar size={13} className="text-slate-400 dark:text-slate-500" />
-                  <span>Start: {new Date(exam.startDate).toLocaleString()}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock size={13} className="text-slate-400 dark:text-slate-500" />
-                  <span>End: {new Date(exam.endDate).toLocaleString()}</span>
+                <div className="space-y-2 mb-6 border-t pt-4 text-xs" style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}>
+                  <div className="flex items-center gap-2">
+                    <Calendar size={13} style={{ color: "var(--text-muted)" }} />
+                    <span>Start: {new Date(exam.startDate).toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock size={13} style={{ color: "var(--text-muted)" }} />
+                    <span>End: {new Date(exam.endDate).toLocaleString()}</span>
+                  </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 pt-2">
                 {isTeacher ? (
                   <>
                     <button
                       onClick={() => router.push(`/exams/${exam.id}/build`)}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 px-3 py-2 text-2xs font-bold text-slate-700 dark:text-white transition-all"
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition-all hover:bg-[var(--bg-secondary)] cursor-pointer"
+                      style={{ borderColor: "var(--border-primary)", color: "var(--text-primary)", backgroundColor: "var(--bg-primary)" }}
                     >
                       <FileText size={14} />
                       Builder
                     </button>
                     <button
                       onClick={() => router.push(`/exams/${exam.id}/analytics`)}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2 text-2xs font-bold text-white hover:bg-indigo-500 transition-all shadow-md"
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold text-white transition-all shadow-md cursor-pointer hover:opacity-90"
+                      style={{ background: "var(--accent-primary)" }}
                     >
                       <Award size={14} />
                       Evaluate
@@ -376,14 +399,15 @@ export default function ExamsDashboard() {
                   <>
                     <button
                       onClick={(e) => openRescheduleModal(exam, e)}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-600 px-3 py-2 text-2xs font-bold text-white hover:bg-amber-500 transition-all shadow-md"
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold text-white hover:bg-amber-500 transition-all shadow-md cursor-pointer"
                     >
                       <Calendar size={14} />
-                      Reschedule Exam
+                      Reschedule
                     </button>
                     <button
                       onClick={() => router.push(`/exams/${exam.id}/analytics`)}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 px-3 py-2 text-2xs font-bold text-slate-700 dark:text-white transition-all"
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition-all hover:bg-[var(--bg-secondary)] cursor-pointer"
+                      style={{ borderColor: "var(--border-primary)", color: "var(--text-primary)", backgroundColor: "var(--bg-primary)" }}
                     >
                       <Award size={14} />
                       Analytics
@@ -396,7 +420,7 @@ export default function ExamsDashboard() {
                         exam.userAttempt.status === "IN_PROGRESS" ? (
                           <button
                             onClick={() => router.push(`/exams/${exam.id}/attempt/${exam.userAttempt.id}`)}
-                            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-amber-500 transition-all shadow-lg"
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-amber-500 transition-all shadow-lg cursor-pointer"
                           >
                             <Play size={14} />
                             Resume Attempt
@@ -404,7 +428,8 @@ export default function ExamsDashboard() {
                         ) : exam.userAttempt.resultPublished ? (
                           <button
                             onClick={() => router.push(`/exams/${exam.id}/result/${exam.userAttempt.id}`)}
-                            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 transition-all shadow-lg"
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-bold text-white transition-all shadow-lg cursor-pointer hover:opacity-90"
+                            style={{ background: "var(--accent-primary)" }}
                           >
                             <CheckCircle2 size={14} />
                             View Result & Score
@@ -418,7 +443,8 @@ export default function ExamsDashboard() {
                       ) : (
                         <button
                           onClick={() => router.push(`/exams/${exam.id}/start`)}
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-indigo-500 transition-all shadow-lg"
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-bold text-white transition-all shadow-lg cursor-pointer hover:opacity-90"
+                          style={{ background: "var(--accent-primary)" }}
                         >
                           <Play size={14} />
                           Start Attempt
@@ -427,7 +453,8 @@ export default function ExamsDashboard() {
                     )}
 
                     {activeTab === "upcoming" && (
-                      <div className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-100 dark:bg-slate-950/40 border border-slate-200 dark:border-white/5 px-4 py-2.5 text-xs font-semibold text-slate-500 select-none">
+                      <div className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border px-4 py-2.5 text-xs font-semibold select-none"
+                        style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border-primary)", color: "var(--text-muted)" }}>
                         <Lock size={14} />
                         Starts {new Date(exam.startDate).toLocaleDateString()}
                       </div>
@@ -437,7 +464,8 @@ export default function ExamsDashboard() {
                       exam.userAttempt?.resultPublished ? (
                         <button
                           onClick={() => router.push(`/exams/${exam.id}/result/${exam.userAttempt.id}`)}
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 transition-all shadow-lg"
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-xs font-bold text-white transition-all shadow-lg cursor-pointer hover:opacity-90"
+                          style={{ background: "var(--accent-primary)" }}
                         >
                           <CheckCircle2 size={14} />
                           View Result & Score
@@ -448,7 +476,8 @@ export default function ExamsDashboard() {
                           Results Under Review
                         </div>
                       ) : (
-                        <div className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-100 dark:bg-slate-950/20 border border-slate-200 dark:border-white/5 px-4 py-2.5 text-xs font-semibold text-slate-500 select-none">
+                        <div className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border px-4 py-2.5 text-xs font-semibold select-none"
+                          style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border-primary)", color: "var(--text-muted)" }}>
                           <Lock size={14} />
                           Exam Closed
                         </div>

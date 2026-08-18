@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArticleCard } from "@/components/journal/cards/ArticleCards";
 import { TagPill, CategoryBadge } from "@/components/journal/ui/JournalUI";
-import NewsletterForm from "@/components/journal/newsletter/NewsletterForm";
 import { ArrowRight, Search } from "lucide-react";
 import { getApiBase } from "@/utils/api";
 import JournalHeaderActions from "@/components/journal/ui/JournalHeaderActions";
@@ -34,7 +33,7 @@ function CategorySection({ title, articles, categorySlug, eyebrow }) {
         <div>
           {eyebrow && <p className="j-eyebrow mb-1">{eyebrow}</p>}
           <h2
-            className="text-2xl font-semibold"
+            className="text-2xl font-bold tracking-tight"
             style={{
               color: "var(--j-text)",
               letterSpacing: "-0.02em",
@@ -46,7 +45,7 @@ function CategorySection({ title, articles, categorySlug, eyebrow }) {
         {categorySlug && (
           <Link
             href={`/journal/category/${categorySlug}`}
-            className="hidden sm:inline-flex items-center gap-1 text-xs hover:underline"
+            className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold hover:underline"
             style={{ fontFamily: "var(--j-font-mono)", color: "var(--j-accent)" }}
           >
             View all <ArrowRight size={12} />
@@ -54,7 +53,7 @@ function CategorySection({ title, articles, categorySlug, eyebrow }) {
         )}
       </div>
 
-      <div>
+      <div className="space-y-4">
         {articles.map((article) => (
           <ArticleCard key={article.slug} article={article} />
         ))}
@@ -63,10 +62,10 @@ function CategorySection({ title, articles, categorySlug, eyebrow }) {
       {categorySlug && (
         <Link
           href={`/journal/category/${categorySlug}`}
-          className="sm:hidden inline-flex items-center gap-1 mt-4 text-xs hover:underline"
+          className="sm:hidden inline-flex items-center gap-1 mt-4 text-xs font-semibold hover:underline"
           style={{ fontFamily: "var(--j-font-mono)", color: "var(--j-accent)" }}
         >
-          View all {title} articles <ArrowRight size={12} />
+          View all {title} <ArrowRight size={12} />
         </Link>
       )}
     </section>
@@ -76,9 +75,9 @@ function CategorySection({ title, articles, categorySlug, eyebrow }) {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export const metadata = {
-  title: "Eduvantix Journal — Learn. Build. Share. Grow.",
+  title: "Eduvantix Blogs — Learn, Build & Grow",
   description:
-    "Programming tutorials, DSA guides, interview prep, AI & ML, web development, career advice, and placement experiences from India's leading EdTech platform.",
+    "Engineering guides, DSA tutorials, interview preparation, system design architecture, and placement advice from the Eduvantix community.",
   alternates: { canonical: "https://eduvantix.com/journal" },
 };
 
@@ -128,19 +127,20 @@ export default async function JournalHomePage() {
   return (
     <JournalGuestGate>
     <div className="px-5 py-8 max-w-7xl mx-auto">
-      {/* ── Platform Page Header Banner (Same layout as Contest Arena & Practice Arena) ── */}
+      {/* ── Platform Page Header Banner ── */}
       <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--j-border)" }}>
         <div className="space-y-2">
           <h1
-            className="text-4xl font-serif tracking-tight"
+            className="text-3xl sm:text-4xl font-bold tracking-tight"
             style={{
               color: "var(--j-text)",
+              fontFamily: "var(--font-title)",
             }}
           >
-            Eduvantix Journal
+            Eduvantix Blogs
           </h1>
-          <p className="text-sm max-w-xl leading-relaxed" style={{ fontFamily: "var(--j-font-reading)", color: "var(--j-text-secondary)" }}>
-            Engineering knowledge, DSA guides, system architecture, interview preparation, and technical insights from the Eduvantix community.
+          <p className="text-sm max-w-xl leading-relaxed" style={{ color: "var(--j-text-secondary)" }}>
+            Engineering guides, DSA tutorials, system architecture, interview preparation, and technical insights from the Eduvantix community.
           </p>
         </div>
 
@@ -151,11 +151,11 @@ export default async function JournalHomePage() {
       {/* ── Category Pill Filter Bar + Search ─────────────────────────────── */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
         <div
-          className="inline-flex items-center gap-1 p-1 rounded-full border overflow-x-auto"
+          className="inline-flex items-center gap-1 p-1 rounded-xl border overflow-x-auto no-scrollbar"
           style={{ background: "var(--j-bg-secondary)", borderColor: "var(--j-border)" }}
         >
           {[
-            { label: "All Articles", href: "/journal" },
+            { label: "All Blogs", href: "/journal" },
             { label: "DSA", href: "/journal/category/dsa" },
             { label: "Web Dev", href: "/journal/category/web-development" },
             { label: "AI & ML", href: "/journal/category/ai-ml" },
@@ -166,12 +166,11 @@ export default async function JournalHomePage() {
             <Link
               key={cat.label}
               href={cat.href}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${idx === 0
-                ? "text-white shadow-sm font-semibold"
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${idx === 0
+                ? "text-white shadow-xs font-bold"
                 : "hover:text-[var(--j-accent)] text-[var(--j-text-secondary)]"
                 }`}
               style={{
-                fontFamily: "var(--j-font-mono)",
                 background: idx === 0 ? "var(--j-accent)" : "transparent",
               }}
             >
@@ -393,41 +392,6 @@ export default async function JournalHomePage() {
           </aside>
         </div>
       </div>
-
-      {/* ── Newsletter ─────────────────────────────────────────────────── */}
-      <section
-        className="border-t border-b"
-        style={{ borderColor: "var(--j-border)", background: "var(--j-bg-secondary)" }}
-        aria-label="Newsletter"
-      >
-        <div className="max-w-2xl mx-auto px-5 py-16 text-center">
-          <p className="j-eyebrow mb-4">Newsletter</p>
-          <h2
-            className="text-3xl font-semibold mb-3"
-            style={{
-              fontFamily: "var(--j-font-heading)",
-              color: "var(--j-text)",
-              letterSpacing: "-0.02em",
-            }}
-          >
-            Engineering insights, weekly.
-          </h2>
-          <p
-            className="text-base mb-8"
-            style={{ fontFamily: "var(--j-font-reading)", color: "var(--j-text-secondary)" }}
-          >
-            Hand-picked articles on DSA, system design, interview prep, and career growth —
-            delivered every week.
-          </p>
-          <NewsletterForm />
-          <p
-            className="mt-4 text-xs"
-            style={{ fontFamily: "var(--j-font-mono)", color: "var(--j-text-muted)" }}
-          >
-            No spam. Unsubscribe anytime.
-          </p>
-        </div>
-      </section>
     </div>
     </JournalGuestGate>
   );

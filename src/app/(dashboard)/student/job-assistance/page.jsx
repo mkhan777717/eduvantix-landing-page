@@ -343,11 +343,11 @@ export default function JobAssistancePage() {
   // ─── Application Form (no active application) ──────────────────────────────
   if (!application) {
     return (
-      <div className="w-full animate-fade-in space-y-6 pb-12">
+      <div className="max-w-2xl mx-auto animate-fade-in space-y-6 pb-12">
         {/* Header */}
-        <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
-          <div className="space-y-2">
-            <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+        <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
+          <div className="space-y-1.5">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
               Job Assistance
             </h1>
             <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
@@ -357,8 +357,8 @@ export default function JobAssistancePage() {
         </section>
 
         {/* Form Card */}
-        <div className="p-6 md:p-8 rounded-3xl border border-[var(--border-primary)] shadow-xl relative overflow-hidden"
-          style={{ backgroundColor: "var(--bg-card)" }}>
+        <div className="p-6 md:p-8 rounded-3xl border shadow-xl relative overflow-hidden"
+          style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
           {/* Decorative glow */}
           <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full blur-3xl pointer-events-none" style={{ background: "var(--accent-primary)", opacity: 0.06 }} />
 

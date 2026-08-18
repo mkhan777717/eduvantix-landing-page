@@ -136,7 +136,7 @@ export default function GamesHubPage() {
       {/* Top Arcade Navigation Bar */}
       <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
         <div className="space-y-2">
-          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
             Eduvantix Arcade
           </h1>
           <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
@@ -147,45 +147,55 @@ export default function GamesHubPage() {
 
       <div className="space-y-8 relative z-10">
         {/* Filters Toolbar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl border border-[var(--border-primary)] shadow-sm" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-2xl border shadow-sm" style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
           {/* Track Filters */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider mr-2" style={{ color: "var(--text-muted)" }}>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
               Track:
             </span>
-            {tracks.map(track => (
-              <button
-                key={track}
-                onClick={() => setFilterTrack(track)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer border border-[var(--border-primary)] ${
-                  filterTrack === track
-                    ? "bg-[var(--text-primary)] text-[var(--bg-primary)] border-[var(--text-primary)]"
-                    : "bg-transparent text-[var(--text-secondary)] border-[var(--border-primary)] hover:bg-[var(--bg-secondary)]"
-                }`}
-              >
-                {track}
-              </button>
-            ))}
+            <div className="inline-flex flex-wrap items-center gap-1 p-1 rounded-xl border bg-[var(--bg-secondary)] border-[var(--border-primary)]">
+              {tracks.map(track => {
+                const active = filterTrack === track;
+                return (
+                  <button
+                    key={track}
+                    onClick={() => setFilterTrack(track)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap"
+                    style={{
+                      backgroundColor: active ? "var(--accent-primary)" : "transparent",
+                      color: active ? "#ffffff" : "var(--text-secondary)",
+                    }}
+                  >
+                    {track}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Difficulty Filters */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider mr-2" style={{ color: "var(--text-muted)" }}>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
               Difficulty:
             </span>
-            {difficulties.map(diff => (
-              <button
-                key={diff}
-                onClick={() => setFilterDifficulty(diff)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer border border-[var(--border-primary)] ${
-                  filterDifficulty === diff
-                    ? "bg-[var(--text-primary)] text-[var(--bg-primary)] border-[var(--text-primary)]"
-                    : "bg-transparent text-[var(--text-secondary)] border-[var(--border-primary)] hover:bg-[var(--bg-secondary)]"
-                }`}
-              >
-                {diff}
-              </button>
-            ))}
+            <div className="inline-flex items-center gap-1 p-1 rounded-xl border bg-[var(--bg-secondary)] border-[var(--border-primary)]">
+              {difficulties.map(diff => {
+                const active = filterDifficulty === diff;
+                return (
+                  <button
+                    key={diff}
+                    onClick={() => setFilterDifficulty(diff)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap"
+                    style={{
+                      backgroundColor: active ? "var(--accent-primary)" : "transparent",
+                      color: active ? "#ffffff" : "var(--text-secondary)",
+                    }}
+                  >
+                    {diff}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 

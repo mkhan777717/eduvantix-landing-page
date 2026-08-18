@@ -2067,15 +2067,15 @@ export default function AdminLivePage() {
   if (!session || !livekitToken) {
     return (
       <>
-        <div className="flex-1 overflow-y-auto w-full custom-scrollbar pb-10 pr-1">
-        <div className="max-w-7xl mx-auto space-y-12 lg:space-y-0 lg:grid lg:grid-cols-[1.3fr_1fr] lg:gap-12 animate-fade-in px-4 sm:px-6 lg:px-8">
+        <div className="flex-1 w-full lg:h-[calc(100vh-5.5rem)] lg:overflow-hidden pb-10 pr-1">
+        <div className="max-w-7xl mx-auto space-y-12 lg:space-y-0 lg:grid lg:grid-cols-[1.3fr_1fr] lg:gap-10 animate-fade-in px-4 sm:px-6 lg:px-8 lg:h-full">
           
-          {/* Left Column: Setup Form */}
-          <div className="space-y-8 max-w-2xl w-full">
+          {/* Left Column: Setup Form (Independent Scroll) */}
+          <div className="space-y-8 max-w-2xl w-full lg:h-full lg:overflow-y-auto lg:pr-3 custom-scrollbar pb-12">
         {/* Page Header */}
         <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
           <div className="space-y-2">
-            <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
               Go Live
             </h1>
             <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
@@ -2388,8 +2388,8 @@ export default function AdminLivePage() {
         </div>
           </div>
 
-          {/* Right Column: Scheduled & Past Broadcasts */}
-          <div className="w-full lg:sticky lg:top-0 lg:h-max space-y-6">
+          {/* Right Column: Scheduled & Past Broadcasts (Independent Scroll) */}
+          <div className="w-full space-y-6 lg:h-full lg:overflow-y-auto lg:pr-2 custom-scrollbar pb-12">
 
 
 

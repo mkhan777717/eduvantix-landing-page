@@ -439,7 +439,7 @@ export default function AdminJobAssistancePage() {
       {/* Header */}
       <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
         <div className="space-y-2">
-          <h1 className="text-4xl font-serif tracking-tight" style={{ color: "var(--text-primary)" }}>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
             Job Assistance Applications
           </h1>
           <p className="text-sm max-w-xl" style={{ color: "var(--text-secondary)" }}>
@@ -498,7 +498,8 @@ export default function AdminJobAssistancePage() {
 
       {/* Filter Tabs & Search */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 max-w-full no-scrollbar">
+        <div className="flex items-center gap-1 p-1 rounded-xl border overflow-x-auto no-scrollbar max-w-full"
+          style={{ borderColor: "var(--border-primary)", backgroundColor: "var(--bg-secondary)" }}>
           {FILTER_TABS.map((tab) => {
             const count = counts[tab.key] || 0;
             const active = filter === tab.key;
@@ -506,11 +507,24 @@ export default function AdminJobAssistancePage() {
               <button
                 key={tab.key}
                 onClick={() => setFilter(tab.key)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
-                  active ? "bg-[var(--accent-primary)] text-white shadow" : "hover:bg-[var(--bg-hover)] text-[var(--text-muted)]"
-                }`}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all cursor-pointer"
+                style={{
+                  backgroundColor: active ? "var(--accent-primary)" : "transparent",
+                  color: active ? "#ffffff" : "var(--text-secondary)",
+                }}
               >
-                {tab.label} {count > 0 && <span className="ml-0.5 opacity-70">({count})</span>}
+                <span>{tab.label}</span>
+                {count > 0 && (
+                  <span
+                    className="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold"
+                    style={{
+                      backgroundColor: active ? "rgba(255,255,255,0.2)" : "var(--bg-card)",
+                      color: active ? "#ffffff" : "var(--text-muted)",
+                    }}
+                  >
+                    {count}
+                  </span>
+                )}
               </button>
             );
           })}

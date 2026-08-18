@@ -1924,10 +1924,7 @@ function FeatureScrollStack() {
         return (
             <div className="w-full max-w-7xl mx-auto px-6 py-12 space-y-12">
                 <div className="text-center max-w-3xl mx-auto mb-8">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-4" style={{ borderColor: "var(--border-accent)", backgroundColor: "rgba(16, 185, 129, 0.08)" }}>
-                        <Layers size={14} className="text-emerald-500" />
-                        <span className="text-[11px] font-bold tracking-wider uppercase text-emerald-500">Platform Features</span>
-                    </div>
+                    <span className="text-xs font-semibold tracking-widest uppercase text-emerald-500 block mb-2">Platform Features</span>
                     <h2 className="text-3xl font-black tracking-tight leading-tight mb-3" style={{ color: "var(--text-primary)" }}>
                         Everything your institute needs, <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">all in one place.</span>
                     </h2>
@@ -1946,10 +1943,7 @@ function FeatureScrollStack() {
         <div className="relative w-full">
             {/* Section Header */}
             <div className="text-center max-w-[1400px] mx-auto mb-14 px-6">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border mb-4" style={{ borderColor: "var(--border-accent)", backgroundColor: "rgba(16, 185, 129, 0.08)" }}>
-                    <Layers size={14} className="text-emerald-500" />
-                    <span className="text-[11px] font-bold tracking-wider uppercase text-emerald-500">Platform Features</span>
-                </div>
+                <span className="text-xs font-semibold tracking-widest uppercase text-emerald-500 block mb-2">Platform Features</span>
                 <h2 className="text-6xl md:text-7xl font-bold tracking-tighter font-black leading-tight mb-2" style={{ color: "var(--text-primary)" }}>
                     Everything your institute needs, <br></br> <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">all in one place.</span>
                 </h2>

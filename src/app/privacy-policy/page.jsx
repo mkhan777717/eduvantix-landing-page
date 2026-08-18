@@ -97,7 +97,7 @@ export default function PrivacyPolicy() {
                 1. Introduction
               </h2>
               <p>
-                Welcome to Eduvantix, a product by DatamindX (
+                Welcome to Eduvantix, an educational platform operated by DatamindX Technologies Pvt. Ltd. (
                 <a
                   href="https://datamindx.in"
                   target="_blank"
@@ -107,9 +107,14 @@ export default function PrivacyPolicy() {
                 >
                   datamindx.in
                 </a>
-                ). This Privacy Policy explains how we collect, use, disclose,
-                and safeguard your information when you visit our website and
-                use our platform.
+                ). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website (
+                <a
+                  href="https://eduvantix.com"
+                  className="underline text-[var(--text-primary)]"
+                >
+                  https://eduvantix.com
+                </a>
+                ) and use our platform services.
               </p>
             </section>
 
@@ -118,25 +123,20 @@ export default function PrivacyPolicy() {
                 2. Information We Collect
               </h2>
               <p>
-                We may collect personal identification information from Users
-                in a variety of ways, including, but not limited to, when Users
-                visit our site, register on the site, subscribe to the
-                newsletter, and in connection with other activities, services,
-                features or resources we make available on our Site.
+                We may collect personal identification information from Users in a variety of ways, including when Users visit our site, register on the site, log in using third-party services, and interact with our educational services.
               </p>
               <ul className="list-disc pl-6 mt-2 space-y-2">
                 <li>
-                  <strong>Personal Data:</strong> Name, email address, phone
-                  number, and other similar information.
+                  <strong>Account & Personal Data:</strong> Full name, email address, phone number, profile image, and authentication credentials.
                 </li>
                 <li>
-                  <strong>Usage Data:</strong> Information on how the platform
-                  is accessed and used, such as IP address, browser type, pages
-                  visited, and time spent on pages.
+                  <strong>Google User Data (Google OAuth):</strong> When you sign up or log in using Google Single Sign-On (SSO), we access basic profile information provided by Google OAuth APIs, including your Google profile name, primary email address, and profile picture URL.
                 </li>
                 <li>
-                  <strong>Platform Data:</strong> Progress in courses, contest
-                  performance, and activity in live classes.
+                  <strong>Usage & Technical Data:</strong> IP address, browser type, operating system, pages visited, time spent on pages, and platform performance diagnostics.
+                </li>
+                <li>
+                  <strong>Platform Data:</strong> Progress in courses, live class participation, quiz submissions, and contest activity.
                 </li>
               </ul>
             </section>
@@ -145,48 +145,96 @@ export default function PrivacyPolicy() {
               <h2 id="usage-heading" className="text-2xl font-semibold mb-4 text-[var(--text-primary)]">
                 3. How We Use Your Information
               </h2>
-              <p>Eduvantix and DataMindx use the collected data for various purposes:</p>
+              <p>Eduvantix uses the collected data for the following legitimate purposes:</p>
               <ul className="list-disc pl-6 mt-2 space-y-2">
-                <li>To provide and maintain our platform</li>
-                <li>To notify you about changes to our platform</li>
-                <li>To provide customer support</li>
-                <li>To gather analysis or valuable information to improve our platform</li>
-                <li>To monitor the usage of our platform</li>
-                <li>To detect, prevent and address technical issues</li>
+                <li>To authenticate users and manage user accounts securely.</li>
+                <li>To deliver, maintain, and personalize our learning services and features.</li>
+                <li>To communicate account updates, transaction receipts, and platform notifications.</li>
+                <li>To provide customer support and respond to inquiries.</li>
+                <li>To monitor, analyze, and optimize platform performance and user experience.</li>
+                <li>To prevent fraud, unauthorized access, and security breaches.</li>
+              </ul>
+            </section>
+
+            {/* Google API Services User Data Policy Compliance */}
+            <section aria-labelledby="google-data-heading" className="p-6 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
+              <h2 id="google-data-heading" className="text-2xl font-semibold mb-4 text-[var(--text-primary)]">
+                4. Google API Services User Data Policy & Limited Use Disclosure
+              </h2>
+              <p className="mb-3">
+                Eduvantix accesses and uses data obtained through Google API Services strictly in accordance with Google requirements.
+              </p>
+              <p className="mb-3 font-medium text-[var(--text-primary)]">
+                Eduvantix's use and transfer to any other app of information received from Google APIs will adhere to the{" "}
+                <a
+                  href="https://developers.google.com/terms/api-services-user-data-policy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline text-[var(--accent-primary)] hover:text-[var(--text-primary)]"
+                >
+                  Google API Services User Data Policy
+                </a>
+                , including the Limited Use requirements.
+              </p>
+              <ul className="list-disc pl-6 space-y-2">
+                <li>
+                  <strong>No Commercial Sharing:</strong> We do not transfer, sell, or rent Google user data to third parties, advertising networks, or data brokers.
+                </li>
+                <li>
+                  <strong>No Advertising Use:</strong> We do not use or transfer Google user data for serving advertisements, personalized ads, or retargeting.
+                </li>
+                <li>
+                  <strong>Human Inspection Restrictions:</strong> No human reads or inspects Google user data except with explicit user consent for troubleshooting purposes, to comply with applicable law, or for aggregated/anonymized internal security audits.
+                </li>
+              </ul>
+            </section>
+
+            <section aria-labelledby="sharing-heading">
+              <h2 id="sharing-heading" className="text-2xl font-semibold mb-4 text-[var(--text-primary)]">
+                5. Data Sharing and Disclosure
+              </h2>
+              <p>
+                We respect your privacy and do not sell or rent your personal information. We share data only in the following limited circumstances:
+              </p>
+              <ul className="list-disc pl-6 mt-2 space-y-2">
+                <li><strong>Service Providers:</strong> With trusted third-party service providers (e.g., hosting infrastructure, database services) bound by confidentiality obligations.</li>
+                <li><strong>Legal Compliance:</strong> If required by law, subpoena, court order, or governmental regulations.</li>
+                <li><strong>Business Transfers:</strong> In connection with any merger, acquisition, or sale of company assets, subject to strict privacy protections.</li>
               </ul>
             </section>
 
             <section aria-labelledby="security-heading">
               <h2 id="security-heading" className="text-2xl font-semibold mb-4 text-[var(--text-primary)]">
-                4. Security of Data
+                6. Data Security, Retention, and User Rights
               </h2>
+              <p className="mb-3">
+                We employ industry-standard encryption, secure socket layer (SSL/TLS) protocols, and access controls to protect your data against unauthorized access, loss, or alteration.
+              </p>
+              <p className="mb-3">
+                <strong>Data Retention & Deletion:</strong> We retain personal data for as long as your account remains active or as needed to provide platform services. Users have the right to request access, correction, or permanent deletion of their account and personal data at any time.
+              </p>
               <p>
-                The security of your data is important to us, but remember
-                that no method of transmission over the Internet, or method of
-                electronic storage is 100% secure. While we strive to use
-                commercially acceptable means to protect your Personal Data, we
-                cannot guarantee its absolute security.
+                To request data deletion, email us at{" "}
+                <a href="mailto:hello@eduvantix.com" className="underline text-[var(--text-primary)]">
+                  hello@eduvantix.com
+                </a>
+                . Account deletion requests will be fulfilled within 30 days.
               </p>
             </section>
 
             <section aria-labelledby="contact-heading">
               <h2 id="contact-heading" className="text-2xl font-semibold mb-4 text-[var(--text-primary)]">
-                5. Contact Us
+                7. Contact Us
               </h2>
-              <p>
-                If you have any questions about this Privacy Policy, please
-                contact us or our parent company, DataMindx, at{" "}
-                <a
-                  href="https://datamindx.in"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline text-[var(--text-primary)]"
-                  aria-label="Visit DatamindX (opens in new tab)"
-                >
-                  datamindx.in
-                </a>
-                .
+              <p className="mb-2">
+                If you have any questions, concerns, or requests regarding this Privacy Policy or our privacy practices, please contact us:
               </p>
+              <ul className="list-none space-y-1 font-medium">
+                <li><strong>Eduvantix</strong> (a product of DatamindX Technologies Pvt. Ltd.)</li>
+                <li>Email: <a href="mailto:hello@eduvantix.com" className="underline text-[var(--text-primary)]">hello@eduvantix.com</a></li>
+                <li>Phone: +91 9205454717</li>
+                <li>Website: <a href="https://eduvantix.com" className="underline text-[var(--text-primary)]">https://eduvantix.com</a></li>
+              </ul>
             </section>
           </div>
         </div>

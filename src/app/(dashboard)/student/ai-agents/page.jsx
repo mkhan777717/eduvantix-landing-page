@@ -316,10 +316,10 @@ export default function AIAgentsPage() {
       {/* ── Top Nav ─────────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-5 py-2.5 border-b flex-shrink-0"
         style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}>
-        <div className="flex items-center gap-1 rounded-xl p-1" style={{ backgroundColor: 'var(--bg-hover)' }}>
+        <div className="flex items-center gap-1 rounded-xl p-1 border" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-primary)' }}>
           {['chat', 'knowledge'].map(view => (
             <button key={view} onClick={() => setMainView(view)}
-              className="px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200"
+              className="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer"
               style={mainView === view
                 ? { backgroundColor: 'var(--accent-primary)', color: '#fff' }
                 : { color: 'var(--text-secondary)' }}>
@@ -329,8 +329,8 @@ export default function AIAgentsPage() {
         </div>
         {selectedAgent && mainView === 'chat' && (
           <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-medium" style={{ color: 'var(--text-secondary)' }}>{selectedAgent.name}</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-bold" style={{ color: 'var(--text-primary)' }}>{selectedAgent.name}</span>
             <span>· Connected ({provider === 'AUTO' ? 'Auto-Routing' : provider})</span>
           </div>
         )}
@@ -350,8 +350,10 @@ export default function AIAgentsPage() {
               {[{ id: 'agents', label: 'Agents' }, { id: 'history', label: 'History' }].map(tab => (
                 <button key={tab.id}
                   onClick={() => { setActiveTab(tab.id); if (tab.id === 'history') fetchConversations(); }}
-                  className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all ${
-                    activeTab === tab.id ? 'text-purple-400 border-b-2 border-purple-500' : 'text-gray-500 hover:text-gray-300'
+                  className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    activeTab === tab.id
+                      ? 'text-[var(--accent-primary)] border-b-2 border-[var(--accent-primary)]'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                   }`}>
                   {tab.label}
                 </button>
