@@ -16,6 +16,9 @@ import ToastContainer from "@/components/ToastContainer";
 import useThemeStore from "@/store/useThemeStore";
 import GiftCoupon from "@/components/GiftCoupon";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import { usePro } from "@/context/ProContext";
+import CareerModeToggle from "@/components/pro/CareerModeToggle";
+import ProSidebar from "@/components/pro/ProSidebar";
 
 // Inner layout component — has access to BrandingContext
 function DashboardLayoutInner({ children }) {
@@ -23,6 +26,8 @@ function DashboardLayoutInner({ children }) {
   const pathname = usePathname();
   const { logout, user, token, API_BASE, activeSession, setActiveSession, loading, updateUser } = useAuth();
   const { siteName, logoUrl: brandingLogoUrl } = useBranding();
+  const { isPro, mode } = usePro();
+  const isCareerMode = isPro && mode === "CAREER";
 
   const inst = user?.institute;
   const isInstituteAffiliated = !!user?.instituteId;
@@ -631,6 +636,25 @@ function DashboardLayoutInner({ children }) {
         className="hidden md:flex flex-col h-full border-r transition-all duration-300 relative z-30"
         style={{ width: isSidebarCollapsed ? "60px" : "195px", backgroundColor: "var(--bg-sidebar)", borderColor: "var(--border-primary)" }}
       >
+        {isCareerMode ? (
+          // ── Pro Career Mode sidebar ────────────────────────────────
+          <>
+            <div className={`flex items-center h-14 border-b ${isSidebarCollapsed ? "justify-center px-0" : "justify-between px-4"}`} style={{ borderColor: "var(--border-primary)" }}>
+              <Link href="/" className={`flex items-center gap-3 py-4 mb-2 ${isSidebarCollapsed ? "px-0" : "px-2"}`}>
+                <div className={`flex items-center overflow-hidden transition-all ${isSidebarCollapsed ? "w-6" : "w-32"}`}>
+                  {brandingLogoUrl ? (
+                    <img src={brandingLogoUrl.startsWith("http") ? brandingLogoUrl : `${API_BASE}${brandingLogoUrl}`} alt={`${siteName} Logo`} className="h-6 object-contain object-left shrink-0 max-w-none" style={{ display: "block" }} />
+                  ) : (
+                    <img src={isDark ? "/logo-white-text.webp" : "/logo-black-text.webp"} alt="Eduvantix Logo" className="h-6 object-contain object-left shrink-0 max-w-none" style={{ display: "block" }} />
+                  )}
+                </div>
+              </Link>
+            </div>
+            <ProSidebar collapsed={isSidebarCollapsed} />
+          </>
+        ) : (
+          // ── Normal Learning Mode sidebar ───────────────────────────
+          <>
         <div className={`flex items-center h-14 border-b ${isSidebarCollapsed ? "justify-center px-0" : "justify-between px-4"}`} style={{ borderColor: "var(--border-primary)" }}>
           <Link href="/" className={`flex items-center gap-3 py-4 mb-2 ${isSidebarCollapsed ? "px-0" : "px-2"}`}>
             <div className={`flex items-center overflow-hidden transition-all ${isSidebarCollapsed ? "w-6" : "w-32"}`}>
@@ -712,6 +736,8 @@ function DashboardLayoutInner({ children }) {
             {!isSidebarCollapsed && <span>Collapse sidebar</span>}
           </button>
         </div>
+          </>
+        )}
       </aside>
       )}
 
@@ -798,6 +824,9 @@ function DashboardLayoutInner({ children }) {
             <div className="flex items-center gap-3 ml-auto">
 
             {isStudentSession && <GiftCoupon />}
+
+            {/* ── Pro / Career Mode Toggle ── */}
+            <CareerModeToggle />
 
 
             {/* ── Universal Notification Bell (all roles) ── */}

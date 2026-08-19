@@ -1,6 +1,7 @@
 import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { ProProvider } from "@/context/ProContext";
 
 /* ─────────────────────────────────────────────
    MetadataBase — MUST be set so all relative
@@ -335,7 +336,7 @@ export default function RootLayout({ children }) {
         style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}
         suppressHydrationWarning={true}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider><ProProvider>{children}</ProProvider></AuthProvider>
       </body>
     </html>
   );
