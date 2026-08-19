@@ -203,7 +203,7 @@ export default function AIVivaPage() {
       const res = await fetch(`${API_BASE}/api/viva/scheduled`, { headers }).catch(() => null);
       if (res && res.ok) {
         const data = await res.json();
-        setScheduledVivas(data.data || data.vivas || []);
+        setScheduledVivas(data.vivas || []);
       }
 
       const histRes = await fetch(`${API_BASE}/api/viva/history`, { headers }).catch(() => null);
