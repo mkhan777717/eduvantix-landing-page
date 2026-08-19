@@ -6,20 +6,23 @@ import Link from "next/link";
 import {
   LayoutDashboard, Trophy, LogOut,
   Menu, X, ChevronLeft, ChevronRight, BookOpen, ArrowLeftRight,
-  Code, Brain, Radio, AlertTriangle, FileText, Gamepad2, FileCheck, Activity, Settings, Paintbrush,
+  Code, Brain, Radio, AlertTriangle, FileText, Gamepad2, FileCheck, Activity, Settings, Paintbrush, Palette,
   ShieldAlert, ShieldCheck, Layers, Users, PlusCircle, List, Bell, BellDot, CheckCircle2, Check, MessageSquare, Crown, HeartHandshake, ClipboardList, Target, Briefcase, CalendarDays, Newspaper, Database
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/context/AuthContext";
+import { BrandingProvider, useBranding } from "@/context/BrandingContext";
 import ToastContainer from "@/components/ToastContainer";
 import useThemeStore from "@/store/useThemeStore";
 import GiftCoupon from "@/components/GiftCoupon";
 import VerifiedBadge from "@/components/VerifiedBadge";
 
-export default function DashboardLayout({ children }) {
+// Inner layout component — has access to BrandingContext
+function DashboardLayoutInner({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const { logout, user, token, API_BASE, activeSession, setActiveSession, loading, updateUser } = useAuth();
+  const { siteName, logoUrl: brandingLogoUrl } = useBranding();
 
   const inst = user?.institute;
   const isInstituteAffiliated = !!user?.instituteId;
@@ -98,6 +101,13 @@ export default function DashboardLayout({ children }) {
       }
     }
   }, [initTheme]);
+
+  // Update document title with custom site name
+  useEffect(() => {
+    if (typeof document !== "undefined" && siteName && siteName !== "Eduvantix") {
+      document.title = document.title.replace(/Eduvantix/gi, siteName);
+    }
+  }, [siteName]);
 
   const effectiveRole = user?.role;
   const isSuperAdmin = effectiveRole === "ADMIN";
@@ -517,6 +527,7 @@ export default function DashboardLayout({ children }) {
       isInstAdmin && { label: "Academic Setup", href: "/academic-setup", icon: BookOpen },
       (isInstAdmin || isBatchMgr) && { label: "Timetable", href: "/timetable", icon: CalendarDays },
       isInstAdmin && { label: "Attendance", href: "/attendance/admin", icon: CheckCircle2 },
+      isInstAdmin && { label: "Branding", href: "/settings/branding", icon: Palette },
 
       !isSuperAdmin && { label: "Share Feedback", href: "/feedback", icon: HeartHandshake },
     ].filter(Boolean);
@@ -623,12 +634,21 @@ export default function DashboardLayout({ children }) {
         <div className={`flex items-center h-14 border-b ${isSidebarCollapsed ? "justify-center px-0" : "justify-between px-4"}`} style={{ borderColor: "var(--border-primary)" }}>
           <Link href="/" className={`flex items-center gap-3 py-4 mb-2 ${isSidebarCollapsed ? "px-0" : "px-2"}`}>
             <div className={`flex items-center overflow-hidden transition-all ${isSidebarCollapsed ? "w-6" : "w-32"}`}>
-              <img
-                src={isDark ? "/logo-white-text.webp" : "/logo-black-text.webp"}
-                alt="Eduvantix Logo"
-                className="h-6 object-contain object-left shrink-0 max-w-none"
-                style={{ display: "block" }}
-              />
+              {brandingLogoUrl ? (
+                <img
+                  src={brandingLogoUrl.startsWith("http") ? brandingLogoUrl : `${API_BASE}${brandingLogoUrl}`}
+                  alt={`${siteName} Logo`}
+                  className="h-6 object-contain object-left shrink-0 max-w-none"
+                  style={{ display: "block" }}
+                />
+              ) : (
+                <img
+                  src={isDark ? "/logo-white-text.webp" : "/logo-black-text.webp"}
+                  alt="Eduvantix Logo"
+                  className="h-6 object-contain object-left shrink-0 max-w-none"
+                  style={{ display: "block" }}
+                />
+              )}
             </div>
           </Link>
         </div>
@@ -704,12 +724,21 @@ export default function DashboardLayout({ children }) {
           >
             <div className="flex items-center justify-between mb-6">
               <Link href="/" className="flex items-center gap-2.5" onClick={() => setIsMobileMenuOpen(false)}>
+              {brandingLogoUrl ? (
+                <img
+                  src={brandingLogoUrl.startsWith("http") ? brandingLogoUrl : `${API_BASE}${brandingLogoUrl}`}
+                  alt={`${siteName} Logo`}
+                  className="h-6 object-contain object-left"
+                  style={{ display: "block" }}
+                />
+              ) : (
                 <img
                   src={isDark ? "/logo-white-text.webp" : "/logo-black-text.webp"}
                   alt="Eduvantix Logo"
                   className="h-6 object-contain object-left"
                   style={{ display: "block" }}
                 />
+              )}
               </Link>
               <button onClick={() => setIsMobileMenuOpen(false)} className="p-1.5 rounded-lg" style={{ color: "var(--text-secondary)" }}>
                 <X size={16} />
@@ -750,11 +779,19 @@ export default function DashboardLayout({ children }) {
                 <Menu size={20} />
               </button>
               <Link href="/">
+              {brandingLogoUrl ? (
+                <img
+                  src={brandingLogoUrl.startsWith("http") ? brandingLogoUrl : `${API_BASE}${brandingLogoUrl}`}
+                  alt={`${siteName} Logo`}
+                  className="h-5 object-contain"
+                />
+              ) : (
                 <img
                   src={isDark ? "/logo-white-text.webp" : "/logo-black-text.webp"}
                   alt="Eduvantix Logo"
                   className="h-5 object-contain"
                 />
+              )}
               </Link>
             </div>
             
@@ -1027,7 +1064,7 @@ export default function DashboardLayout({ children }) {
         )}
 
         <main className={`flex-1 overflow-y-auto ${isLiveStudioMode ? 'bg-[var(--bg-primary)]' : ''}`}>
-          <div className={isLiveStudioMode || pathname.startsWith('/courses') || pathname.includes('/careers') ? "h-full flex flex-col min-h-0" : "max-w-7xl mx-auto p-6 md:p-8"}>
+          <div className={isLiveStudioMode || pathname.startsWith('/courses') ? "h-full flex flex-col min-h-0" : "max-w-7xl mx-auto p-6 md:p-8"}>
             {isFeatureBlocked ? <BlockedScreen /> : children}
           </div>
         </main>
@@ -1096,5 +1133,14 @@ export default function DashboardLayout({ children }) {
       {/* Add Toast Container here */}
       <ToastContainer />
     </div>
+  );
+}
+
+// Outer wrapper that provides BrandingContext
+export default function DashboardLayout({ children }) {
+  return (
+    <BrandingProvider>
+      <DashboardLayoutInner>{children}</DashboardLayoutInner>
+    </BrandingProvider>
   );
 }
