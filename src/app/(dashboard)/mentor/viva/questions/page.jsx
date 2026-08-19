@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "@/context/AuthContext";
 import {
   Brain, Plus, Edit2, Trash2, X, Check,
@@ -31,6 +32,8 @@ const emptyForm = {
 
 export default function AIAllInOneVivaPage({ children }) {
   const { user, token, API_BASE } = useAuth();
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => setIsClient(true), []);
 
   // --- Common Headers ---
   const getHeaders = useCallback((isJson = true) => ({
@@ -180,7 +183,7 @@ export default function AIAllInOneVivaPage({ children }) {
     try {
       const res = await fetch(`${API_BASE}/api/viva/scheduled`, { headers: getHeaders() });
       const data = await res.json();
-      if (res.ok && data.success) setVivas(data.vivas || []);
+      if (res.ok && data.success) setVivas(data.data || data.vivas || []);
     } catch { /* silent */ }
     finally { setVivasLoading(false); }
   }, [API_BASE, getHeaders]);
@@ -578,57 +581,58 @@ export default function AIAllInOneVivaPage({ children }) {
   // MODAL RENDER FUNCTION
   // ==========================================
   const renderModals = () => {
-    return (
+    if (!isClient) return null;
+    return createPortal(
       <>
         {/* 1. Add/Edit Question Modal */}
         {modalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div className="bg-[#111625] border border-[var(--border-primary)] w-full max-w-xl rounded-2xl p-6 space-y-4">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/30 backdrop-blur-md">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-xl rounded-2xl p-6 space-y-4 shadow-xl">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-bold text-slate-200">{editingId ? "Edit Question" : "Add New Question"}</h3>
-                <button onClick={closeModal} className="p-1 hover:bg-[var(--bg-hover)] rounded"><X size={18} /></button>
+                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">{editingId ? "Edit Question" : "Add New Question"}</h3>
+                <button onClick={closeModal} className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded text-slate-500"><X size={18} /></button>
               </div>
-              {formError && <div className="p-3 bg-rose-500/10 border border-[var(--border-primary)] border-rose-500/20 text-rose-400 text-xs rounded-xl">{formError}</div>}
+              {formError && <div className="p-3 bg-rose-50 border border-rose-200 text-rose-600 text-xs rounded-xl">{formError}</div>}
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Question Text *</label>
-                  <textarea rows={3} value={form.questionText} onChange={e => setForm({...form, questionText: e.target.value})} className="w-full bg-[#161B2B] text-slate-200 border border-[var(--border-primary)] rounded-xl p-3 text-sm focus:border-zinc-500 outline-none resize-none" placeholder="Enter question..." />
+                  <label className="block text-xs font-bold text-slate-500 mb-1">Question Text *</label>
+                  <textarea rows={3} value={form.questionText} onChange={e => setForm({...form, questionText: e.target.value})} className="w-full bg-zinc-50 dark:bg-zinc-900 text-slate-800 dark:text-slate-200 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-sm focus:border-zinc-500 outline-none resize-none" placeholder="Enter question..." />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Subject Folder *</label>
-                    <select value={form.subject} onChange={e => setForm({...form, subject: e.target.value})} className="w-full bg-[#161B2B] text-slate-200 border border-[var(--border-primary)] rounded-xl p-3 text-sm outline-none">
+                    <label className="block text-xs font-bold text-slate-500 mb-1">Subject Folder *</label>
+                    <select value={form.subject} onChange={e => setForm({...form, subject: e.target.value})} className="w-full bg-zinc-50 dark:bg-zinc-900 text-slate-800 dark:text-slate-200 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-sm outline-none">
                       <option value="">Select Folder</option>
                       {subjectNames.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Topic (Optional)</label>
-                    <input type="text" value={form.topic} onChange={e => setForm({...form, topic: e.target.value})} className="w-full bg-[#161B2B] text-slate-200 border border-[var(--border-primary)] rounded-xl p-3 text-sm outline-none" placeholder="e.g. Callbacks" />
+                    <label className="block text-xs font-bold text-zinc-500 mb-1">Topic (Optional)</label>
+                    <input type="text" value={form.topic} onChange={e => setForm({...form, topic: e.target.value})} className="w-full bg-zinc-50 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-zinc-200 dark:border-zinc-700 rounded-xl p-3 text-sm outline-none" placeholder="e.g. Callbacks" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Difficulty *</label>
+                  <label className="block text-xs font-bold text-zinc-500 mb-1">Difficulty *</label>
                   <div className="flex gap-2">
                     {DIFFICULTIES.map(d => (
-                      <button type="button" key={d} onClick={() => setForm({...form, difficulty: d})} className={`flex-1 py-2 rounded-xl text-xs font-bold border border-[var(--border-primary)] transition-all ${form.difficulty === d ? "bg-[var(--accent-primary)] text-[var(--text-on-accent)] border-transparent" : "border-[var(--border-primary)] text-[var(--text-muted)]"}`}>
+                      <button type="button" key={d} onClick={() => setForm({...form, difficulty: d})} className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all ${form.difficulty === d ? "bg-[var(--accent-primary)] text-[var(--text-on-accent)] border-transparent" : "border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800"}`}>
                         {d}
                       </button>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Expected Answer Keywords (comma separated) *</label>
-                  <input type="text" value={form.keywords} onChange={e => setForm({...form, keywords: e.target.value})} className="w-full bg-[#161B2B] text-slate-200 border border-[var(--border-primary)] rounded-xl p-3 text-sm outline-none" placeholder="e.g. scope, lexical, variables" />
+                  <label className="block text-xs font-bold text-zinc-500 mb-1">Expected Answer Keywords (comma separated) *</label>
+                  <input type="text" value={form.keywords} onChange={e => setForm({...form, keywords: e.target.value})} className="w-full bg-zinc-50 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-zinc-200 dark:border-zinc-700 rounded-xl p-3 text-sm outline-none" placeholder="e.g. scope, lexical, variables" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Detailed Rubric Expected Answer (Optional)</label>
-                  <textarea rows={2} value={form.expectedAnswer} onChange={e => setForm({...form, expectedAnswer: e.target.value})} className="w-full bg-[#161B2B] text-slate-200 border border-[var(--border-primary)] rounded-xl p-3 text-sm outline-none resize-none" placeholder="Provide complete context..." />
+                  <label className="block text-xs font-bold text-zinc-500 mb-1">Detailed Rubric Expected Answer (Optional)</label>
+                  <textarea rows={2} value={form.expectedAnswer} onChange={e => setForm({...form, expectedAnswer: e.target.value})} className="w-full bg-zinc-50 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-zinc-200 dark:border-zinc-700 rounded-xl p-3 text-sm outline-none resize-none" placeholder="Provide complete context..." />
                 </div>
               </div>
               <div className="flex gap-3 pt-2">
-                <button onClick={closeModal} className="flex-1 py-2.5 border border-[var(--border-primary)] rounded-xl text-sm text-[var(--text-muted)] font-bold hover:bg-[var(--bg-hover)]">Cancel</button>
-                <button onClick={handleSaveManual} disabled={formSaving} className="flex-1 py-2.5 bg-[var(--accent-primary)] hover:bg-zinc-700 font-bold text-sm text-[var(--text-primary)] rounded-xl">
+                <button onClick={closeModal} className="flex-1 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-500 font-bold hover:bg-zinc-50 dark:hover:bg-zinc-800">Cancel</button>
+                <button onClick={handleSaveManual} disabled={formSaving} className="flex-1 py-2.5 bg-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/90 font-bold text-sm text-[var(--text-primary)] rounded-xl">
                   {formSaving ? "Saving..." : "Save"}
                 </button>
               </div>
@@ -638,14 +642,14 @@ export default function AIAllInOneVivaPage({ children }) {
 
         {/* 2. Add Folder Modal */}
         {subjectModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div className="bg-[#111625] border border-[var(--border-primary)] w-full max-w-sm rounded-2xl p-6 space-y-4">
-              <h3 className="text-lg font-bold text-slate-200">Add Subject Folder</h3>
-              {subjectModalError && <div className="p-2 bg-rose-500/10 border border-[var(--border-primary)] border-rose-500/20 text-rose-400 text-xs rounded-lg">{subjectModalError}</div>}
-              <input type="text" value={newFolderSubjectName} onChange={e => setNewFolderSubjectName(e.target.value)} className="w-full bg-[#161B2B] text-slate-200 border border-[var(--border-primary)] rounded-xl p-3 text-sm outline-none" placeholder="Subject Name..." />
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/30 backdrop-blur-md">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-sm rounded-2xl p-6 space-y-4 shadow-xl">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Add Subject Folder</h3>
+              {subjectModalError && <div className="p-2 bg-rose-50 border border-rose-200 text-rose-600 text-xs rounded-lg">{subjectModalError}</div>}
+              <input type="text" value={newFolderSubjectName} onChange={e => setNewFolderSubjectName(e.target.value)} className="w-full bg-zinc-50 dark:bg-zinc-900 text-slate-800 dark:text-slate-200 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-sm outline-none" placeholder="Subject Name..." />
               <div className="flex gap-3">
-                <button onClick={() => setSubjectModalOpen(false)} className="flex-1 py-2 border border-[var(--border-primary)] rounded-xl text-xs text-[var(--text-muted)] font-bold hover:bg-[var(--bg-hover)]">Cancel</button>
-                <button onClick={handleCreateSubjectFolder} className="flex-1 py-2 bg-[var(--accent-primary)] hover:bg-zinc-700 font-bold text-xs text-[var(--text-primary)] rounded-xl">Create</button>
+                <button onClick={() => setSubjectModalOpen(false)} className="flex-1 py-2 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs text-zinc-500 font-bold hover:bg-zinc-50 dark:hover:bg-zinc-800">Cancel</button>
+                <button onClick={handleCreateSubjectFolder} className="flex-1 py-2 bg-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/90 font-bold text-xs text-[var(--text-primary)] rounded-xl">Create</button>
               </div>
             </div>
           </div>
@@ -653,10 +657,10 @@ export default function AIAllInOneVivaPage({ children }) {
 
         {/* 3. Delete Question Confirm */}
         {deleteTarget && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div className="bg-[#111625] border border-[var(--border-primary)] w-full max-w-sm rounded-2xl p-6 space-y-4">
-              <h3 className="text-lg font-bold text-slate-200">Delete Question</h3>
-              <p className="text-[var(--text-muted)] text-sm">Are you sure you want to delete: <span className="font-semibold text-slate-200">"{deleteTarget.questionText}"</span>?</p>
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/30 backdrop-blur-md">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-sm rounded-2xl p-6 space-y-4 shadow-xl">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Delete Question</h3>
+              <p className="text-slate-500 text-sm">Are you sure you want to delete: <span className="font-semibold text-slate-800 dark:text-slate-200">"{deleteTarget.questionText}"</span>?</p>
               <div className="flex gap-3">
                 <button onClick={() => setDeleteTarget(null)} className="flex-1 py-2 border border-[var(--border-primary)] rounded-xl text-xs font-bold text-[var(--text-muted)] hover:bg-[var(--bg-hover)]">Cancel</button>
                 <button onClick={handleDeleteQuestion} disabled={deleteLoading} className="flex-1 py-2 bg-rose-600 hover:bg-rose-700 font-bold text-xs text-[var(--text-primary)] rounded-xl">
@@ -669,10 +673,10 @@ export default function AIAllInOneVivaPage({ children }) {
 
         {/* 5. Delete PDF Confirm */}
         {pdfDeleteTarget && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div className="bg-[#111625] border border-[var(--border-primary)] w-full max-w-sm rounded-2xl p-6 space-y-4">
-              <h3 className="text-lg font-bold text-slate-200">Delete PDF Notes</h3>
-              <p className="text-[var(--text-muted)] text-sm">Are you sure you want to delete <span className="font-semibold text-slate-200">"{pdfDeleteTarget.title}"</span>?</p>
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/30 backdrop-blur-md">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-sm rounded-2xl p-6 space-y-4 shadow-xl">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Delete PDF Notes</h3>
+              <p className="text-slate-500 text-sm">Are you sure you want to delete <span className="font-semibold text-slate-800 dark:text-slate-200">"{pdfDeleteTarget.title}"</span>?</p>
               <div className="flex gap-3">
                 <button onClick={() => setPdfDeleteTarget(null)} className="flex-1 py-2 border border-[var(--border-primary)] rounded-xl text-xs font-bold text-[var(--text-muted)] hover:bg-[var(--bg-hover)]">Cancel</button>
                 <button onClick={handleDeletePdf} disabled={pdfDeleteLoading} className="flex-1 py-2 bg-rose-600 hover:bg-rose-700 font-bold text-xs text-[var(--text-primary)] rounded-xl">
@@ -685,10 +689,10 @@ export default function AIAllInOneVivaPage({ children }) {
 
         {/* 6. Schedule Viva Modal */}
         {scheduleOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-            <form onSubmit={handleScheduleSubmit} className="bg-[#111625] border border-[var(--border-primary)] w-full max-w-3xl rounded-2xl p-6 space-y-4 my-8">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/30 backdrop-blur-md overflow-y-auto">
+            <form onSubmit={handleScheduleSubmit} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-3xl rounded-2xl p-6 space-y-4 my-8 shadow-xl">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-bold text-slate-200 flex items-center gap-2"><Calendar className="w-5 h-5 text-[var(--text-primary)]" />{editingVivaId ? "Edit Viva Session" : "Schedule Viva Session"}</h3>
+                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2"><Calendar className="w-5 h-5 text-slate-500" />{editingVivaId ? "Edit Viva Session" : "Schedule Viva Session"}</h3>
                 <button type="button" onClick={() => setScheduleOpen(false)} className="p-1 hover:bg-[var(--bg-hover)] rounded"><X size={18} /></button>
               </div>
               {scheduleError && <div className="p-3 bg-rose-500/10 border border-[var(--border-primary)] border-rose-500/20 text-rose-400 text-xs rounded-xl">{scheduleError}</div>}
@@ -698,41 +702,43 @@ export default function AIAllInOneVivaPage({ children }) {
                 {/* Form Details */}
                 <div className="lg:col-span-2 space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Viva Title *</label>
-                    <input type="text" required value={scheduleTitle} onChange={e => setScheduleTitle(e.target.value)} className="w-full bg-[#161B2B] border border-[var(--border-primary)] rounded-xl p-3 text-sm outline-none" placeholder="e.g. JS Closures Final Exam" />
+                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 mb-1">Viva Title *</label>
+                    <input type="text" required value={scheduleTitle} onChange={e => setScheduleTitle(e.target.value)} className="w-full bg-zinc-50 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-zinc-200 dark:border-zinc-700 rounded-xl p-3 text-sm outline-none" placeholder="e.g. JS Closures Final Exam" />
                   </div>
                    <div>
-                     <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Select Subject *</label>
-                     <select required value={scheduleSubject} onChange={e => setScheduleSubject(e.target.value)} className="w-full bg-[#161B2B] border border-[var(--border-primary)] rounded-xl p-3 text-sm outline-none">
+                     <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 mb-1">Select Subject *</label>
+                     <select required value={scheduleSubject} onChange={e => setScheduleSubject(e.target.value)} className="w-full bg-zinc-50 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-zinc-200 dark:border-zinc-700 rounded-xl p-3 text-sm outline-none">
                        <option value="">Select Folder</option>
                        {subjectNames.map(s => <option key={s} value={s}>{s}</option>)}
                      </select>
                    </div>
                   <div>
-                    <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Description (Optional)</label>
-                    <textarea rows={2} value={scheduleDescription} onChange={e => setScheduleDescription(e.target.value)} className="w-full bg-[#161B2B] border border-[var(--border-primary)] rounded-xl p-3 text-sm outline-none resize-none" placeholder="Instructions..." />
+                    <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 mb-1">Description (Optional)</label>
+                    <textarea rows={2} value={scheduleDescription} onChange={e => setScheduleDescription(e.target.value)} className="w-full bg-zinc-50 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-zinc-200 dark:border-zinc-700 rounded-xl p-3 text-sm outline-none resize-none" placeholder="Instructions..." />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Start Time *</label>
-                      <input type="datetime-local" required value={scheduleStartTime} onChange={e => setScheduleStartTime(e.target.value)} className="w-full bg-[#161B2B] border border-[var(--border-primary)] rounded-xl p-3 text-xs outline-none" />
+                      <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 mb-1">Start Time *</label>
+                      <input type="datetime-local" required value={scheduleStartTime} onChange={e => setScheduleStartTime(e.target.value)} className="w-full bg-zinc-50 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-zinc-200 dark:border-zinc-700 rounded-xl p-3 text-xs outline-none" />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">End Time *</label>
-                      <input type="datetime-local" required value={scheduleEndTime} onChange={e => setScheduleEndTime(e.target.value)} className="w-full bg-[#161B2B] border border-[var(--border-primary)] rounded-xl p-3 text-xs outline-none" />
+                      <label className="block text-xs font-bold text-zinc-500 dark:text-zinc-400 mb-1">End Time *</label>
+                      <input type="datetime-local" required value={scheduleEndTime} onChange={e => setScheduleEndTime(e.target.value)} className="w-full bg-zinc-50 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-zinc-200 dark:border-zinc-700 rounded-xl p-3 text-xs outline-none" />
                     </div>
                   </div>
                 </div>
 
                 {/* Questions Picker */}
-                <div className="flex flex-col h-[320px] lg:h-[350px] border border-[var(--border-primary)] rounded-xl p-4 bg-[#0E1322]">
-                  <p className="text-xs font-bold text-[var(--text-muted)] mb-2 uppercase tracking-wider">Select Questions ({scheduleSelectedQuestions.length})</p>
+                <div className="flex flex-col h-[320px] lg:h-[350px] border border-zinc-200 dark:border-zinc-700 rounded-xl p-4 bg-zinc-50 dark:bg-zinc-800/50">
+                  <p className="text-xs font-bold text-zinc-500 mb-2 uppercase tracking-wider">Select Questions ({scheduleSelectedQuestions.length})</p>
                   <div className="flex-1 overflow-y-auto space-y-2 pr-1">
-                    {questions.length === 0 ? (
-                      <p className="text-slate-500 text-xs text-center py-10">No questions in bank.</p>
+                    {!scheduleSubject ? (
+                      <p className="text-zinc-400 text-xs text-center py-10">Select a subject to view available questions.</p>
+                    ) : questions.filter(q => q.subject.toLowerCase() === scheduleSubject.toLowerCase()).length === 0 ? (
+                      <p className="text-zinc-400 text-xs text-center py-10">No questions in this subject folder.</p>
                     ) : (
                       questions
-                        .filter(q => (!scheduleSubject || q.subject.toLowerCase() === scheduleSubject.toLowerCase()))
+                        .filter(q => q.subject.toLowerCase() === scheduleSubject.toLowerCase())
                         .map(q => {
                           const isSel = scheduleSelectedQuestions.includes(q.id);
                           return (
@@ -743,12 +749,12 @@ export default function AIAllInOneVivaPage({ children }) {
                                   prev.includes(q.id) ? prev.filter(id => id !== q.id) : [...prev, q.id]
                                 );
                               }}
-                              className={`p-2.5 rounded border border-[var(--border-primary)] text-left cursor-pointer transition-all select-none ${
-                                isSel ? "bg-emerald-500/10 border-emerald-500/50 outline outline-2 outline-emerald-500/30" : "bg-[#111625] border-[var(--border-primary)]/80 hover:border-[var(--border-primary)]"
+                              className={`p-2.5 rounded border text-left cursor-pointer transition-all select-none ${
+                                isSel ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500/50 outline outline-2 outline-emerald-500/30" : "bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-500"
                               }`}
                             >
-                              <span className="text-[9px] uppercase font-bold text-[var(--text-muted)]">{q.difficulty}</span>
-                              <p className="text-xs font-medium text-slate-200 mt-0.5 line-clamp-2">{q.questionText}</p>
+                              <span className="text-[9px] uppercase font-bold text-zinc-400">{q.difficulty}</span>
+                              <p className="text-xs font-medium text-slate-800 dark:text-slate-200 mt-0.5 line-clamp-2">{q.questionText}</p>
                             </div>
                           );
                         })
@@ -757,9 +763,9 @@ export default function AIAllInOneVivaPage({ children }) {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4 border-t border-[var(--border-primary)]/80">
-                <button type="button" onClick={() => setScheduleOpen(false)} className="flex-1 py-2.5 border border-[var(--border-primary)] rounded-xl text-sm text-[var(--text-muted)] font-bold hover:bg-[var(--bg-hover)]">Cancel</button>
-                <button type="submit" disabled={scheduleSubmitting} className="flex-1 py-2.5 bg-[var(--accent-gradient)] hover:brightness-110  font-bold text-sm text-[var(--text-primary)] rounded-xl">
+              <div className="flex gap-3 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                <button type="button" onClick={() => setScheduleOpen(false)} className="flex-1 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-slate-600 dark:text-zinc-400 font-bold hover:bg-zinc-50 dark:hover:bg-zinc-800">Cancel</button>
+                <button type="submit" disabled={scheduleSubmitting} className="flex-1 py-2.5 bg-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/90 border border-emerald-600 dark:border-emerald-400 font-bold text-sm text-white rounded-xl">
                   {scheduleSubmitting ? "Scheduling..." : "Schedule & Publish"}
                 </button>
               </div>
@@ -769,11 +775,11 @@ export default function AIAllInOneVivaPage({ children }) {
 
         {/* 7. PDF AI Question Extraction Main Modal */}
         {extractModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-            <div className="bg-[#111625] border border-[var(--border-primary)] w-full max-w-4xl rounded-2xl p-6 space-y-6 my-8">
-              <div className="flex justify-between items-center border-b border-[var(--border-primary)] pb-3">
-                <h3 className="text-lg font-bold text-slate-200 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-[var(--text-muted)]" />
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/30 backdrop-blur-md overflow-y-auto">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-4xl rounded-2xl p-6 space-y-6 my-8 shadow-xl">
+              <div className="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-3">
+                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-slate-500" />
                   AI Question Extractor
                 </h3>
                 <button type="button" onClick={() => setExtractModalOpen(false)} className="p-1 hover:bg-[var(--bg-hover)] rounded"><X size={18} /></button>
@@ -843,8 +849,8 @@ export default function AIAllInOneVivaPage({ children }) {
                 )}
               </div>
 
-              <div className="flex justify-end pt-3 border-t border-[var(--border-primary)]/80">
-                <button type="button" onClick={() => setExtractModalOpen(false)} className="px-4 py-2 border border-[var(--border-primary)] rounded-xl text-xs font-bold text-[var(--text-muted)] hover:bg-[var(--bg-hover)]">Close</button>
+              <div className="flex justify-end pt-3 border-t border-zinc-200 dark:border-zinc-800">
+                <button type="button" onClick={() => setExtractModalOpen(false)} className="px-4 py-2 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800">Close</button>
               </div>
             </div>
           </div>
@@ -852,33 +858,33 @@ export default function AIAllInOneVivaPage({ children }) {
 
         {/* 8. Upload PDF Modal */}
         {uploadOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <form onSubmit={handleUploadFile} className="bg-[#111625] border border-[var(--border-primary)] w-full max-w-md rounded-2xl p-6 space-y-4">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/30 backdrop-blur-md">
+            <form onSubmit={handleUploadFile} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-md rounded-2xl p-6 space-y-4 shadow-xl">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-bold text-slate-200">Upload PDF</h3>
-                <button type="button" onClick={() => setUploadOpen(false)} className="p-1 hover:bg-[var(--bg-hover)] rounded"><X size={18} /></button>
+                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Upload PDF</h3>
+                <button type="button" onClick={() => setUploadOpen(false)} className="p-1 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded text-slate-500"><X size={18} /></button>
               </div>
-              {uploadError && <div className="p-3 bg-rose-500/10 border border-[var(--border-primary)] border-rose-500/20 text-rose-400 text-xs rounded-xl">{uploadError}</div>}
+              {uploadError && <div className="p-3 bg-rose-50 border border-rose-200 text-rose-600 text-xs rounded-xl">{uploadError}</div>}
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Select PDF Document *</label>
-                  <input type="file" accept=".pdf" required onChange={e => setUploadFile(e.target.files[0])} className="w-full text-sm text-[var(--text-muted)] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[var(--accent-primary)] file:text-[var(--text-primary)] hover:file:bg-zinc-700 cursor-pointer" />
+                  <label className="block text-xs font-bold text-zinc-500 mb-1">Select PDF Document *</label>
+                  <input type="file" accept=".pdf" required onChange={e => setUploadFile(e.target.files[0])} className="w-full text-sm text-zinc-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[var(--accent-primary)] file:text-[var(--text-primary)] hover:file:bg-[var(--accent-primary)]/90 cursor-pointer" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Title *</label>
-                  <input type="text" required value={uploadTitle} onChange={e => setUploadTitle(e.target.value)} className="w-full bg-[#161B2B] border border-[var(--border-primary)] rounded-xl p-3 text-sm outline-none" placeholder="e.g. JavaScript Class Notes" />
+                  <label className="block text-xs font-bold text-zinc-500 mb-1">Title *</label>
+                  <input type="text" required value={uploadTitle} onChange={e => setUploadTitle(e.target.value)} className="w-full bg-zinc-50 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-zinc-200 dark:border-zinc-700 rounded-xl p-3 text-sm outline-none" placeholder="e.g. JavaScript Class Notes" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-1">Subject Folder *</label>
-                  <select required value={uploadSubject} onChange={e => setUploadSubject(e.target.value)} className="w-full bg-[#161B2B] border border-[var(--border-primary)] rounded-xl p-3 text-sm outline-none">
+                  <label className="block text-xs font-bold text-zinc-500 mb-1">Subject Folder *</label>
+                  <select required value={uploadSubject} onChange={e => setUploadSubject(e.target.value)} className="w-full bg-zinc-50 dark:bg-zinc-800 text-slate-800 dark:text-slate-200 border border-zinc-200 dark:border-zinc-700 rounded-xl p-3 text-sm outline-none">
                     <option value="">Select Folder</option>
                     {subjectNames.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
               </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setUploadOpen(false)} className="flex-1 py-2.5 border border-[var(--border-primary)] rounded-xl text-sm text-[var(--text-muted)] font-bold hover:bg-[var(--bg-hover)]">Cancel</button>
-                <button type="submit" disabled={uploading} className="flex-1 py-2.5 bg-[var(--accent-primary)] hover:bg-zinc-700 font-bold text-sm text-[var(--text-primary)] rounded-xl cursor-pointer">
+                <button type="button" onClick={() => setUploadOpen(false)} className="flex-1 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-500 font-bold hover:bg-zinc-50 dark:hover:bg-zinc-800">Cancel</button>
+                <button type="submit" disabled={uploading} className="flex-1 py-2.5 bg-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/90 font-bold text-sm text-[var(--text-primary)] rounded-xl cursor-pointer">
                   {uploading ? "Uploading..." : "Upload"}
                 </button>
               </div>
@@ -888,12 +894,12 @@ export default function AIAllInOneVivaPage({ children }) {
 
         {/* 9. Delete PDF Confirm */}
         {pdfDeleteTarget && (
-          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <div className="bg-[#111625] border border-[var(--border-primary)] w-full max-w-sm rounded-2xl p-6 space-y-4">
-              <h3 className="text-lg font-bold text-slate-200">Delete PDF Notes</h3>
-              <p className="text-[var(--text-muted)] text-sm">Are you sure you want to delete <span className="font-semibold text-slate-200">"{pdfDeleteTarget.title}"</span>?</p>
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/30 backdrop-blur-md">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 w-full max-w-sm rounded-2xl p-6 space-y-4 shadow-xl">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Delete PDF Notes</h3>
+              <p className="text-zinc-500 text-sm">Are you sure you want to delete <span className="font-semibold text-slate-800 dark:text-slate-200">"{pdfDeleteTarget.title}"</span>?</p>
               <div className="flex gap-3">
-                <button onClick={() => setPdfDeleteTarget(null)} className="flex-1 py-2 border border-[var(--border-primary)] rounded-xl text-xs font-bold text-[var(--text-muted)] hover:bg-[var(--bg-hover)] cursor-pointer">Cancel</button>
+                <button onClick={() => setPdfDeleteTarget(null)} className="flex-1 py-2 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer">Cancel</button>
                 <button onClick={handleDeletePdf} disabled={pdfDeleteLoading} className="flex-1 py-2 bg-rose-600 hover:bg-rose-700 font-bold text-xs text-[var(--text-primary)] rounded-xl cursor-pointer">
                   {pdfDeleteLoading ? "Deleting..." : "Delete"}
                 </button>
@@ -901,7 +907,8 @@ export default function AIAllInOneVivaPage({ children }) {
             </div>
           </div>
         )}
-      </>
+      </>,
+      document.body
     );
   };
 
@@ -1197,7 +1204,7 @@ export default function AIAllInOneVivaPage({ children }) {
                   setScheduleSuccess("");
                   setScheduleOpen(true);
                 }}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--accent-gradient)] hover:brightness-110  font-bold text-xs text-[var(--text-primary)] shadow transition-all cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/90 border border-emerald-600 dark:border-emerald-400 font-bold text-xs text-white shadow transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Schedule Viva</span>
