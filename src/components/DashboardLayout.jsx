@@ -1064,7 +1064,7 @@ function DashboardLayoutInner({ children }) {
         )}
 
         <main className={`flex-1 overflow-y-auto ${isLiveStudioMode ? 'bg-[var(--bg-primary)]' : ''}`}>
-          <div className={isLiveStudioMode || pathname.startsWith('/courses') || pathname.includes('/careers') ? "h-full flex flex-col min-h-0" : "max-w-7xl mx-auto p-6 md:p-8"}>
+          <div className={isLiveStudioMode || pathname.startsWith('/courses') ? "h-full flex flex-col min-h-0" : "max-w-7xl mx-auto p-6 md:p-8"}>
             {isFeatureBlocked ? <BlockedScreen /> : children}
           </div>
         </main>
