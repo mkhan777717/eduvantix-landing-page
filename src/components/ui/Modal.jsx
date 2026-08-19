@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import React, { useEffect } from "react";
 import { X } from "lucide-react";
 
 export default function Modal({
@@ -12,10 +11,7 @@ export default function Modal({
   maxWidth = "max-w-md",
   className = "",
 }) {
-  const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
-    setMounted(true);
     if (isOpen) {
       document.body.style.overflow = "hidden";
     } else {
@@ -26,9 +22,9 @@ export default function Modal({
     };
   }, [isOpen]);
 
-  if (!isOpen || !mounted) return null;
+  if (!isOpen) return null;
 
-  return createPortal(
+  return (
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
@@ -38,31 +34,26 @@ export default function Modal({
       
       {/* Modal Content */}
       <div 
-        className={`relative w-full ${maxWidth} bg-[var(--bg-card)] border border-[var(--border-primary)] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200 ${className}`}
+        className={`relative w-full ${maxWidth} bg-white dark:bg-[#0c0c0b] border border-black/5 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200 ${className}`}
       >
         {/* Header */}
-        {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-primary)]">
-            <h3 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
-              {title}
-            </h3>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
-              style={{ color: "var(--text-muted)" }}
-            >
-              <X size={18} />
-            </button>
-          </div>
-        )}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-black/5 dark:border-white/5">
+          <h3 className="text-xl font-serif font-bold text-slate-900 dark:text-slate-100 m-0">
+            {title}
+          </h3>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors"
+          >
+            <X size={18} />
+          </button>
+        </div>
         
         {/* Body */}
         <div className="p-6 overflow-y-auto max-h-[calc(100vh-10rem)]">
           {children}
         </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
 }
-

@@ -50,7 +50,7 @@ export default function ScheduleVivaPage() {
       const res = await fetch(`${API_BASE}/api/viva/scheduled`, { headers: getHeaders() });
       const data = await res.json();
       if (data.success) {
-        setVivas(data.data || data.vivas || []);
+        setVivas(data.vivas);
       } else {
         setError(data.message || "Failed to load Vivas.");
       }
