@@ -2,11 +2,12 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import Modal from "@/components/ui/Modal";
 import {
   Briefcase, Plus, Edit3, Trash2, Search, Eye, Download, X, Loader2,
   CheckCircle2, XCircle, Clock, AlertTriangle, FileText, ExternalLink,
   Users, MapPin, ChevronDown, Globe, Building2, RefreshCw, Send, Mail,
-  LayoutList, Settings2, ToggleLeft, ToggleRight, ArrowUpRight, Flame
+  LayoutList, Settings2, ToggleLeft, ToggleRight, ArrowUpRight, Flame, Save
 } from "lucide-react";
 
 // ─── Status Badge Config (reused from job-assistance pattern) ─────────────────
@@ -109,15 +110,16 @@ export default function AdminCareersPage() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  // Job Form Modal
-  const [showJobForm, setShowJobForm] = useState(false);
+  // Job Form Modal State
+  const [showJobModal, setShowJobModal] = useState(false);
+  const closeJobModal = () => setShowJobModal(false);
   const [editingJob, setEditingJob] = useState(null);
   const [jobForm, setJobForm] = useState({
     title: "", department: "", location: "Remote", type: "FULL_TIME",
     experience: "", description: "", requirements: "", responsibilities: "", skills: ""
   });
 
-  // Application Review Modal
+  // Application Review Modal State
   const [selectedApp, setSelectedApp] = useState(null);
   const [reviewMode, setReviewMode] = useState(false);
   const [newStatus, setNewStatus] = useState("REVIEWED");
@@ -195,7 +197,7 @@ export default function AdminCareersPage() {
   const openAddJob = () => {
     setEditingJob(null);
     setJobForm({ title: "", department: "", location: "Remote", type: "FULL_TIME", experience: "", description: "", requirements: "", responsibilities: "", skills: "" });
-    setShowJobForm(true);
+    setShowJobModal(true);
   };
 
   const openEditJob = (job) => {
@@ -207,7 +209,7 @@ export default function AdminCareersPage() {
       responsibilities: (job.responsibilities || []).join("\n"),
       skills: (job.skills || []).join(", ")
     });
-    setShowJobForm(true);
+    setShowJobModal(true);
   };
 
   const handleJobSave = async () => {
@@ -238,7 +240,7 @@ export default function AdminCareersPage() {
 
       await fetchAdminJobs();
       showFeedback(editingJob ? "Job updated successfully." : "Job posted successfully! Students can now apply.");
-      setShowJobForm(false);
+      setShowJobModal(false);
     } catch (err) {
       showFeedback(err.message || "Failed to save job posting.", true);
     } finally {
@@ -267,7 +269,6 @@ export default function AdminCareersPage() {
   };
 
   const handleToggleHot = async (job) => {
-    // Optimistic update
     setJobs((prev) =>
       prev.map((j) => (j.id === job.id ? { ...j, isHot: !j.isHot } : j))
     );
@@ -278,7 +279,6 @@ export default function AdminCareersPage() {
       });
       const data = await res.json();
       if (!data.success) {
-        // Revert optimistic update on failure
         setJobs((prev) =>
           prev.map((j) => (j.id === job.id ? { ...j, isHot: job.isHot } : j))
         );
@@ -317,28 +317,6 @@ export default function AdminCareersPage() {
     setNewStatus(app.status === "PENDING" ? "REVIEWED" : app.status);
     setAdminNote(app.adminNote || "");
     setReviewMode(true);
-    setPreviewBlobUrl(null);
-
-    // Fetch candidate resume blob
-    if (app.id) {
-      setPreviewLoading(true);
-      const ext = (app.resumeFileName || "").split(".").pop().toLowerCase();
-      setPreviewFileType(ext === "docx" ? "docx" : "pdf");
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/careers/admin/applications/${app.id}/resume`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        if (res.ok) {
-          const blob = await res.blob();
-          const url = URL.createObjectURL(blob);
-          setPreviewBlobUrl(url);
-        }
-      } catch (err) {
-        console.warn("Failed fetching resume blob:", err);
-      } finally {
-        setPreviewLoading(false);
-      }
-    }
   };
 
   const handleStatusUpdate = async (shouldSendEmail = false) => {
@@ -459,7 +437,6 @@ export default function AdminCareersPage() {
     }
   };
 
-  // ── Stats ──────────────────────────────────────────────────────────────────
   const stats = {
     totalJobs: jobs.length,
     activeJobs: jobs.filter((j) => j.isActive).length,
@@ -473,7 +450,6 @@ export default function AdminCareersPage() {
 
   return (
     <div className="w-full animate-fade-in space-y-8 pb-12">
-      {/* ── Feedback Toasts ── */}
       {(success || error) && (
         <div className={`fixed top-5 right-5 z-[99999] flex items-center gap-3 px-5 py-3.5 rounded-2xl border shadow-2xl animate-in slide-in-from-top-4 fade-in duration-300`}
           style={{
@@ -485,7 +461,6 @@ export default function AdminCareersPage() {
         </div>
       )}
 
-      {/* ── Page Header ── */}
       <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b pb-6 mb-6 shrink-0 relative" style={{ borderColor: "var(--border-primary)" }}>
         <div className="space-y-2">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight" style={{ color: "var(--text-primary)", fontFamily: "var(--font-title)" }}>
@@ -507,7 +482,6 @@ export default function AdminCareersPage() {
         )}
       </section>
 
-      {/* ── Stats Row ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {[
           { label: "Total Jobs", value: stats.totalJobs, color: "#3b82f6" },
@@ -524,7 +498,6 @@ export default function AdminCareersPage() {
         ))}
       </div>
 
-      {/* ── Tab Switcher ── */}
       <div className="flex items-center gap-1 p-1 rounded-xl border w-fit" style={{ borderColor: "var(--border-primary)", backgroundColor: "var(--bg-secondary)" }}>
         {[
           { key: "jobs", label: "Job Postings", icon: Briefcase },
@@ -545,9 +518,6 @@ export default function AdminCareersPage() {
         ))}
       </div>
 
-      {/* ══════════════════════════════════════
-            TAB: JOB POSTINGS
-        ══════════════════════════════════════ */}
       {activeTab === "jobs" && (
         <div className="space-y-3">
           {jobs.length === 0 ? (
@@ -584,9 +554,7 @@ export default function AdminCareersPage() {
                         <p className="text-[11px] mt-0.5" style={{ color: "var(--text-muted)" }}>{job.department}</p>
                       </div>
                     </div>
-                    {/* Active toggle + Hot toggle */}
                     <div className="flex items-center gap-2">
-                      {/* 🔥 Hot / Priority toggle */}
                       <button
                         onClick={() => handleToggleHot(job)}
                         title={job.isHot ? "Remove from Priority" : "Mark as Priority (max 3)"}
@@ -601,7 +569,6 @@ export default function AdminCareersPage() {
                         {job.isHot ? "Priority" : "Set Hot"}
                       </button>
 
-                      {/* Active toggle */}
                       <button
                         onClick={() => handleToggleJob(job)}
                         className="flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer"
@@ -617,7 +584,6 @@ export default function AdminCareersPage() {
                     </div>
                   </div>
 
-                  {/* Meta */}
                   <div className="flex items-center gap-3 flex-wrap mb-3">
                     <span className="flex items-center gap-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
                       {job.location === "Remote" ? <Globe size={11} /> : <Building2 size={11} />}
@@ -636,7 +602,6 @@ export default function AdminCareersPage() {
                     </span>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex items-center gap-2 pt-2 border-t" style={{ borderColor: "var(--border-primary)" }}>
                     <button
                       onClick={() => openEditJob(job)}
@@ -667,12 +632,8 @@ export default function AdminCareersPage() {
         </div>
       )}
 
-      {/* ══════════════════════════════════════
-            TAB: APPLICATIONS
-        ══════════════════════════════════════ */}
       {activeTab === "applications" && (
         <div className="space-y-4">
-          {/* Search + Filters */}
           <div className="flex flex-col sm:flex-row gap-3 flex-wrap">
             <div className="relative flex-1 min-w-[200px]">
               <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }} />
@@ -686,7 +647,6 @@ export default function AdminCareersPage() {
               />
             </div>
 
-            {/* Status filter */}
             <div className="relative">
               <select
                 value={filterStatus}
@@ -702,7 +662,6 @@ export default function AdminCareersPage() {
               <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }} />
             </div>
 
-            {/* Job filter */}
             <div className="relative">
               <select
                 value={filterJob}
@@ -716,7 +675,6 @@ export default function AdminCareersPage() {
             </div>
           </div>
 
-          {/* Applications Table */}
           <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "var(--border-primary)" }}>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -750,30 +708,21 @@ export default function AdminCareersPage() {
                           backgroundColor: idx % 2 === 0 ? "var(--bg-card)" : "var(--bg-secondary)"
                         }}
                       >
-                        {/* Applicant */}
                         <td className="px-4 py-3">
                           <div>
                             <p className="text-xs font-bold" style={{ color: "var(--text-primary)" }}>{app.applicantName}</p>
                             <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>{app.email}</p>
                           </div>
                         </td>
-
-                        {/* Job */}
                         <td className="px-4 py-3">
                           <p className="text-xs font-semibold" style={{ color: "var(--text-secondary)" }}>{app.jobTitle}</p>
                         </td>
-
-                        {/* Contact */}
                         <td className="px-4 py-3">
                           <p className="text-[10px] font-mono" style={{ color: "var(--text-muted)" }}>{app.mobile}</p>
                         </td>
-
-                        {/* Date */}
                         <td className="px-4 py-3">
                           <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>{app.appliedAt}</p>
                         </td>
-
-                        {/* Status Badge */}
                         <td className="px-4 py-3">
                           <span
                             className="px-2 py-0.5 rounded-lg text-[10px] font-bold border whitespace-nowrap"
@@ -782,8 +731,6 @@ export default function AdminCareersPage() {
                             {st.label}
                           </span>
                         </td>
-
-                        {/* Resume Column (Matching Job Assistance) */}
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1.5 whitespace-nowrap">
                             <button
@@ -801,8 +748,6 @@ export default function AdminCareersPage() {
                             </button>
                           </div>
                         </td>
-
-                        {/* Actions (Right Aligned) */}
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center justify-end gap-2 whitespace-nowrap">
                             <button
@@ -812,7 +757,6 @@ export default function AdminCareersPage() {
                             >
                               <Eye size={12} /> Review
                             </button>
-
                             <button
                               onClick={() => handleSendStatusEmailOnly(app)}
                               disabled={actionLoading === `send-email-${app.id}`}
@@ -830,7 +774,6 @@ export default function AdminCareersPage() {
               </table>
             </div>
           </div>
-
           <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>
             Showing {filteredApps.length} of {applications.length} applications
           </p>
@@ -838,285 +781,250 @@ export default function AdminCareersPage() {
       )}
 
       {/* ══════════════════════════════════════
-          JOB FORM MODAL
-      ══════════════════════════════════════ */}
-      {showJobForm && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setShowJobForm(false)}>
-          <div
-            className="w-full max-w-2xl rounded-2xl border shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
-            style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "var(--border-primary)" }}>
-              <h3 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
-                {editingJob ? "Edit Job Posting" : "Post New Job"}
-              </h3>
-              <button onClick={() => setShowJobForm(false)} className="p-1.5 rounded-lg hover:bg-[var(--bg-hover)] cursor-pointer" style={{ color: "var(--text-muted)" }}>
-                <X size={16} />
-              </button>
-            </div>
-
-            <div className="px-6 py-5 space-y-4 max-h-[75vh] overflow-y-auto">
-              {/* Title + Department */}
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: "Job Title *", key: "title", placeholder: "e.g. Full Stack Developer" },
-                  { label: "Department *", key: "department", placeholder: "e.g. Engineering" },
-                ].map(({ label, key, placeholder }) => (
-                  <div key={key} className="space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>{label}</label>
-                    <input
-                      type="text"
-                      value={jobForm[key]}
-                      onChange={(e) => setJobForm((p) => ({ ...p, [key]: e.target.value }))}
-                      placeholder={placeholder}
-                      className="w-full px-3 py-2.5 rounded-xl border text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] transition-all"
-                      style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {/* Location + Type */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>Location Type</label>
-                  <div className="relative">
-                    <select
-                      value={jobForm.location}
-                      onChange={(e) => setJobForm((p) => ({ ...p, location: e.target.value }))}
-                      className="w-full px-3 pr-8 py-2.5 rounded-xl border text-xs appearance-none cursor-pointer focus:outline-none"
-                      style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
-                    >
-                      <option value="Remote">Remote</option>
-                      <option value="Onsite">Onsite</option>
-                    </select>
-                    <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }} />
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>Job Type</label>
-                  <div className="relative">
-                    <select
-                      value={jobForm.type}
-                      onChange={(e) => setJobForm((p) => ({ ...p, type: e.target.value }))}
-                      className="w-full px-3 pr-8 py-2.5 rounded-xl border text-xs appearance-none cursor-pointer focus:outline-none"
-                      style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
-                    >
-                      <option value="FULL_TIME">Full-time</option>
-                      <option value="INTERNSHIP">Internship</option>
-                      <option value="PART_TIME">Part-time</option>
-                    </select>
-                    <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Experience + Skills */}
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: "Experience Range", key: "experience", placeholder: "e.g. 2-4 years" },
-                  { label: "Skills (comma-separated)", key: "skills", placeholder: "e.g. React, Node.js, AWS" },
-                ].map(({ label, key, placeholder }) => (
-                  <div key={key} className="space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>{label}</label>
-                    <input
-                      type="text"
-                      value={jobForm[key]}
-                      onChange={(e) => setJobForm((p) => ({ ...p, [key]: e.target.value }))}
-                      placeholder={placeholder}
-                      className="w-full px-3 py-2.5 rounded-xl border text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] transition-all"
-                      style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {/* Description */}
-              {[
-                { label: "Job Description", key: "description", placeholder: "Describe the role and what they'll be doing...", rows: 3 },
-                { label: "Requirements (one per line)", key: "requirements", placeholder: "3+ years React experience\nStrong problem-solving skills", rows: 3 },
-                { label: "Responsibilities (one per line)", key: "responsibilities", placeholder: "Build and maintain web apps\nParticipate in code reviews", rows: 3 },
-              ].map(({ label, key, placeholder, rows }) => (
-                <div key={key} className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>{label}</label>
-                  <textarea
-                    value={jobForm[key]}
-                    onChange={(e) => setJobForm((p) => ({ ...p, [key]: e.target.value }))}
-                    placeholder={placeholder}
-                    rows={rows}
-                    className="w-full px-3 py-2.5 rounded-xl border text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] transition-all resize-none"
-                    style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
-                  />
-                </div>
-              ))}
-
-              {/* Save Button */}
-              <button
-                onClick={handleJobSave}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-white transition-all hover:opacity-90 active:scale-95 cursor-pointer shadow-md"
-                style={{ background: "var(--accent-gradient)" }}
-              >
-                <Send size={13} />
-                {editingJob ? "Save Changes" : "Post Job"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════
-          APPLICATION REVIEW DRAWER
-      ══════════════════════════════════════ */}
-      {reviewMode && selectedApp && (
-        <div className="fixed inset-0 z-[9990] flex" onClick={() => { setReviewMode(false); setSelectedApp(null); }}>
-          <div className="flex-1" />
-          <div
-            className="w-full max-w-lg h-full overflow-y-auto shadow-2xl animate-in slide-in-from-right duration-300"
-            style={{ backgroundColor: "var(--bg-card)", borderLeft: "1px solid var(--border-primary)" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 border-b"
-              style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
-              <div>
-                <h3 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>Review Application</h3>
-                <p className="text-[10px] mt-0.5" style={{ color: "var(--text-muted)" }}>{selectedApp.jobTitle}</p>
-              </div>
-              <button onClick={() => { setReviewMode(false); setSelectedApp(null); }}
-                className="p-1.5 rounded-lg hover:bg-[var(--bg-hover)] cursor-pointer" style={{ color: "var(--text-muted)" }}>
-                <X size={16} />
-              </button>
-            </div>
-
-            <div className="p-5 space-y-5">
-              {/* Applicant Info */}
-              <div className="p-4 rounded-2xl border space-y-2.5" style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border-primary)" }}>
-                <h4 className="text-xs font-black uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Applicant Info</h4>
-                {[
-                  { label: "Name", value: selectedApp.applicantName },
-                  { label: "Email", value: selectedApp.email },
-                  { label: "Mobile", value: selectedApp.mobile },
-                  { label: "Applied On", value: selectedApp.appliedAt },
-                  { label: "Role", value: selectedApp.jobTitle },
-                ].map(({ label, value }) => (
-                  <div key={label} className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold" style={{ color: "var(--text-muted)" }}>{label}</span>
-                    <span className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>{value}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Cover Note */}
-              {selectedApp.coverNote && (
-                <div className="space-y-1.5">
-                  <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Cover Note</p>
-                  <p className="text-xs leading-relaxed p-3 rounded-xl border italic"
-                    style={{ color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)", borderColor: "var(--border-primary)" }}>
-                    "{selectedApp.coverNote}"
-                  </p>
-                </div>
-              )}
-
-              {/* Resume Preview Area */}
-              <div className="space-y-2">
-                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Resume</p>
-                <div className="p-4 rounded-xl border flex items-center justify-between"
-                  style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border-primary)" }}>
-                  <div className="flex items-center gap-2">
-                    <FileText size={16} style={{ color: "var(--accent-primary)" }} />
-                    <div>
-                      <p className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>{selectedApp.resumeFileName}</p>
-                      <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>Resume document</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <button
-                      onClick={() => handleOpenResumePreview(selectedApp)}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold border cursor-pointer hover:bg-[var(--bg-hover)] transition-all"
-                      style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
-                    >
-                      <Eye size={11} /> Preview
-                    </button>
-                    <button
-                      onClick={() => handleDownloadResume(selectedApp)}
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer text-white transition-all hover:opacity-90"
-                      style={{ backgroundColor: "var(--accent-primary)" }}
-                    >
-                      <Download size={11} /> Download
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status Update */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Update Status</p>
-                  <button
-                    onClick={handleSendStatusEmailOnly}
-                    disabled={actionLoading === "send-email"}
-                    className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    <Mail size={12} /> {actionLoading === "send-email" ? "Sending..." : "Send Status Email Now"}
-                  </button>
-                </div>
-                <div className="relative">
-                  <select
-                    value={newStatus}
-                    onChange={(e) => setNewStatus(e.target.value)}
-                    className="w-full px-3 pr-8 py-2.5 rounded-xl border text-xs font-semibold appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
-                    style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
-                  >
-                    {Object.entries(APP_STATUS).map(([k, v]) => (
-                      <option key={k} value={k}>{v.label}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }} />
-                </div>
-              </div>
-
-              {/* Admin Note */}
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>
-                  Internal Note <span className="text-[9px] font-normal">(optional)</span>
-                </label>
-                <textarea
-                  value={adminNote}
-                  onChange={(e) => setAdminNote(e.target.value)}
-                  placeholder="Add notes about this applicant for your team..."
-                  rows={3}
-                  className="w-full px-3 py-2.5 rounded-xl border text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] resize-none transition-all"
+            ADD / EDIT JOB MODAL
+        ══════════════════════════════════════ */}
+      <Modal 
+        isOpen={showJobModal} 
+        onClose={closeJobModal} 
+        title={editingJob ? "Edit Job Posting" : "Post New Job"}
+        maxWidth="max-w-2xl"
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: "Job Title *", key: "title", placeholder: "e.g. Full Stack Developer" },
+              { label: "Department *", key: "department", placeholder: "e.g. Engineering" },
+            ].map(({ label, key, placeholder }) => (
+              <div key={key} className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>{label}</label>
+                <input
+                  type="text"
+                  value={jobForm[key]}
+                  onChange={(e) => setJobForm((p) => ({ ...p, [key]: e.target.value }))}
+                  placeholder={placeholder}
+                  className="w-full px-3 py-2.5 rounded-xl border text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] transition-all"
                   style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
                 />
               </div>
+            ))}
+          </div>
 
-              {/* Update Buttons */}
-              <div className="grid grid-cols-2 gap-2 pt-2">
-                <button
-                  onClick={() => handleStatusUpdate(false)}
-                  disabled={actionLoading === "review"}
-                  className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider border cursor-pointer hover:bg-[var(--bg-hover)] transition-all"
-                  style={{ borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>Location Type</label>
+              <div className="relative">
+                <select
+                  value={jobForm.location}
+                  onChange={(e) => setJobForm((p) => ({ ...p, location: e.target.value }))}
+                  className="w-full px-3 pr-8 py-2.5 rounded-xl border text-xs appearance-none cursor-pointer focus:outline-none"
+                  style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
                 >
-                  <CheckCircle2 size={13} />
-                  Save Status
-                </button>
-                <button
-                  onClick={() => handleStatusUpdate(true)}
-                  disabled={actionLoading === "review"}
-                  className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-white transition-all hover:opacity-90 active:scale-95 cursor-pointer shadow-md"
-                  style={{ background: "var(--accent-gradient)" }}
+                  <option value="Remote">Remote</option>
+                  <option value="Onsite">Onsite</option>
+                </select>
+                <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>Job Type</label>
+              <div className="relative">
+                <select
+                  value={jobForm.type}
+                  onChange={(e) => setJobForm((p) => ({ ...p, type: e.target.value }))}
+                  className="w-full px-3 pr-8 py-2.5 rounded-xl border text-xs appearance-none cursor-pointer focus:outline-none"
+                  style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
                 >
-                  <Mail size={13} />
-                  Save & Send Email
-                </button>
+                  <option value="FULL_TIME">Full-time</option>
+                  <option value="INTERNSHIP">Internship</option>
+                  <option value="PART_TIME">Part-time</option>
+                </select>
+                <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }} />
               </div>
             </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: "Experience Range", key: "experience", placeholder: "e.g. 2-4 years" },
+              { label: "Skills (comma-separated)", key: "skills", placeholder: "e.g. React, Node.js, AWS" },
+            ].map(({ label, key, placeholder }) => (
+              <div key={key} className="space-y-1.5">
+                <label className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>{label}</label>
+                <input
+                  type="text"
+                  value={jobForm[key]}
+                  onChange={(e) => setJobForm((p) => ({ ...p, [key]: e.target.value }))}
+                  placeholder={placeholder}
+                  className="w-full px-3 py-2.5 rounded-xl border text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] transition-all"
+                  style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
+                />
+              </div>
+            ))}
+          </div>
+
+          {[
+            { label: "Job Description", key: "description", placeholder: "Describe the role and what they'll be doing...", rows: 3 },
+            { label: "Requirements (one per line)", key: "requirements", placeholder: "3+ years React experience\nStrong problem-solving skills", rows: 3 },
+            { label: "Responsibilities (one per line)", key: "responsibilities", placeholder: "Build and maintain web apps\nParticipate in code reviews", rows: 3 },
+          ].map(({ label, key, placeholder, rows }) => (
+            <div key={key} className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>{label}</label>
+              <textarea
+                value={jobForm[key]}
+                onChange={(e) => setJobForm((p) => ({ ...p, [key]: e.target.value }))}
+                placeholder={placeholder}
+                rows={rows}
+                className="w-full px-3 py-2.5 rounded-xl border text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] transition-all resize-none"
+                style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
+              />
+            </div>
+          ))}
+
+          <button
+            onClick={handleJobSave}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-white transition-all hover:opacity-90 active:scale-95 cursor-pointer shadow-md"
+            style={{ background: "var(--accent-gradient)" }}
+          >
+            <Send size={13} />
+            {editingJob ? "Save Changes" : "Post Job"}
+          </button>
         </div>
-      )}
+      </Modal>
+
+      {/* ══════════════════════════════════════
+          APPLICATION REVIEW DRAWER (converted to Modal)
+      ══════════════════════════════════════ */}
+      <Modal 
+        isOpen={reviewMode && selectedApp} 
+        onClose={() => { setReviewMode(false); setSelectedApp(null); }}
+        title={`Review: ${selectedApp?.jobTitle}`}
+        maxWidth="max-w-2xl"
+      >
+        {selectedApp && (
+          <div className="space-y-5">
+            <div className="p-4 rounded-2xl border space-y-2.5" style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border-primary)" }}>
+              <h4 className="text-xs font-black uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Applicant Info</h4>
+              {[
+                { label: "Name", value: selectedApp.applicantName },
+                { label: "Email", value: selectedApp.email },
+                { label: "Mobile", value: selectedApp.mobile },
+                { label: "Applied On", value: selectedApp.appliedAt },
+                { label: "Role", value: selectedApp.jobTitle },
+              ].map(({ label, value }) => (
+                <div key={label} className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold" style={{ color: "var(--text-muted)" }}>{label}</span>
+                  <span className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>{value}</span>
+                </div>
+              ))}
+            </div>
+
+            {selectedApp.coverNote && (
+              <div className="space-y-1.5">
+                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Cover Note</p>
+                <p className="text-xs leading-relaxed p-3 rounded-xl border italic"
+                  style={{ color: "var(--text-secondary)", backgroundColor: "var(--bg-secondary)", borderColor: "var(--border-primary)" }}>
+                  "{selectedApp.coverNote}"
+                </p>
+              </div>
+            )}
+
+            {/* Resume Preview Area */}
+            <div className="space-y-2">
+              <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Resume</p>
+              <div className="p-4 rounded-xl border flex items-center justify-between"
+                style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border-primary)" }}>
+                <div className="flex items-center gap-2">
+                  <FileText size={16} style={{ color: "var(--accent-primary)" }} />
+                  <div>
+                    <p className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>{selectedApp.resumeFileName}</p>
+                    <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>Resume document</p>
+                  </div>
+                </div>
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={() => handleOpenResumePreview(selectedApp)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold border cursor-pointer hover:bg-[var(--bg-hover)] transition-all"
+                    style={{ borderColor: "var(--border-primary)", color: "var(--text-secondary)" }}
+                  >
+                    <Eye size={11} /> Preview
+                  </button>
+                  <button
+                    onClick={() => handleDownloadResume(selectedApp)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer text-white transition-all hover:opacity-90"
+                    style={{ backgroundColor: "var(--accent-primary)" }}
+                  >
+                    <Download size={11} /> Download
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Status Update */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Update Status</p>
+                <button
+                  onClick={() => handleSendStatusEmailOnly(selectedApp)}
+                  disabled={actionLoading === `send-email-${selectedApp.id}`}
+                  className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <Mail size={12} /> {actionLoading === `send-email-${selectedApp.id}` ? "Sending..." : "Send Status Email Now"}
+                </button>
+              </div>
+              <div className="relative">
+                <select
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  className="w-full px-3 pr-8 py-2.5 rounded-xl border text-xs font-semibold appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)]"
+                  style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
+                >
+                  {Object.entries(APP_STATUS).map(([k, v]) => (
+                    <option key={k} value={k}>{v.label}</option>
+                  ))}
+                </select>
+                <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "var(--text-muted)" }} />
+              </div>
+            </div>
+
+            {/* Admin Note */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold uppercase tracking-wider block" style={{ color: "var(--text-muted)" }}>
+                Internal Note <span className="text-[9px] font-normal">(optional)</span>
+              </label>
+              <textarea
+                value={adminNote}
+                onChange={(e) => setAdminNote(e.target.value)}
+                placeholder="Add notes about this applicant for your team..."
+                rows={3}
+                className="w-full px-3 py-2.5 rounded-xl border text-xs focus:outline-none focus:ring-1 focus:ring-[var(--accent-primary)] resize-none transition-all"
+                style={{ backgroundColor: "var(--bg-input)", borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
+              />
+            </div>
+
+            {/* Update Buttons */}
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              <button
+                onClick={() => handleStatusUpdate(false)}
+                disabled={actionLoading === "review"}
+                className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider border cursor-pointer hover:bg-[var(--bg-hover)] transition-all"
+                style={{ borderColor: "var(--border-primary)", color: "var(--text-primary)" }}
+              >
+                {actionLoading === "review" ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
+                Save Only
+              </button>
+              <button
+                onClick={() => handleStatusUpdate(true)}
+                disabled={actionLoading === "review"}
+                className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider text-white transition-all hover:opacity-90 active:scale-95 cursor-pointer shadow-md"
+                style={{ backgroundColor: "var(--accent-primary)" }}
+              >
+                {actionLoading === "review" ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
+                Save & Email
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* ─── Resume Preview Modal (Matching Job Assistance Pattern) ─── */}
       {showPreviewModal && previewApp && (

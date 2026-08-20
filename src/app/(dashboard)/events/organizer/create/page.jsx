@@ -127,18 +127,7 @@ export default function CreateEventPage() {
             />
           </div>
 
-          <div className="space-y-3">
-            <label className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider">Event Type</label>
-            <select 
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-              className="w-full bg-[var(--bg-hover)] border border-[var(--border-primary)] rounded-xl px-4 py-3 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-primary)] transition-colors"
-            >
-              <option value="INSTITUTE">Institute Only</option>
-              <option value="GLOBAL">Global</option>
-            </select>
-          </div>
+
 
           <div className="space-y-3">
             <label className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider">Max Capacity</label>
