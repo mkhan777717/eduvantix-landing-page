@@ -36,15 +36,15 @@ export default function CareerModeToggle() {
         title="Upgrade to Eduvantix Pro"
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all hover:scale-[1.02] cursor-pointer"
         style={{
-          background: "linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(168,85,247,0.1) 100%)",
-          border: "1px solid rgba(124,58,237,0.25)",
-          color: "#a855f7",
+          background: "var(--pro-accent-glow)",
+          border: "1px solid var(--pro-border-subtle)",
+          color: "var(--pro-accent-primary)",
         }}
         onMouseEnter={e => {
-          e.currentTarget.style.background = "linear-gradient(135deg, rgba(124,58,237,0.25) 0%, rgba(168,85,247,0.18) 100%)";
+          e.currentTarget.style.background = "var(--pro-bg-surface-sunken)";
         }}
         onMouseLeave={e => {
-          e.currentTarget.style.background = "linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(168,85,247,0.1) 100%)";
+          e.currentTarget.style.background = "var(--pro-accent-glow)";
         }}
       >
         <Sparkles size={12} />
@@ -60,9 +60,10 @@ export default function CareerModeToggle() {
         title="Switch to Learning Mode"
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all hover:scale-[1.02] cursor-pointer"
         style={{
-          background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
-          border: "1px solid rgba(124,58,237,0.5)",
+          background: "var(--pro-accent-gradient)",
+          border: "1px solid var(--pro-accent-primary)",
           color: "#fff",
+          boxShadow: "0 0 20px var(--accent-glow)"
         }}
       >
         <Zap size={12} className="fill-white" />
@@ -83,15 +84,15 @@ export default function CareerModeToggle() {
       title="Switch to Career Mode"
       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all hover:scale-[1.02] cursor-pointer"
       style={{
-        background: "linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(168,85,247,0.08) 100%)",
-        border: "1px solid rgba(124,58,237,0.2)",
-        color: "#a855f7",
+        background: "var(--pro-accent-glow)",
+        border: "1px solid var(--pro-border-subtle)",
+        color: "var(--pro-accent-primary)",
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.background = "linear-gradient(135deg, rgba(124,58,237,0.22) 0%, rgba(168,85,247,0.16) 100%)";
+        e.currentTarget.style.background = "var(--pro-bg-surface-sunken)";
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.background = "linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(168,85,247,0.08) 100%)";
+        e.currentTarget.style.background = "var(--pro-accent-glow)";
       }}
     >
       <Sparkles size={12} />

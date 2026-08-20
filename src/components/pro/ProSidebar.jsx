@@ -71,12 +71,12 @@ export default function ProSidebar({ collapsed = false }) {
   };
 
   return (
-    <div className="flex flex-col h-full" style={{ backgroundColor: "var(--bg-sidebar)" }}>
+    <div className="flex flex-col h-full" style={{ backgroundColor: "var(--pro-bg-surface)", borderColor: "var(--pro-border-subtle)" }}>
       {/* Header */}
       {!collapsed && (
         <div
           className="px-3 py-3 border-b"
-          style={{ borderColor: "var(--border-primary)" }}
+          style={{ borderColor: "var(--pro-border-subtle)" }}
         >
           <div className="flex items-center gap-2">
             <div
@@ -86,7 +86,7 @@ export default function ProSidebar({ collapsed = false }) {
               <Sparkles size={12} className="text-white" />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: "#a855f7" }}>
+              <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: "var(--pro-accent-primary)" }}>
                 Career Mode
               </p>
             </div>
@@ -100,8 +100,8 @@ export default function ProSidebar({ collapsed = false }) {
           <div key={section.label}>
             {!collapsed && (
               <p
-                className="px-3 mb-1 text-[8px] font-black uppercase tracking-widest"
-                style={{ color: "var(--text-muted)" }}
+                className="px-3 mb-1 text-[9px] font-bold uppercase tracking-[0.15em] font-mono"
+                style={{ color: "var(--pro-text-secondary)" }}
               >
                 {section.label}
               </p>
@@ -121,9 +121,10 @@ export default function ProSidebar({ collapsed = false }) {
                     }}
                     className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all relative group"
                     style={{
-                      color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-                      backgroundColor: isActive ? "rgba(124,58,237,0.12)" : "transparent",
+                      color: isActive ? "var(--pro-text-primary)" : "var(--text-secondary)",
+                      backgroundColor: isActive ? "var(--pro-bg-surface-sunken)" : "transparent",
                       fontWeight: isActive ? 600 : 400,
+                      opacity: item.comingSoon ? 0.6 : 1,
                     }}
                     onMouseEnter={e => {
                       if (!isActive) e.currentTarget.style.backgroundColor = "var(--bg-hover)";
@@ -134,26 +135,18 @@ export default function ProSidebar({ collapsed = false }) {
                   >
                     {isActive && (
                       <div
-                        className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full"
-                        style={{ background: "#a855f7" }}
+                        className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full"
+                        style={{ background: "var(--pro-accent-gradient)" }}
                       />
                     )}
                     <Icon
-                      size={14}
+                      size={16}
                       className="flex-shrink-0"
-                      style={{ color: isActive ? "#a855f7" : "var(--text-muted)" }}
+                      style={{ color: isActive ? "var(--pro-accent-primary)" : "var(--pro-text-secondary)" }}
                     />
                     {!collapsed && (
                       <>
                         <span>{item.label}</span>
-                        {item.comingSoon && (
-                          <span
-                            className="ml-auto text-[8px] px-1 py-0.5 rounded font-bold uppercase tracking-wider"
-                            style={{ background: "rgba(124,58,237,0.12)", color: "#a855f7" }}
-                          >
-                            Soon
-                          </span>
-                        )}
                       </>
                     )}
 
@@ -174,7 +167,7 @@ export default function ProSidebar({ collapsed = false }) {
       </nav>
 
       {/* Footer — exit Career Mode */}
-      <div className="p-2 border-t" style={{ borderColor: "var(--border-primary)" }}>
+      <div className="p-2 border-t" style={{ borderColor: "var(--pro-border-subtle)" }}>
         <button
           onClick={handleExitCareerMode}
           className="flex items-center gap-2.5 w-full px-3 py-2 rounded-xl text-[10px] transition-all"

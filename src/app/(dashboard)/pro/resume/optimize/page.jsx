@@ -1,6 +1,16 @@
 "use client";
-import { FileText } from "lucide-react";
-import { ProEmptyState } from "@/components/pro/ProDashboardCard";
-export default function ResumeOptimizePage() {
-  return <ProEmptyState icon={FileText} title="Resume Optimizer" description="AI-powered resume tailoring for specific job descriptions, improving match scores and recruiter visibility." phase="3" />;
+
+import React from "react";
+import ProFeaturePreview from "@/components/pro/ProFeaturePreview";
+import { Zap } from "lucide-react";
+
+export default function ResumeOptimizerPage() {
+  return (
+    <ProFeaturePreview 
+      icon={Zap}
+      title="Resume Optimizer"
+      description="Automatically tailor your resume for specific job descriptions with one click."
+      requirement="Upload a base resume first."
+    />
+  );
 }

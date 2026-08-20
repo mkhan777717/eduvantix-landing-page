@@ -27,7 +27,7 @@ export default function UpgradePage() {
       <div className="flex flex-col items-center justify-center py-20 px-6 text-center max-w-lg mx-auto space-y-6">
         <div
           className="w-20 h-20 rounded-3xl flex items-center justify-center"
-          style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)" }}
+          style={{ background: "var(--pro-accent-gradient)" }}
         >
           <Sparkles size={32} className="text-white" />
         </div>
@@ -45,7 +45,7 @@ export default function UpgradePage() {
             router.push("/pro");
           }}
           className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white transition-all hover:scale-[1.02]"
-          style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)" }}
+          style={{ background: "var(--pro-accent-gradient)" }}
         >
           <Zap size={14} />
           Open Career Dashboard
@@ -88,9 +88,9 @@ export default function UpgradePage() {
           >
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-              style={{ background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.2)" }}
+              style={{ background: "var(--pro-accent-glow)", border: "1px solid var(--pro-border-subtle)" }}
             >
-              <Icon size={14} style={{ color: "#a855f7" }} />
+              <Icon size={14} style={{ color: "var(--pro-accent-primary)" }} />
             </div>
             <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>{label}</span>
             <Check size={14} className="ml-auto flex-shrink-0" style={{ color: "#10b981" }} />
@@ -102,8 +102,8 @@ export default function UpgradePage() {
       <div
         className="rounded-2xl border p-8 text-center space-y-4"
         style={{
-          background: "linear-gradient(135deg, rgba(124,58,237,0.1) 0%, rgba(168,85,247,0.06) 100%)",
-          borderColor: "rgba(124,58,237,0.2)",
+          background: "var(--pro-accent-glow)",
+          borderColor: "var(--pro-border-subtle)",
         }}
       >
         <h2 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>

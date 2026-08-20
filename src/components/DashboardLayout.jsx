@@ -7,7 +7,8 @@ import {
   LayoutDashboard, Trophy, LogOut,
   Menu, X, ChevronLeft, ChevronRight, BookOpen, ArrowLeftRight,
   Code, Brain, Radio, AlertTriangle, FileText, Gamepad2, FileCheck, Activity, Settings, Paintbrush, Palette,
-  ShieldAlert, ShieldCheck, Layers, Users, PlusCircle, List, Bell, BellDot, CheckCircle2, Check, MessageSquare, Crown, HeartHandshake, ClipboardList, Target, Briefcase, CalendarDays, Newspaper, Database
+  ShieldAlert, ShieldCheck, Layers, Users, PlusCircle, List, Bell, BellDot, CheckCircle2, Check, MessageSquare, Crown, HeartHandshake, ClipboardList, Target, Briefcase, CalendarDays, Newspaper, Database,
+  User, Map, Mic, Bot, Zap
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/context/AuthContext";
@@ -480,26 +481,44 @@ function DashboardLayoutInner({ children }) {
   };
 
   if (isStudentSession) {
-    sidebarLinks = [
-      { label: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
-      { label: "Learn", href: "/learn", icon: BookOpen },
-      { label: "Practice Arena", href: "/practice", icon: Code },
-      { label: "Contest Arena", href: "/contest", icon: Trophy },
-      { label: "Exam Center", href: "/exams", icon: FileText },
-      { label: "Discuss Forum", href: "/discuss", icon: MessageSquare },
-      { label: "Blogs", href: "/journal", icon: Newspaper },
-      { label: "AI Viva", href: "/student/viva", icon: Brain },
-      { label: "AI Agents", href: "/student/ai-agents", icon: Brain },
-      { label: "Live Sessions", href: "/live-classes", icon: Radio },
-      { label: "Learn with Games", href: "/student/games", icon: Gamepad2 },
-      { label: "Events", href: "/events", icon: CalendarDays },
-      isInstituteAffiliated ? { label: "My Schedule", href: "/timetable/student", icon: CalendarDays } : null,
-      isInstituteAffiliated ? { label: "My Attendance", href: "/attendance/student", icon: CheckCircle2 } : null,
-      isInstituteAffiliated ? { label: "Study Materials", href: "/student/materials", icon: FileText } : null,
-      { label: "Resume Builder", href: "/student/resume", icon: FileCheck },
-      { label: "Job Assistance", href: "/student/job-assistance", icon: Briefcase },
-      { label: "Share Feedback", href: "/feedback", icon: HeartHandshake },
-    ].filter(Boolean);
+    if (isCareerMode) {
+      sidebarLinks = [
+        { label: "Overview", href: "/pro", icon: LayoutDashboard },
+        { label: "Career Profile", href: "/pro/profile", icon: User },
+        { label: "Resume Analysis", href: "/pro/resume", icon: FileText },
+        { label: "Resume Optimizer", href: "/pro/resume/optimize", icon: Zap },
+        { label: "Skill Intelligence", href: "/pro/skills", icon: Brain },
+        { label: "Skill Gap", href: "/pro/skills/gap", icon: Target },
+        { label: "My Roadmap", href: "/pro/roadmap", icon: Map },
+        { label: "Projects", href: "/pro/projects", icon: Code },
+        { label: "AI Interview", href: "/pro/interview", icon: Mic },
+        { label: "AI Viva", href: "/pro/viva", icon: Radio },
+        { label: "Job Matches", href: "/pro/jobs", icon: Briefcase },
+        { label: "Applications", href: "/pro/applications", icon: FileCheck },
+        { label: "AI Career Coach", href: "/pro/coach", icon: Bot },
+      ].filter(Boolean);
+    } else {
+      sidebarLinks = [
+        { label: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
+        { label: "Learn", href: "/learn", icon: BookOpen },
+        { label: "Practice Arena", href: "/practice", icon: Code },
+        { label: "Contest Arena", href: "/contest", icon: Trophy },
+        { label: "Exam Center", href: "/exams", icon: FileText },
+        { label: "Discuss Forum", href: "/discuss", icon: MessageSquare },
+        { label: "Blogs", href: "/journal", icon: Newspaper },
+        { label: "AI Viva", href: "/student/viva", icon: Brain },
+        { label: "AI Agents", href: "/student/ai-agents", icon: Brain },
+        { label: "Live Sessions", href: "/live-classes", icon: Radio },
+        { label: "Learn with Games", href: "/student/games", icon: Gamepad2 },
+        { label: "Events", href: "/events", icon: CalendarDays },
+        isInstituteAffiliated ? { label: "My Schedule", href: "/timetable/student", icon: CalendarDays } : null,
+        isInstituteAffiliated ? { label: "My Attendance", href: "/attendance/student", icon: CheckCircle2 } : null,
+        isInstituteAffiliated ? { label: "Study Materials", href: "/student/materials", icon: FileText } : null,
+        { label: "Resume Builder", href: "/student/resume", icon: FileCheck },
+        { label: "Job Assistance", href: "/student/job-assistance", icon: Briefcase },
+        { label: "Share Feedback", href: "/feedback", icon: HeartHandshake },
+      ].filter(Boolean);
+    }
   } else {
     sidebarLinks = [
       {
@@ -630,7 +649,7 @@ function DashboardLayoutInner({ children }) {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "var(--bg-primary)" }}>
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: isCareerMode ? "var(--pro-bg-canvas)" : "var(--bg-primary)", transition: "background-color 0.3s ease" }}>
       {!isLiveStudioMode && (
         <aside
         className="hidden md:flex flex-col h-full border-r transition-all duration-300 relative z-30"

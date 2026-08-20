@@ -1,6 +1,15 @@
 "use client";
-import { ClipboardList } from "lucide-react";
-import { ProEmptyState } from "@/components/pro/ProDashboardCard";
+
+import React from "react";
+import ProFeaturePreview from "@/components/pro/ProFeaturePreview";
+import { FileCheck } from "lucide-react";
+
 export default function ApplicationsPage() {
-  return <ProEmptyState icon={ClipboardList} title="Application Tracking" description="Track all your job applications in one place. Monitor status, set reminders, and get AI-powered follow-up suggestions." phase="7" />;
+  return (
+    <ProFeaturePreview 
+      icon={FileCheck}
+      title="Application Tracker"
+      description="Track the status of all your job applications in one central dashboard."
+    />
+  );
 }

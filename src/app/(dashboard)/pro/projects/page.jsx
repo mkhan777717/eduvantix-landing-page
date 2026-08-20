@@ -1,6 +1,15 @@
 "use client";
-import { FolderCode } from "lucide-react";
-import { ProEmptyState } from "@/components/pro/ProDashboardCard";
+
+import React from "react";
+import ProFeaturePreview from "@/components/pro/ProFeaturePreview";
+import { Code } from "lucide-react";
+
 export default function ProjectsPage() {
-  return <ProEmptyState icon={FolderCode} title="Project Recommendations" description="Get AI-curated project ideas tailored to your target role and skill gaps. Build a portfolio that stands out to recruiters." phase="5" />;
+  return (
+    <ProFeaturePreview 
+      icon={Code}
+      title="Pro Projects"
+      description="Build industry-level projects tailored to your target role to strengthen your portfolio."
+    />
+  );
 }

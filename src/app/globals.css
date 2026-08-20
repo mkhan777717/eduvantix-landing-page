@@ -53,11 +53,25 @@
     --noise-opacity: 0.03;
     --dot-color: rgba(17, 17, 16, 0.08);
 
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-desc: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-desc: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-title: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
     --font-heading: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
     --font-serif: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+
+    /* ---- PRO THEME (Light) ---- */
+    --pro-bg-canvas: #F7F6FB;
+    --pro-bg-surface: #FFFFFF;
+    --pro-bg-surface-sunken: #F1EFF9;
+    --pro-border-subtle: #E8E5F3;
+    --pro-text-primary: #17141F;
+    --pro-text-secondary: #666078;
+    --pro-accent-primary: #059669;
+    --pro-accent-primary-strong: #047857;
+    --pro-accent-gradient: linear-gradient(135deg, #059669 0%, #047857 100%);
+    --pro-premium-gold: #B8842E;
+    --pro-premium-gold-bg: #FBF0DC;
+    --pro-success: #0F9D6E;
   }
 
   /* ---- DARK THEME ---- */
@@ -100,8 +114,22 @@
     --selection-bg: rgba(255, 255, 255, 0.15);
     --selection-text: #ffffff;
 
-    --noise-opacity: 0.04;
-    --dot-color: rgba(237, 237, 236, 0.05);
+    --noise-opacity: 0.05;
+    --dot-color: rgba(255, 255, 255, 0.08);
+
+    /* ---- PRO THEME (Dark) ---- */
+    --pro-bg-canvas: #0C0A13;
+    --pro-bg-surface: #15121F;
+    --pro-bg-surface-raised: #1D1830;
+    --pro-border-subtle: #2B2440;
+    --pro-text-primary: #F3F1FA;
+    --pro-text-secondary: #A79CC2;
+    --pro-accent-primary: #10b981;
+    --pro-accent-primary-strong: #059669;
+    --pro-accent-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --pro-premium-gold: #F2C572;
+    --pro-premium-gold-bg: rgba(242, 197, 114, 0.12);
+    --pro-success: #34D399;
 
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-desc: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -1686,3 +1714,43 @@ html.theme-dark select option,
 /* Hide scrollbar utility */
 .scrollbar-none::-webkit-scrollbar { display: none; }
 .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* =============================================
+   PRO THEME TYPOGRAPHY & UTILITIES
+   ============================================= */
+.font-display {
+  font-family: 'Fraunces', serif;
+}
+
+.font-mono {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.pro-glass-card {
+  background-color: var(--pro-bg-surface);
+  border: 1px solid var(--pro-border-subtle);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(5,150,105,0.06);
+  transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pro-glass-card {
+    transition: none;
+  }
+}
+
+.pro-glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05), 0 12px 32px rgba(5,150,105,0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pro-glass-card:hover {
+    transform: none;
+  }
+}
+
+html.theme-dark .pro-glass-card-hero {
+  box-shadow: 0 0 40px rgba(16,185,129,0.15);
+}

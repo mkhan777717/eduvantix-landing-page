@@ -1,6 +1,16 @@
 "use client";
+
+import React from "react";
+import ProFeaturePreview from "@/components/pro/ProFeaturePreview";
 import { Map } from "lucide-react";
-import { ProEmptyState } from "@/components/pro/ProDashboardCard";
-export default function RoadmapPage() {
-  return <ProEmptyState icon={Map} title="Personalized Roadmap" description="Your AI-generated career roadmap will appear here after your career analysis is complete. It will include milestones, resources, and timelines." phase="5" />;
+
+export default function MyRoadmapPage() {
+  return (
+    <ProFeaturePreview 
+      icon={Map}
+      title="My Roadmap"
+      description="A highly personalized, step-by-step learning journey designed to reach your career goal."
+      requirement="Complete your Career Profile and take the initial assessment."
+    />
+  );
 }

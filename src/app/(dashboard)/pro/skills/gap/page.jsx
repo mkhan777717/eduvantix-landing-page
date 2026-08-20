@@ -1,6 +1,16 @@
 "use client";
-import { Brain } from "lucide-react";
-import { ProEmptyState } from "@/components/pro/ProDashboardCard";
+
+import React from "react";
+import ProFeaturePreview from "@/components/pro/ProFeaturePreview";
+import { Target } from "lucide-react";
+
 export default function SkillGapPage() {
-  return <ProEmptyState icon={Brain} title="Skill Gap Analysis" description="Our AI will compare your current skills against your target role requirements and generate a prioritised learning plan." phase="4" />;
+  return (
+    <ProFeaturePreview 
+      icon={Target}
+      title="Skill Gap Analysis"
+      description="Compare your current skills with industry standards for your target role and get targeted recommendations."
+      requirement="Complete your Career Profile first."
+    />
+  );
 }

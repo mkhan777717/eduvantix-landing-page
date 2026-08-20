@@ -1,6 +1,16 @@
 "use client";
+
+import React from "react";
+import ProFeaturePreview from "@/components/pro/ProFeaturePreview";
 import { FileText } from "lucide-react";
-import { ProEmptyState } from "@/components/pro/ProDashboardCard";
-export default function ResumePage() {
-  return <ProEmptyState icon={FileText} title="Resume Intelligence" description="Upload your resume and our AI will analyse it for ATS compatibility, keyword gaps, and personalised improvements." phase="3" />;
+
+export default function ResumeAnalysisPage() {
+  return (
+    <ProFeaturePreview 
+      icon={FileText}
+      title="Resume Analysis"
+      description="Get AI-powered insights on your resume to improve your ATS score and land more interviews."
+      requirement="Complete your Career Profile first."
+    />
+  );
 }

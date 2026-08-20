@@ -1,6 +1,15 @@
 "use client";
+
+import React from "react";
+import ProFeaturePreview from "@/components/pro/ProFeaturePreview";
 import { Brain } from "lucide-react";
-import { ProEmptyState } from "@/components/pro/ProDashboardCard";
-export default function SkillsPage() {
-  return <ProEmptyState icon={Brain} title="Skill Intelligence" description="Complete your career profile and take skill assessments to generate your personalised skill profile and benchmarking." phase="4" />;
+
+export default function SkillIntelligencePage() {
+  return (
+    <ProFeaturePreview 
+      icon={Brain}
+      title="Skill Intelligence"
+      description="Detailed analytics of your technical proficiency across languages and frameworks based on your activity."
+    />
+  );
 }

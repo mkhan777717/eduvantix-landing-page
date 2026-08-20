@@ -27,34 +27,19 @@ export default function ProDashboardCard({
 }) {
   return (
     <div
-      className="rounded-2xl border p-5 flex flex-col gap-4 transition-all"
-      style={{
-        backgroundColor: "var(--bg-card)",
-        borderColor: "var(--border-primary)",
-      }}
+      className="rounded-2xl p-6 flex flex-col gap-4 pro-glass-card"
     >
       {/* Header */}
       <div className="flex items-center gap-3">
         <div
-          className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{
-            background: `${accentColor}18`,
-            border: `1px solid ${accentColor}30`,
-          }}
+          className="w-8 h-8 rounded-md border flex items-center justify-center flex-shrink-0"
+          style={{ borderColor: "var(--pro-border-subtle)" }}
         >
-          {Icon && <Icon size={16} style={{ color: accentColor }} />}
+          {Icon && <Icon size={16} style={{ color: "var(--pro-text-primary)" }} />}
         </div>
         <h3 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
           {title}
         </h3>
-        {status === "coming_soon" && (
-          <span
-            className="ml-auto text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider"
-            style={{ background: "rgba(124,58,237,0.12)", color: "#a855f7" }}
-          >
-            Coming Soon
-          </span>
-        )}
       </div>
 
       {/* Content */}
