@@ -7,7 +7,8 @@ import {
   LayoutDashboard, Trophy, LogOut,
   Menu, X, ChevronLeft, ChevronRight, BookOpen, ArrowLeftRight,
   Code, Brain, Radio, AlertTriangle, FileText, Gamepad2, FileCheck, Activity, Settings, Paintbrush, Palette,
-  ShieldAlert, ShieldCheck, Layers, Users, PlusCircle, List, Bell, BellDot, CheckCircle2, Check, MessageSquare, Crown, HeartHandshake, ClipboardList, Target, Briefcase, CalendarDays, Newspaper, Database
+  ShieldAlert, ShieldCheck, Layers, Users, PlusCircle, List, Bell, BellDot, CheckCircle2, Check, MessageSquare, Crown, HeartHandshake, ClipboardList, Target, Briefcase, CalendarDays, Newspaper, Database,
+  User, Map, Mic, Bot, Zap
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/context/AuthContext";
@@ -16,6 +17,9 @@ import ToastContainer from "@/components/ToastContainer";
 import useThemeStore from "@/store/useThemeStore";
 import GiftCoupon from "@/components/GiftCoupon";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import { usePro } from "@/context/ProContext";
+import CareerModeToggle from "@/components/pro/CareerModeToggle";
+import ProSidebar from "@/components/pro/ProSidebar";
 
 // Inner layout component — has access to BrandingContext
 function DashboardLayoutInner({ children }) {
@@ -23,6 +27,8 @@ function DashboardLayoutInner({ children }) {
   const pathname = usePathname();
   const { logout, user, token, API_BASE, activeSession, setActiveSession, loading, updateUser } = useAuth();
   const { siteName, logoUrl: brandingLogoUrl } = useBranding();
+  const { isPro, mode } = usePro();
+  const isCareerMode = isPro && mode === "CAREER";
 
   const inst = user?.institute;
   const isInstituteAffiliated = !!user?.instituteId;
@@ -475,26 +481,44 @@ function DashboardLayoutInner({ children }) {
   };
 
   if (isStudentSession) {
-    sidebarLinks = [
-      { label: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
-      { label: "Learn", href: "/learn", icon: BookOpen },
-      { label: "Practice Arena", href: "/practice", icon: Code },
-      { label: "Contest Arena", href: "/contest", icon: Trophy },
-      { label: "Exam Center", href: "/exams", icon: FileText },
-      { label: "Discuss Forum", href: "/discuss", icon: MessageSquare },
-      { label: "Blogs", href: "/journal", icon: Newspaper },
-      { label: "AI Viva", href: "/student/viva", icon: Brain },
-      { label: "AI Agents", href: "/student/ai-agents", icon: Brain },
-      { label: "Live Sessions", href: "/live-classes", icon: Radio },
-      { label: "Learn with Games", href: "/student/games", icon: Gamepad2 },
-      { label: "Events", href: "/events", icon: CalendarDays },
-      isInstituteAffiliated ? { label: "My Schedule", href: "/timetable/student", icon: CalendarDays } : null,
-      isInstituteAffiliated ? { label: "My Attendance", href: "/attendance/student", icon: CheckCircle2 } : null,
-      isInstituteAffiliated ? { label: "Study Materials", href: "/student/materials", icon: FileText } : null,
-      { label: "Resume Builder", href: "/student/resume", icon: FileCheck },
-      { label: "Job Assistance", href: "/student/job-assistance", icon: Briefcase },
-      { label: "Share Feedback", href: "/feedback", icon: HeartHandshake },
-    ].filter(Boolean);
+    if (isCareerMode) {
+      sidebarLinks = [
+        { label: "Overview", href: "/pro", icon: LayoutDashboard },
+        { label: "Career Profile", href: "/pro/profile", icon: User },
+        { label: "Resume Analysis", href: "/pro/resume", icon: FileText },
+        { label: "Resume Optimizer", href: "/pro/resume/optimize", icon: Zap },
+        { label: "Skill Intelligence", href: "/pro/skills", icon: Brain },
+        { label: "Skill Gap", href: "/pro/skills/gap", icon: Target },
+        { label: "My Roadmap", href: "/pro/roadmap", icon: Map },
+        { label: "Projects", href: "/pro/projects", icon: Code },
+        { label: "AI Interview", href: "/pro/interview", icon: Mic },
+        { label: "AI Viva", href: "/pro/viva", icon: Radio },
+        { label: "Job Matches", href: "/pro/jobs", icon: Briefcase },
+        { label: "Applications", href: "/pro/applications", icon: FileCheck },
+        { label: "AI Career Coach", href: "/pro/coach", icon: Bot },
+      ].filter(Boolean);
+    } else {
+      sidebarLinks = [
+        { label: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
+        { label: "Learn", href: "/learn", icon: BookOpen },
+        { label: "Practice Arena", href: "/practice", icon: Code },
+        { label: "Contest Arena", href: "/contest", icon: Trophy },
+        { label: "Exam Center", href: "/exams", icon: FileText },
+        { label: "Discuss Forum", href: "/discuss", icon: MessageSquare },
+        { label: "Blogs", href: "/journal", icon: Newspaper },
+        { label: "AI Viva", href: "/student/viva", icon: Brain },
+        { label: "AI Agents", href: "/student/ai-agents", icon: Brain },
+        { label: "Live Sessions", href: "/live-classes", icon: Radio },
+        { label: "Learn with Games", href: "/student/games", icon: Gamepad2 },
+        { label: "Events", href: "/events", icon: CalendarDays },
+        isInstituteAffiliated ? { label: "My Schedule", href: "/timetable/student", icon: CalendarDays } : null,
+        isInstituteAffiliated ? { label: "My Attendance", href: "/attendance/student", icon: CheckCircle2 } : null,
+        isInstituteAffiliated ? { label: "Study Materials", href: "/student/materials", icon: FileText } : null,
+        { label: "Resume Builder", href: "/student/resume", icon: FileCheck },
+        { label: "Job Assistance", href: "/student/job-assistance", icon: Briefcase },
+        { label: "Share Feedback", href: "/feedback", icon: HeartHandshake },
+      ].filter(Boolean);
+    }
   } else {
     sidebarLinks = [
       {
@@ -625,12 +649,31 @@ function DashboardLayoutInner({ children }) {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "var(--bg-primary)" }}>
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: isCareerMode ? "var(--pro-bg-canvas)" : "var(--bg-primary)", transition: "background-color 0.3s ease" }}>
       {!isLiveStudioMode && (
         <aside
         className="hidden md:flex flex-col h-full border-r transition-all duration-300 relative z-30"
         style={{ width: isSidebarCollapsed ? "60px" : "195px", backgroundColor: "var(--bg-sidebar)", borderColor: "var(--border-primary)" }}
       >
+        {isCareerMode ? (
+          // ── Pro Career Mode sidebar ────────────────────────────────
+          <>
+            <div className={`flex items-center h-14 border-b ${isSidebarCollapsed ? "justify-center px-0" : "justify-between px-4"}`} style={{ borderColor: "var(--border-primary)" }}>
+              <Link href="/" className={`flex items-center gap-3 py-4 mb-2 ${isSidebarCollapsed ? "px-0" : "px-2"}`}>
+                <div className={`flex items-center overflow-hidden transition-all ${isSidebarCollapsed ? "w-6" : "w-32"}`}>
+                  {brandingLogoUrl ? (
+                    <img src={brandingLogoUrl.startsWith("http") ? brandingLogoUrl : `${API_BASE}${brandingLogoUrl}`} alt={`${siteName} Logo`} className="h-6 object-contain object-left shrink-0 max-w-none" style={{ display: "block" }} />
+                  ) : (
+                    <img src={isDark ? "/logo-white-text.webp" : "/logo-black-text.webp"} alt="Eduvantix Logo" className="h-6 object-contain object-left shrink-0 max-w-none" style={{ display: "block" }} />
+                  )}
+                </div>
+              </Link>
+            </div>
+            <ProSidebar collapsed={isSidebarCollapsed} />
+          </>
+        ) : (
+          // ── Normal Learning Mode sidebar ───────────────────────────
+          <>
         <div className={`flex items-center h-14 border-b ${isSidebarCollapsed ? "justify-center px-0" : "justify-between px-4"}`} style={{ borderColor: "var(--border-primary)" }}>
           <Link href="/" className={`flex items-center gap-3 py-4 mb-2 ${isSidebarCollapsed ? "px-0" : "px-2"}`}>
             <div className={`flex items-center overflow-hidden transition-all ${isSidebarCollapsed ? "w-6" : "w-32"}`}>
@@ -712,6 +755,8 @@ function DashboardLayoutInner({ children }) {
             {!isSidebarCollapsed && <span>Collapse sidebar</span>}
           </button>
         </div>
+          </>
+        )}
       </aside>
       )}
 
@@ -798,6 +843,9 @@ function DashboardLayoutInner({ children }) {
             <div className="flex items-center gap-3 ml-auto">
 
             {isStudentSession && <GiftCoupon />}
+
+            {/* ── Pro / Career Mode Toggle ── */}
+            <CareerModeToggle />
 
 
             {/* ── Universal Notification Bell (all roles) ── */}
