@@ -1,27 +1,23 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import { Sparkles } from "lucide-react";
 
 /**
- * ProBadge — small inline badge indicating Pro status.
- * Usage: <ProBadge /> or <ProBadge size="sm" />
+ * ProBadge — Small inline badge indicating Pro status.
  */
 export default function ProBadge({ size = "sm", className = "" }) {
-  const textSize = size === "xs" ? "text-[8px]" : "text-[9px]";
+  const textSize = size === "xs" ? "text-[8px]" : "text-[10px]";
   const padding = size === "xs" ? "px-1 py-0.5" : "px-1.5 py-0.5";
-  const iconSize = size === "xs" ? 7 : 9;
+  const iconSize = size === "xs" ? 8 : 10;
 
   return (
     <span
-      className={`inline-flex items-center gap-0.5 ${padding} ${textSize} font-bold rounded-md tracking-wider uppercase ${className}`}
-      style={{
-        background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #ec4899 100%)",
-        color: "#fff",
-      }}
+      className={`inline-flex items-center gap-1 ${padding} ${textSize} font-semibold rounded-md tracking-wider uppercase bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 ${className}`}
     >
-      <Sparkles size={iconSize} className="flex-shrink-0" />
+      <Sparkles size={iconSize} className="flex-shrink-0 text-emerald-500" />
       Pro
     </span>
   );
 }
+
