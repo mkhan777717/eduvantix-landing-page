@@ -60,18 +60,19 @@
     --font-serif: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
 
     /* ---- PRO THEME (Light) ---- */
-    --pro-bg-canvas: #F7F6FB;
-    --pro-bg-surface: #FFFFFF;
-    --pro-bg-surface-sunken: #F1EFF9;
-    --pro-border-subtle: #E8E5F3;
-    --pro-text-primary: #17141F;
-    --pro-text-secondary: #666078;
-    --pro-accent-primary: #059669;
-    --pro-accent-primary-strong: #047857;
-    --pro-accent-gradient: linear-gradient(135deg, #059669 0%, #047857 100%);
+    --pro-bg-canvas: var(--bg-primary);
+    --pro-bg-surface: var(--bg-card);
+    --pro-bg-surface-sunken: var(--bg-input);
+    --pro-bg-surface-raised: var(--bg-hover);
+    --pro-border-subtle: var(--border-primary);
+    --pro-text-primary: var(--text-primary);
+    --pro-text-secondary: var(--text-secondary);
+    --pro-accent-primary: var(--accent-primary);
+    --pro-accent-primary-strong: var(--accent-secondary);
+    --pro-accent-gradient: var(--accent-gradient);
     --pro-premium-gold: #B8842E;
     --pro-premium-gold-bg: #FBF0DC;
-    --pro-success: #0F9D6E;
+    --pro-success: var(--text-accent);
   }
 
   /* ---- DARK THEME ---- */
@@ -118,18 +119,19 @@
     --dot-color: rgba(255, 255, 255, 0.08);
 
     /* ---- PRO THEME (Dark) ---- */
-    --pro-bg-canvas: #0C0A13;
-    --pro-bg-surface: #15121F;
-    --pro-bg-surface-raised: #1D1830;
-    --pro-border-subtle: #2B2440;
-    --pro-text-primary: #F3F1FA;
-    --pro-text-secondary: #A79CC2;
-    --pro-accent-primary: #10b981;
-    --pro-accent-primary-strong: #059669;
-    --pro-accent-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --pro-bg-canvas: var(--bg-primary);
+    --pro-bg-surface: var(--bg-card);
+    --pro-bg-surface-raised: var(--bg-hover);
+    --pro-bg-surface-sunken: var(--bg-input);
+    --pro-border-subtle: var(--border-primary);
+    --pro-text-primary: var(--text-primary);
+    --pro-text-secondary: var(--text-secondary);
+    --pro-accent-primary: var(--accent-primary);
+    --pro-accent-primary-strong: var(--accent-secondary);
+    --pro-accent-gradient: var(--accent-gradient);
     --pro-premium-gold: #F2C572;
     --pro-premium-gold-bg: rgba(242, 197, 114, 0.12);
-    --pro-success: #34D399;
+    --pro-success: var(--text-accent2);
 
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-desc: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;

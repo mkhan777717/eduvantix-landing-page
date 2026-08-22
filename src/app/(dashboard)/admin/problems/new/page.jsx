@@ -39,23 +39,23 @@ function insertMd(taRef, setValue, type) {
 function MdToolbar({ taRef, setValue }) {
   const b = (label, action, cls) => (
     <button type="button" onClick={() => insertMd(taRef, setValue, action)}
-      className={`px-1.5 py-1 text-[10px] font-bold rounded-lg hover:bg-white/10 transition-all cursor-pointer ${cls || "text-slate-400 hover:text-white"}`}>
+      className={`px-1.5 py-1 text-[10px] font-bold rounded-lg transition-all cursor-pointer hover:bg-[var(--bg-hover)] ${cls || "text-[var(--text-muted)] hover:text-[var(--text-primary)]"}`}>
       {label}
     </button>
   );
   return (
-    <div className="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-[#1a1f2e] border border-[var(--border-primary)] border-white/10 flex-wrap">
-      <button type="button" onClick={() => insertMd(taRef, setValue, "bold")} className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-white cursor-pointer"><Bold size={10} /></button>
-      <button type="button" onClick={() => insertMd(taRef, setValue, "italic")} className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-white cursor-pointer"><Italic size={10} /></button>
-      <div className="w-px h-3 bg-white/10 mx-1" />
+    <div className="flex items-center gap-0.5 px-2 py-1 rounded-lg border border-[var(--border-primary)] flex-wrap" style={{ background: "var(--bg-input)" }}>
+      <button type="button" onClick={() => insertMd(taRef, setValue, "bold")} className="p-1 rounded hover:bg-[var(--bg-hover)] text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"><Bold size={10} /></button>
+      <button type="button" onClick={() => insertMd(taRef, setValue, "italic")} className="p-1 rounded hover:bg-[var(--bg-hover)] text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"><Italic size={10} /></button>
+      <div className="w-px h-3 mx-1 bg-[var(--border-primary)]" />
       {b("H2", "heading")}
-      {b("`c`", "inline", "font-mono text-slate-400")}
-      <div className="w-px h-3 bg-white/10 mx-1" />
-      {b("js", "block-js", "text-amber-400")}
-      {b("py", "block-py", "text-neutral-400")}
-      {b("go", "block-go", "text-emerald-400")}
-      <div className="w-px h-3 bg-white/10 mx-1" />
-      <button type="button" onClick={() => insertMd(taRef, setValue, "list")} className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-white cursor-pointer"><List size={10} /></button>
+      {b("`c`", "inline", "font-mono text-[var(--text-muted)]")}
+      <div className="w-px h-3 mx-1 bg-[var(--border-primary)]" />
+      {b("js", "block-js", "text-amber-500")}
+      {b("py", "block-py", "text-neutral-500")}
+      {b("go", "block-go", "text-emerald-500")}
+      <div className="w-px h-3 mx-1 bg-[var(--border-primary)]" />
+      <button type="button" onClick={() => insertMd(taRef, setValue, "list")} className="p-1 rounded hover:bg-[var(--bg-hover)] text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"><List size={10} /></button>
     </div>
   );
 }
@@ -64,37 +64,37 @@ function CodePanel({ lang, value, onChange, rows = 10 }) {
   const colors = { javascript: "#f59e0b", python: "#3b82f6", go: "#10b981", cpp: "#f43f5e", java: "#06b6d4" };
   const labels = { javascript: "JS · Node.js", python: "Python 3", go: "Go", cpp: "C++ (GCC 17)", java: "Java (JDK 21)" };
   return (
-    <div className="rounded-2xl overflow-hidden border border-[var(--border-primary)] border-white/10 shadow-2xl">
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#161b27] border-b border-white/10">
+    <div className="rounded-2xl overflow-hidden border border-[var(--border-primary)] shadow-sm bg-[var(--bg-card)]">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[var(--bg-input)] border-b border-[var(--border-primary)]">
         <div className="flex items-center gap-2">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-rose-500/80" />
             <div className="w-3 h-3 rounded-full bg-amber-500/80" />
             <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
           </div>
-          <span className="text-[10px] font-bold font-mono ml-1" style={{ color: colors[lang] || "#6366f1" }}>
+          <span className="text-[10px] font-bold font-mono ml-1" style={{ color: colors[lang] || "var(--accent-primary)" }}>
             {labels[lang] || lang}
           </span>
         </div>
-        <Terminal size={11} className="text-slate-600" />
+        <Terminal size={11} className="text-[var(--text-muted)]" />
       </div>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
         spellCheck="false"
-        className="w-full bg-[#0d1117] text-slate-200 font-mono text-[12px] leading-6 px-5 py-4 outline-none resize-none border-none placeholder:text-slate-700"
-        style={{ caretColor: "#6366f1" }}
+        className="w-full bg-[var(--bg-code)] text-[var(--text-primary)] font-mono text-[12px] leading-6 px-5 py-4 outline-none resize-none border-none placeholder-[var(--text-muted)]"
+        style={{ caretColor: "var(--accent-primary)" }}
       />
     </div>
   );
 }
 
 function DarkInput({ style, ...props }) {
-  return <input {...props} style={style} className="w-full rounded-xl px-4 py-3 text-sm bg-[#111827] border border-[var(--border-primary)] border-white/10 text-white placeholder:text-slate-600 outline-none focus:border-zinc-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-medium" />;
+  return <input {...props} style={style} className="w-full rounded-xl px-4 py-3 text-sm border border-[var(--border-primary)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-all font-medium bg-[var(--bg-input)] text-[var(--text-primary)] placeholder-[var(--text-muted)]" />;
 }
 function DarkSelect({ children, ...props }) {
-  return <select {...props} className="w-full rounded-xl px-4 py-3 text-sm bg-[#111827] border border-[var(--border-primary)] border-white/10 text-white outline-none focus:border-zinc-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-medium cursor-pointer">{children}</select>;
+  return <select {...props} className="w-full rounded-xl px-4 py-3 text-sm border border-[var(--border-primary)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-all font-medium cursor-pointer bg-[var(--bg-input)] text-[var(--text-primary)]">{children}</select>;
 }
 function DarkTextarea({ style, onPaste, ...props }) {
   const handlePaste = (e) => {
@@ -130,7 +130,7 @@ function DarkTextarea({ style, onPaste, ...props }) {
       {...props}
       onPaste={handlePaste}
       style={style}
-      className="w-full rounded-xl px-4 py-3 text-sm bg-[#111827] border border-[var(--border-primary)] border-white/10 text-white placeholder:text-slate-600 outline-none focus:border-zinc-500/60 focus:ring-1 focus:ring-indigo-500/30 transition-all font-mono resize-none leading-relaxed"
+      className="w-full rounded-xl px-4 py-3 text-sm border border-[var(--border-primary)] outline-none focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)] transition-all font-mono resize-none leading-relaxed bg-[var(--bg-input)] text-[var(--text-primary)] placeholder-[var(--text-muted)]"
     />
   );
 }
@@ -206,10 +206,10 @@ export default function CreateProblem() {
 
   const stepDone = {
     details:    title.trim().length >= 3,
-    statement:  desc.trim().length >= 10 && !!inputFmt.trim() && !!outputFmt.trim() && !!constr.trim(),
-    templates:  templatesVisited && !!(tmplJS.trim() || tmplPy.trim() || tmplGo.trim() || tmplCPP.trim() || tmplJava.trim()),
-    testcases:  testCases.length > 0 && testCases.some(t => t.isSample) && testCases.every(t => t.expectedOutput.trim()),
-    tabcontent: tabcontentVisited && !!followup.trim() && !!editorial.trim() && !!solution.trim() && !!evaluation.trim(),
+    statement:  !!(desc.trim() || inputFmt.trim() || outputFmt.trim() || constr.trim()),
+    templates:  !!(tmplJS.trim() || tmplPy.trim() || tmplGo.trim() || tmplCPP.trim() || tmplJava.trim()),
+    testcases:  testCases.length > 0 && testCases.some(t => t.input.trim() || t.expectedOutput.trim()),
+    tabcontent: !!(followup.trim() || editorial.trim() || solution.trim() || evaluation.trim()),
   };
 
   const showToast = useCallback((text, type = "error") => {
@@ -227,39 +227,7 @@ export default function CreateProblem() {
   const handlePublish = async () => {
     const errs = {};
     if (title.trim().length < 3) { errs.title = "Title must be at least 3 characters"; setActiveTab("details"); }
-    else if (desc.trim().length < 10 || !inputFmt.trim() || !outputFmt.trim() || !constr.trim()) {
-      if (!desc.trim()) { errs.desc = "Description is required"; }
-      else if (desc.trim().length < 10) { errs.desc = "Description must be at least 10 characters"; }
-      if (!inputFmt.trim()) { errs.inputFmt = "Input format is required"; }
-      if (!outputFmt.trim()) { errs.outputFmt = "Output format is required"; }
-      if (!constr.trim()) { errs.constr = "Constraints are required"; }
-      
-      if (errs.desc) setStatSub("desc");
-      else if (errs.inputFmt) setStatSub("input");
-      else if (errs.outputFmt) setStatSub("output");
-      else if (errs.constr) setStatSub("constr");
-
-      setActiveTab("statement");
-    }
-    else if (testCases.length === 0 || !testCases.some(t => t.isSample) || testCases.some((t, i) => !t.expectedOutput.trim())) {
-      if (testCases.length === 0) { errs.tc = "At least one test case is required"; }
-      if (!testCases.some(t => t.isSample)) { errs.tc = "At least one sample test case required"; }
-      testCases.forEach((t, i) => { if (!t.expectedOutput.trim()) errs[`tc_${i}`] = `Test Case #${i + 1} needs expected output`; });
-      setActiveTab("testcases");
-    }
-    else if (!followup.trim() || !editorial.trim() || !solution.trim() || !evaluation.trim()) {
-      if (!followup.trim()) errs.followup = "Followup is required";
-      if (!editorial.trim()) errs.editorial = "Editorial is required";
-      if (!solution.trim()) errs.solution = "Solution is required";
-      if (!evaluation.trim()) errs.evaluation = "Evaluation is required";
-
-      if (errs.followup) setSub5("followup");
-      else if (errs.editorial) setSub5("editorial");
-      else if (errs.solution) setSub5("solution");
-      else if (errs.evaluation) setSub5("evaluation");
-
-      setActiveTab("tabcontent");
-    }
+    
     setErrors(errs);
     if (Object.keys(errs).length > 0) { showToast("Please fix the highlighted issues before publishing.", "error"); return; }
 
@@ -481,12 +449,12 @@ export default function CreateProblem() {
         {/* Page header */}
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <button onClick={() => router.push("/admin/problems")} className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-300 transition-colors cursor-pointer">
+            <button onClick={() => router.push("/admin/problems")} className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer">
               <ArrowLeft size={13} /> Back to Problems
             </button>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-3">
-              <span className="bg-gradient-to-r from-zinc-400 via-violet-400 to-[var(--text-primary)] text-transparent bg-clip-text">Create Coding Problem</span>
-              <Sparkles size={20} className="text-amber-400 animate-pulse" />
+              <span className="text-[var(--text-primary)]">Create Coding Problem</span>
+              <Sparkles size={20} className="text-[var(--accent-primary)] animate-pulse" />
             </h1>
           </div>
           <div className="flex items-center gap-3">
@@ -514,33 +482,33 @@ export default function CreateProblem() {
                 const done = stepDone[step.id];
                 return (
                   <button key={step.id} onClick={() => setActiveTab(step.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3.5 transition-all cursor-pointer text-left ${isActive ? "bg-gradient-to-r from-zinc-600/20 to-violet-600/10 border-l-2 border-zinc-500" : "hover:bg-white/5 border-l-2 border-transparent"} ${i < STEPS.length - 1 ? "border-b border-white/5" : ""}`}>
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-[11px] font-black transition-all ${done ? "bg-emerald-500/20 border border-[var(--border-primary)] border-emerald-500/40 text-emerald-400" : isActive ? "bg-zinc-500/20 border border-[var(--border-primary)] border-zinc-500/60 text-zinc-300" : "bg-white/5 border border-[var(--border-primary)] border-white/10 text-slate-600"}`}>
+                    className={`w-full flex items-center gap-3 px-4 py-3.5 transition-all cursor-pointer text-left ${isActive ? "bg-[var(--bg-hover)] border-l-2 border-[var(--accent-primary)]" : "hover:bg-[var(--bg-hover)] border-l-2 border-transparent"} ${i < STEPS.length - 1 ? "border-b border-[var(--border-primary)]" : ""}`}>
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-[11px] font-black transition-all ${done ? "bg-emerald-500/20 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400" : isActive ? "bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/30 text-[var(--accent-primary)]" : "bg-[var(--bg-input)] border border-[var(--border-primary)] text-[var(--text-muted)]"}`}>
                       {done ? <Check size={12} /> : step.num}
                     </div>
                     <div className="min-w-0">
-                      <p className={`text-xs font-bold truncate transition-colors ${isActive ? "text-white" : done ? "text-slate-300" : "text-slate-500"}`}>{step.label}</p>
-                      <p className="text-[10px] text-slate-600 truncate">{step.desc}</p>
+                      <p className={`text-xs font-bold truncate transition-colors ${isActive ? "text-[var(--text-primary)]" : done ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]"}`}>{step.label}</p>
+                      <p className="text-[10px] text-[var(--text-muted)] truncate">{step.desc}</p>
                     </div>
-                    {isActive && <ChevronRight size={12} className="ml-auto text-zinc-400 shrink-0" />}
+                    {isActive && <ChevronRight size={12} className="ml-auto text-[var(--text-muted)] shrink-0" />}
                   </button>
                 );
               })}
             </div>
 
             <button onClick={handlePublish} disabled={saving}
-              className="w-full py-3.5 rounded-2xl font-black text-sm text-white shadow-xl transition-all cursor-pointer flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-              style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7)" }}>
+              className="w-full py-3.5 rounded-2xl font-black text-sm text-[var(--text-on-accent)] shadow-xl transition-all cursor-pointer flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ background: "var(--accent-gradient)" }}>
               {saving
                 ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>Publishing…</span></>
                 : <><Save size={15} /><span>Publish Problem</span></>}
             </button>
 
             <div className="rounded-2xl border border-[var(--border-primary)] p-3 space-y-2" style={{ background: "var(--bg-card)", borderColor: "var(--border-primary)" }}>
-              <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-600">Demo Templates</p>
+              <p className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--text-muted)]">Demo Templates</p>
               <div className="grid grid-cols-2 gap-1.5">
-                <button onClick={() => loadDemo("fizzbuzz")} className="py-2 rounded-xl text-[10px] font-bold bg-zinc-500/10 text-zinc-400 hover:bg-zinc-500/20 transition-all border border-[var(--border-primary)] border-zinc-500/20 cursor-pointer">FizzBuzz</button>
-                <button onClick={() => loadDemo("clear")} className="py-2 rounded-xl text-[10px] font-bold bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-all border border-[var(--border-primary)] border-rose-500/20 cursor-pointer">Clear All</button>
+                <button onClick={() => loadDemo("fizzbuzz")} className="py-2 rounded-xl text-[10px] font-bold bg-[var(--bg-hover)] text-[var(--text-primary)] hover:bg-[var(--bg-input)] transition-all border border-[var(--border-primary)] cursor-pointer">FizzBuzz</button>
+                <button onClick={() => loadDemo("clear")} className="py-2 rounded-xl text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition-all border border-[var(--border-primary)] cursor-pointer">Clear All</button>
               </div>
             </div>
           </div>
@@ -550,13 +518,13 @@ export default function CreateProblem() {
             {/* Panel header */}
             <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: "var(--border-primary)", background: "var(--bg-secondary)" }}>
               <div className="flex items-center gap-3">
-                {(() => { const s = STEPS.find(s => s.id === activeTab); const I = s?.icon; return I ? <I size={16} className="text-zinc-400" /> : null; })()}
+                {(() => { const s = STEPS.find(s => s.id === activeTab); const I = s?.icon; return I ? <I size={16} className="text-[var(--accent-primary)]" /> : null; })()}
                 <div>
-                  <h2 className="text-sm font-black text-white">{STEPS.find(s => s.id === activeTab)?.label}</h2>
-                  <p className="text-[10px] text-slate-500">{STEPS.find(s => s.id === activeTab)?.desc}</p>
+                  <h2 className="text-sm font-black text-[var(--text-primary)]">{STEPS.find(s => s.id === activeTab)?.label}</h2>
+                  <p className="text-[10px] text-[var(--text-muted)]">{STEPS.find(s => s.id === activeTab)?.desc}</p>
                 </div>
               </div>
-              <span className="text-[11px] font-bold text-slate-600">Step {idx + 1} / {STEPS.length}</span>
+              <span className="text-[11px] font-bold text-[var(--text-muted)]">Step {idx + 1} / {STEPS.length}</span>
             </div>
 
             {/* Panel body */}
@@ -568,15 +536,15 @@ export default function CreateProblem() {
                   <motion.div key="details" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div className="space-y-2">
-                        <label className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-1">
+                        <label className="text-[11px] font-extrabold uppercase tracking-widest text-[var(--text-muted)] flex items-center gap-1">
                           Problem Title <span className="text-rose-500 text-base leading-none">*</span>
                         </label>
                         <DarkInput placeholder="e.g. Invert Binary Tree" value={title} onChange={e => handleTitleChange(e.target.value)} />
                         {errors.title && <p className="text-[10px] text-rose-400 flex items-center gap-1"><AlertCircle size={10} />{errors.title}</p>}
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
-                          Slug / ID <span className="text-slate-600 normal-case font-normal text-[10px]">(auto-generated)</span>
+                        <label className="text-[11px] font-extrabold uppercase tracking-widest text-[var(--text-muted)]">
+                          Slug / ID <span className="text-[var(--text-muted)] normal-case font-normal text-[10px]">(auto-generated)</span>
                         </label>
                         <DarkInput
                           placeholder="e.g. invert-binary-tree"
@@ -588,7 +556,7 @@ export default function CreateProblem() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
+                        <label className="text-[11px] font-extrabold uppercase tracking-widest text-[var(--text-muted)]">
                           Difficulty <span className="text-rose-500 text-base leading-none">*</span>
                         </label>
                         <DarkSelect value={difficulty} onChange={e => setDifficulty(e.target.value)}>
@@ -598,7 +566,7 @@ export default function CreateProblem() {
                         </DarkSelect>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">Category / Domain</label>
+                        <label className="text-[11px] font-extrabold uppercase tracking-widest text-[var(--text-muted)]">Category / Domain</label>
                         <DarkSelect value={category} onChange={e => setCategory(e.target.value)}>
                           <option value="Security">Security</option>
                           <option value="Algorithms">Algorithms</option>
@@ -609,7 +577,7 @@ export default function CreateProblem() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
-                        Tags <span className="text-slate-600 normal-case font-normal text-[10px]">(comma-separated)</span>
+                        Tags <span className="text-[var(--text-muted)] normal-case font-normal text-[10px]">(comma-separated)</span>
                       </label>
                       <div className="relative">
                         <Tag size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600" />
@@ -645,7 +613,7 @@ export default function CreateProblem() {
                         {statSub === "desc" && (
                           <>
                             <div className="flex items-center justify-between flex-wrap gap-2">
-                              <label className="text-[11px] font-extrabold uppercase tracking-widest text-zinc-400">Problem Description *</label>
+                              <label className="text-[11px] font-extrabold uppercase tracking-widest text-zinc-400">Problem Description</label>
                               <MdToolbar taRef={descRef} setValue={setDesc} />
                             </div>
                             <DarkTextarea ref={descRef} placeholder={"Describe the problem in markdown…\n\n### Example\nFor N = 5, output 1 2 3 4 5"} value={desc} onChange={e => setDesc(e.target.value)} rows={14} />
@@ -655,7 +623,7 @@ export default function CreateProblem() {
                         {statSub === "input" && (
                           <>
                             <div className="flex items-center justify-between flex-wrap gap-2">
-                              <label className="text-[11px] font-extrabold uppercase tracking-widest text-violet-400">Input Format *</label>
+                              <label className="text-[11px] font-extrabold uppercase tracking-widest text-violet-400">Input Format</label>
                               <MdToolbar taRef={inputFmtRef} setValue={setInputFmt} />
                             </div>
                             <DarkTextarea ref={inputFmtRef} placeholder="Describe the input format clearly…" value={inputFmt} onChange={e => setInputFmt(e.target.value)} rows={10} />
@@ -665,7 +633,7 @@ export default function CreateProblem() {
                         {statSub === "output" && (
                           <>
                             <div className="flex items-center justify-between flex-wrap gap-2">
-                              <label className="text-[11px] font-extrabold uppercase tracking-widest text-cyan-400">Output Format *</label>
+                              <label className="text-[11px] font-extrabold uppercase tracking-widest text-cyan-400">Output Format</label>
                               <MdToolbar taRef={outputFmtRef} setValue={setOutputFmt} />
                             </div>
                             <DarkTextarea ref={outputFmtRef} placeholder="Describe the expected output format…" value={outputFmt} onChange={e => setOutputFmt(e.target.value)} rows={10} />
@@ -675,7 +643,7 @@ export default function CreateProblem() {
                         {statSub === "constr" && (
                           <>
                             <div className="flex items-center justify-between flex-wrap gap-2">
-                              <label className="text-[11px] font-extrabold uppercase tracking-widest text-amber-400">Constraints *</label>
+                              <label className="text-[11px] font-extrabold uppercase tracking-widest text-amber-400">Constraints</label>
                               <MdToolbar taRef={constraintsRef} setValue={setConstr} />
                             </div>
                             <DarkTextarea ref={constraintsRef} placeholder={"1 ≤ N ≤ 10^5\n-10^9 ≤ A[i] ≤ 10^9"} value={constr} onChange={e => setConstr(e.target.value)} rows={10} />
@@ -784,16 +752,16 @@ export default function CreateProblem() {
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <label className="text-[10px] font-extrabold uppercase tracking-widest text-amber-400">Input</label>
-                              <textarea placeholder="Test input…" value={tc.input}
+                              <label className="text-[10px] font-extrabold uppercase tracking-widest text-amber-400">Input Data</label>
+                              <textarea placeholder="Input content…" value={tc.input}
                                 onChange={e => { const n = [...testCases]; n[i].input = e.target.value; setTestCases(n); }}
-                                rows={4} className="w-full rounded-xl px-4 py-3 text-xs bg-[#0d1117] border border-[var(--border-primary)] border-white/10 text-slate-300 font-mono outline-none resize-y focus:border-amber-500/40 transition-all placeholder:text-slate-700" />
+                                rows={4} className="w-full rounded-xl px-4 py-3 text-xs bg-[var(--bg-code)] text-[var(--text-primary)] border border-[var(--border-primary)] font-mono outline-none resize-y focus:border-[var(--accent-primary)] transition-all placeholder-[var(--text-muted)]" />
                             </div>
                             <div className="space-y-2">
                               <label className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-400">Expected Output</label>
                               <textarea placeholder="Expected output…" value={tc.expectedOutput}
                                 onChange={e => { const n = [...testCases]; n[i].expectedOutput = e.target.value; setTestCases(n); }}
-                                rows={4} className="w-full rounded-xl px-4 py-3 text-xs bg-[#0d1117] border border-[var(--border-primary)] border-white/10 text-slate-300 font-mono outline-none resize-y focus:border-emerald-500/40 transition-all placeholder:text-slate-700" />
+                                rows={4} className="w-full rounded-xl px-4 py-3 text-xs bg-[var(--bg-code)] text-[var(--text-primary)] border border-[var(--border-primary)] font-mono outline-none resize-y focus:border-[var(--accent-primary)] transition-all placeholder-[var(--text-muted)]" />
                             </div>
                           </div>
                         </motion.div>
@@ -816,23 +784,23 @@ export default function CreateProblem() {
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       {[
-                        { id: "followup",   label: "Followup",   icon: "💬", cls: "text-zinc-400 bg-zinc-500/15 border-zinc-500/40" },
-                        { id: "editorial",  label: "Editorial",  icon: "📖", cls: "text-violet-400 bg-violet-500/15 border-violet-500/40" },
-                        { id: "solution",   label: "Solution",   icon: "✅", cls: "text-emerald-400 bg-emerald-500/15 border-emerald-500/40" },
-                        { id: "evaluation", label: "Evaluation", icon: "🎯", cls: "text-amber-400 bg-amber-500/15 border-amber-500/40" },
+                        { id: "followup",   label: "Followup",   icon: "💬", cls: "text-zinc-500 bg-zinc-500/15 border-zinc-500/40" },
+                        { id: "editorial",  label: "Editorial",  icon: "📖", cls: "text-violet-500 bg-violet-500/15 border-violet-500/40" },
+                        { id: "solution",   label: "Solution",   icon: "✅", cls: "text-emerald-500 bg-emerald-500/15 border-emerald-500/40" },
+                        { id: "evaluation", label: "Evaluation", icon: "🎯", cls: "text-amber-500 bg-amber-500/15 border-amber-500/40" },
                       ].map(s => (
                         <button key={s.id} type="button" onClick={() => setSub5(s.id)}
-                          className={`py-3 rounded-xl text-[11px] font-bold border border-[var(--border-primary)] transition-all cursor-pointer flex flex-col items-center gap-1 ${sub5 === s.id ? s.cls : "bg-white/5 border-white/10 text-slate-500 hover:text-slate-300"}`}>
+                          className={`py-3 rounded-xl text-[11px] font-bold border border-[var(--border-primary)] transition-all cursor-pointer flex flex-col items-center gap-1 ${sub5 === s.id ? s.cls : "bg-[var(--bg-input)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"}`}>
                           <span>{s.icon}</span>{s.label}
                         </button>
                       ))}
                     </div>
                     <AnimatePresence mode="wait">
                       {[
-                        { id: "followup",   ref: followupRef,   val: followup,   set: setFollowup,   lbl: "Followup Questions *",       clr: "text-zinc-400",  previewCls: "border-zinc-500/20 bg-zinc-500/5" },
-                        { id: "editorial",  ref: editorialRef,  val: editorial,  set: setEditorial,  lbl: "Editorial / Approach *",     clr: "text-violet-400",  previewCls: "border-violet-500/20 bg-violet-500/5" },
-                        { id: "solution",   ref: solutionRef,   val: solution,   set: setSolution,   lbl: "Official Solution Code *",   clr: "text-emerald-400", previewCls: "border-emerald-500/20 bg-emerald-500/5" },
-                        { id: "evaluation", ref: evaluationRef, val: evaluation, set: setEvaluation, lbl: "Evaluation Criteria *",      clr: "text-amber-400",   previewCls: "border-amber-500/20 bg-amber-500/5" },
+                        { id: "followup",   ref: followupRef,   val: followup,   set: setFollowup,   lbl: "Followup Questions",       clr: "text-zinc-400",  previewCls: "border-zinc-500/20 bg-zinc-500/5" },
+                        { id: "editorial",  ref: editorialRef,  val: editorial,  set: setEditorial,  lbl: "Editorial / Approach",     clr: "text-violet-400",  previewCls: "border-violet-500/20 bg-violet-500/5" },
+                        { id: "solution",   ref: solutionRef,   val: solution,   set: setSolution,   lbl: "Official Solution Code",   clr: "text-emerald-400", previewCls: "border-emerald-500/20 bg-emerald-500/5" },
+                        { id: "evaluation", ref: evaluationRef, val: evaluation, set: setEvaluation, lbl: "Evaluation Criteria",      clr: "text-amber-400",   previewCls: "border-amber-500/20 bg-amber-500/5" },
                       ].filter(s => s.id === sub5).map(s => (
                         <motion.div key={s.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                           <div className="space-y-2">
