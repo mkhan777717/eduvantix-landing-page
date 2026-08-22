@@ -1390,6 +1390,7 @@ export default function CareersClient({ standalone = true }) {
   const [myApplications, setMyApplications] = useState([]);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showJobDetail, setShowJobDetail] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState(0);
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -1543,9 +1544,9 @@ export default function CareersClient({ standalone = true }) {
 
       {/* Main Page Layout */}
       <div className="flex-1 flex min-h-0">
-        {/* Left Vertical Navigation Bar */}
+        {/* Left Vertical Navigation Bar (Desktop Only) */}
         <aside
-          className="w-20 sm:w-24 shrink-0 border-r flex flex-col items-center py-6 gap-6 sticky top-0 h-[calc(100vh-64px)] overflow-y-auto no-scrollbar z-20"
+          className="hidden md:flex w-20 sm:w-24 shrink-0 border-r flex-col items-center py-6 gap-6 sticky top-0 h-[calc(100vh-64px)] overflow-y-auto no-scrollbar z-20"
           style={{ backgroundColor: isDark ? "#0A0A0A" : "#FAFAFA", borderColor: border }}
         >
           {TOP_TABS.map((tab) => {
@@ -1588,8 +1589,8 @@ export default function CareersClient({ standalone = true }) {
           })}
         </aside>
 
-        {/* MAIN CONTENT AREA (Scrolls naturally) */}
-        <main className="flex-1 min-w-0">
+        {/* MAIN CONTENT AREA (Scrolls naturally, with bottom padding on mobile for bottom nav) */}
+        <main className="flex-1 min-w-0 pb-20 md:pb-0">
           {/* ── TAB 1: HOME ── */}
           {activeTab === "home" && (
             <div className="relative flex flex-col" style={{ backgroundColor: bg }}>
@@ -1925,19 +1926,21 @@ export default function CareersClient({ standalone = true }) {
           {/* ── TAB 4: HOW WE WORK ── */}
           {activeTab === "how-we-work" && (
             <div className="p-6 md:p-12 space-y-12 max-w-6xl mx-auto">
+              {/* Modern Subtabs Pill Bar without browser scrollbars */}
               <div className="flex items-center justify-center">
                 <div
-                  className="inline-flex items-center gap-1.5 p-1 rounded-xl border overflow-x-auto"
+                  className="inline-flex items-center gap-1.5 p-1.5 rounded-2xl border shadow-sm max-w-full overflow-x-auto no-scrollbar scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                   style={{ backgroundColor: isDark ? "#0A0A0A" : "#F4F4F5", borderColor: border }}
                 >
                   {WORK_SUB_TABS.map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setActiveWorkSubTab(tab.id)}
-                      className="px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap"
+                      className="px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap"
                       style={{
                         backgroundColor: activeWorkSubTab === tab.id ? (isDark ? "#1C1C1C" : "#FFFFFF") : "transparent",
-                        color: activeWorkSubTab === tab.id ? text : secondary,
+                        color: activeWorkSubTab === tab.id ? (isDark ? "#FFFFFF" : "#111111") : secondary,
+                        boxShadow: activeWorkSubTab === tab.id ? "0 2px 8px rgba(0,0,0,0.08)" : "none",
                       }}
                     >
                       {tab.label}
@@ -1947,29 +1950,65 @@ export default function CareersClient({ standalone = true }) {
               </div>
 
               {activeWorkSubTab === "overview" && (
-                <div className="space-y-8">
-                  <div className="text-center max-w-2xl mx-auto">
-                    <span className="text-xs font-semibold tracking-widest uppercase block mb-3" style={{ color: "#10b981" }}>
-                      Team Culture
+                <div className="space-y-10">
+                  {/* Hero Header */}
+                  <div className="text-center max-w-3xl mx-auto space-y-3">
+                    <span className="text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full border inline-block" style={{ color: "#10b981", borderColor: "rgba(16,185,129,0.25)", backgroundColor: "rgba(16,185,129,0.08)" }}>
+                      Team Culture &amp; Values
                     </span>
-                    <h2 className="text-3xl font-extrabold tracking-tight" style={{ color: text, fontFamily: `-apple-system, BlinkMacSystemFont, 'Inter', sans-serif` }}>
-                      How We Work at Eduvantix
+                    <h2 className="text-3xl md:text-4xl font-black tracking-tight" style={{ color: text, fontFamily: `-apple-system, BlinkMacSystemFont, 'Inter', sans-serif` }}>
+                      How We Build &amp; Ship at Eduvantix
                     </h2>
-                    <p className="mt-2 text-sm" style={{ color: secondary }}>
-                      Remote-first flexibility, daily collaboration, direct founder mentorship, and real production impact.
+                    <p className="text-sm leading-relaxed" style={{ color: secondary }}>
+                      A high-ownership engineering environment where remote flexibility meets daily collaboration and real production impact.
                     </p>
                   </div>
 
+                  {/* Highlights Banner Stats */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[
+                      { label: "Remote Flexibility", value: "100%", desc: "Async & schedule freedom", icon: Globe, color: "#10b981" },
+                      { label: "Daily Live Sync", value: "30 min", desc: "Unblock & build together", icon: Laptop, color: "#6366f1" },
+                      { label: "Founder Mentorship", value: "1-on-1", desc: "Direct architecture pairing", icon: Sparkles, color: "#f59e0b" },
+                      { label: "Production Impact", value: "Immediate", desc: "Ship to active students", icon: Rocket, color: "#ec4899" },
+                    ].map((stat, i) => {
+                      const Icon = stat.icon;
+                      return (
+                        <div
+                          key={i}
+                          className="p-5 rounded-2xl border transition-transform hover:-translate-y-1 space-y-2"
+                          style={{ backgroundColor: cardBg, borderColor: border }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
+                              <Icon size={16} />
+                            </div>
+                            <span className="text-lg font-black" style={{ color: text }}>{stat.value}</span>
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold" style={{ color: text }}>{stat.label}</p>
+                            <p className="text-[11px] mt-0.5" style={{ color: secondary }}>{stat.desc}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* 4 Core Pillars Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                     {[
-                      { icon: Globe, title: "Remote-First", desc: "Work from home or campus with flexible schedules while staying connected." },
-                      { icon: Laptop, title: "Daily Syncs", desc: "Quick daily syncs to align tasks, brainstorm, and unblock code together." },
-                      { icon: Sparkles, title: "Direct Mentorship", desc: "Work closely with company founders and leads on high-impact features." },
-                      { icon: IndianRupee, title: "Skill-Based Pay", desc: "Performance-indexed stipend + official completion letters & LOR." },
+                      { icon: Globe, title: "Remote-First", desc: "Work from home or campus with flexible schedules while staying connected across regions." },
+                      { icon: Laptop, title: "Daily Live Syncs", desc: "Quick daily standups to align sprint goals, brainstorm UI, and unblock code together." },
+                      { icon: Sparkles, title: "Direct Mentorship", desc: "Pair closely with company founders and leads on high-throughput backend and AI systems." },
+                      { icon: IndianRupee, title: "Skill-Based Pay", desc: "Performance-indexed compensation + official verified completion credentials & LOR." },
                     ].map((card, i) => {
                       const Icon = card.icon;
                       return (
-                        <div key={i} className="p-6 rounded-2xl border space-y-3" style={{ backgroundColor: cardBg, borderColor: border }}>
+                        <div
+                          key={i}
+                          className="p-6 rounded-2xl border space-y-3 transition-all hover:shadow-lg hover:-translate-y-1"
+                          style={{ backgroundColor: cardBg, borderColor: border }}
+                        >
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: "rgba(16,185,129,0.1)", color: "#10b981" }}>
                             <Icon size={20} />
                           </div>
@@ -1983,26 +2022,54 @@ export default function CareersClient({ standalone = true }) {
               )}
 
               {activeWorkSubTab === "flexibility" && (
-                <div className="space-y-8">
-                  <div className="text-center max-w-2xl mx-auto">
-                    <span className="text-xs font-semibold tracking-widest uppercase block mb-3" style={{ color: "#10b981" }}>
+                <div className="space-y-10">
+                  <div className="text-center max-w-2xl mx-auto space-y-2">
+                    <span className="text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full border inline-block" style={{ color: "#10b981", borderColor: "rgba(16,185,129,0.25)", backgroundColor: "rgba(16,185,129,0.08)" }}>
                       Work Autonomy
                     </span>
                     <h2 className="text-3xl font-extrabold tracking-tight" style={{ color: text, fontFamily: `-apple-system, BlinkMacSystemFont, 'Inter', sans-serif` }}>
                       Flexible Working &amp; Daily Syncs
                     </h2>
+                    <p className="text-xs leading-relaxed" style={{ color: secondary }}>
+                      We optimize for high-trust output over rigid hours. Work when you are most productive.
+                    </p>
+                  </div>
+
+                  {/* Daily Engineering Rituals Flow */}
+                  <div className="p-7 rounded-3xl border space-y-6" style={{ backgroundColor: cardBg, borderColor: border }}>
+                    <div className="flex items-center gap-2">
+                      <Zap size={18} className="text-emerald-500" />
+                      <h3 className="text-base font-bold" style={{ color: text }}>A Typical Day at Eduvantix</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      {[
+                        { step: "Morning Async", time: "Flexible", title: "Slack / Discord Update", desc: "Share what you finished and what you are building today." },
+                        { step: "Midday Sync", time: "30 Mins", title: "Live Huddle & Pairing", desc: "Share screen, demo features, and debug complex challenges together." },
+                        { step: "Deep Focus", time: "Self-Paced", title: "Uninterrupted Coding", desc: "Deep work blocks without unnecessary meetings or micro-management." },
+                        { step: "Continuous Ship", time: "Daily", title: "PR Review & Deploy", desc: "Fast code reviews from senior engineers and continuous deployment." },
+                      ].map((item, i) => (
+                        <div key={i} className="p-4 rounded-2xl border space-y-2" style={{ backgroundColor: isDark ? "#0A0A0A" : "#FAFAFA", borderColor: border }}>
+                          <div className="flex items-center justify-between text-[10px] font-bold">
+                            <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">{item.step}</span>
+                            <span style={{ color: secondary }}>{item.time}</span>
+                          </div>
+                          <h4 className="text-xs font-bold" style={{ color: text }}>{item.title}</h4>
+                          <p className="text-[11px] leading-relaxed" style={{ color: secondary }}>{item.desc}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {[
-                      { icon: Laptop, title: "Daily Live Collaboration", desc: "Review progress, share screen to debug code, and keep aligned on sprint goals." },
-                      { icon: Clock, title: "Flexible Work Schedule", desc: "Manage your own hours around college classes or personal routine." },
-                      { icon: Globe, title: "Work From Anywhere", desc: "100% remote-friendly structure with reliable async communication." },
-                      { icon: Heart, title: "Direct Founder Access", desc: "Jump on a quick call anytime with senior devs to resolve blockers fast." },
+                      { icon: Laptop, title: "Daily Live Collaboration", desc: "Review progress, share screen to debug code, and keep aligned on sprint goals with senior engineers." },
+                      { icon: Clock, title: "Flexible Work Schedule", desc: "Manage your own hours around college classes, exam periods, or personal routines." },
+                      { icon: Globe, title: "Work From Anywhere", desc: "100% remote-friendly structure with reliable async tools (Slack, GitHub, LiveKit)." },
+                      { icon: Heart, title: "Direct Founder Access", desc: "Jump on a quick call anytime with founders to resolve blockers and discuss ideas." },
                     ].map((card, i) => {
                       const Icon = card.icon;
                       return (
-                        <div key={i} className="p-7 rounded-2xl border space-y-3" style={{ backgroundColor: cardBg, borderColor: border }}>
+                        <div key={i} className="p-7 rounded-2xl border space-y-3 transition-all hover:shadow-lg" style={{ backgroundColor: cardBg, borderColor: border }}>
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: "rgba(16,185,129,0.1)", color: "#10b981" }}>
                             <Icon size={20} />
                           </div>
@@ -2017,8 +2084,8 @@ export default function CareersClient({ standalone = true }) {
 
               {activeWorkSubTab === "benefits" && (
                 <div className="space-y-8">
-                  <div className="text-center max-w-2xl mx-auto">
-                    <span className="text-xs font-semibold tracking-widest uppercase block mb-3" style={{ color: "#10b981" }}>
+                  <div className="text-center max-w-2xl mx-auto space-y-2">
+                    <span className="text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full border inline-block" style={{ color: "#10b981", borderColor: "rgba(16,185,129,0.25)", backgroundColor: "rgba(16,185,129,0.08)" }}>
                       Perks &amp; Rewards
                     </span>
                     <h2 className="text-3xl font-extrabold tracking-tight" style={{ color: text, fontFamily: `-apple-system, BlinkMacSystemFont, 'Inter', sans-serif` }}>
@@ -2026,7 +2093,7 @@ export default function CareersClient({ standalone = true }) {
                     </h2>
                   </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[
                       { icon: IndianRupee, title: "Skill-Indexed Stipend", desc: "Fair compensation evaluated directly on practical task performance and code quality." },
                       { icon: Award, title: "Founder LOR", desc: "Personalized Letter of Recommendation signed directly by founders for top performers." },
@@ -2037,7 +2104,7 @@ export default function CareersClient({ standalone = true }) {
                     ].map((card, i) => {
                       const Icon = card.icon;
                       return (
-                        <div key={i} className="p-7 rounded-2xl border space-y-3" style={{ backgroundColor: cardBg, borderColor: border }}>
+                        <div key={i} className="p-7 rounded-2xl border space-y-3 transition-all hover:shadow-lg" style={{ backgroundColor: cardBg, borderColor: border }}>
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: "rgba(16,185,129,0.1)", color: "#10b981" }}>
                             <Icon size={20} />
                           </div>
@@ -2052,8 +2119,8 @@ export default function CareersClient({ standalone = true }) {
 
               {activeWorkSubTab === "diversity" && (
                 <div className="space-y-8">
-                  <div className="text-center max-w-2xl mx-auto">
-                    <span className="text-xs font-semibold tracking-widest uppercase block mb-3" style={{ color: "#10b981" }}>
+                  <div className="text-center max-w-2xl mx-auto space-y-2">
+                    <span className="text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full border inline-block" style={{ color: "#10b981", borderColor: "rgba(16,185,129,0.25)", backgroundColor: "rgba(16,185,129,0.08)" }}>
                       Inclusion &amp; Culture
                     </span>
                     <h2 className="text-3xl font-extrabold tracking-tight" style={{ color: text, fontFamily: `-apple-system, BlinkMacSystemFont, 'Inter', sans-serif` }}>
@@ -2070,7 +2137,7 @@ export default function CareersClient({ standalone = true }) {
                     ].map((card, i) => {
                       const Icon = card.icon;
                       return (
-                        <div key={i} className="p-7 rounded-2xl border space-y-3" style={{ backgroundColor: cardBg, borderColor: border }}>
+                        <div key={i} className="p-7 rounded-2xl border space-y-3 transition-all hover:shadow-lg" style={{ backgroundColor: cardBg, borderColor: border }}>
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: "rgba(16,185,129,0.1)", color: "#10b981" }}>
                             <Icon size={20} />
                           </div>
@@ -2088,19 +2155,21 @@ export default function CareersClient({ standalone = true }) {
           {/* ── TAB 5: HOW WE HIRE ── */}
           {activeTab === "how-we-hire" && (
             <div className="p-6 md:p-12 space-y-12 max-w-6xl mx-auto">
+              {/* Subtabs Pill Bar */}
               <div className="flex items-center justify-center">
                 <div
-                  className="inline-flex items-center gap-1.5 p-1 rounded-xl border overflow-x-auto"
+                  className="inline-flex items-center gap-1.5 p-1.5 rounded-2xl border shadow-sm max-w-full overflow-x-auto no-scrollbar scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                   style={{ backgroundColor: isDark ? "#0A0A0A" : "#F4F4F5", borderColor: border }}
                 >
                   {HIRE_SUB_TABS.map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setActiveHireSubTab(tab.id)}
-                      className="px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap"
+                      className="px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap"
                       style={{
                         backgroundColor: activeHireSubTab === tab.id ? (isDark ? "#1C1C1C" : "#FFFFFF") : "transparent",
-                        color: activeHireSubTab === tab.id ? text : secondary,
+                        color: activeHireSubTab === tab.id ? (isDark ? "#FFFFFF" : "#111111") : secondary,
+                        boxShadow: activeHireSubTab === tab.id ? "0 2px 8px rgba(0,0,0,0.08)" : "none",
                       }}
                     >
                       {tab.label}
@@ -2111,8 +2180,8 @@ export default function CareersClient({ standalone = true }) {
 
               {activeHireSubTab === "process" && (
                 <div className="space-y-8">
-                  <div className="text-center max-w-2xl mx-auto">
-                    <span className="text-xs font-semibold tracking-widest uppercase block mb-3" style={{ color: "#10b981" }}>
+                  <div className="text-center max-w-2xl mx-auto space-y-2">
+                    <span className="text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full border inline-block" style={{ color: "#10b981", borderColor: "rgba(16,185,129,0.25)", backgroundColor: "rgba(16,185,129,0.08)" }}>
                       Selection Journey
                     </span>
                     <h2 className="text-3xl font-extrabold tracking-tight" style={{ color: text, fontFamily: `-apple-system, BlinkMacSystemFont, 'Inter', sans-serif` }}>
@@ -2123,12 +2192,12 @@ export default function CareersClient({ standalone = true }) {
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
                     {[
                       { step: "01", title: "Apply Online", desc: "Submit your resume & portfolio link in under 2 minutes." },
-                      { step: "02", title: "Practical Assessment", desc: "Complete a short real-world task focused on actual code or design." },
-                      { step: "03", title: "Team Chat", desc: "30-minute conversation with engineering leads & founders." },
-                      { step: "04", title: "Offer & Onboarding", desc: "Receive a transparent offer and set up your welcome tech kit." },
+                      { step: "02", title: "Practical Task", desc: "Complete a short real-world challenge focused on actual code or UI." },
+                      { step: "03", title: "Team Chat", desc: "30-minute friendly conversation with engineering leads & founders." },
+                      { step: "04", title: "Offer & Welcome", desc: "Receive transparent offer details and welcome tech kit setup." },
                     ].map((step, i) => (
-                      <div key={i} className="p-6 rounded-2xl border space-y-3" style={{ backgroundColor: cardBg, borderColor: border }}>
-                        <span className="text-2xl font-mono font-bold" style={{ color: "#10b981" }}>{step.step}</span>
+                      <div key={i} className="p-6 rounded-2xl border space-y-3 transition-all hover:shadow-lg hover:-translate-y-1" style={{ backgroundColor: cardBg, borderColor: border }}>
+                        <span className="text-2xl font-mono font-black" style={{ color: "#10b981" }}>{step.step}</span>
                         <h3 className="text-sm font-bold" style={{ color: text }}>{step.title}</h3>
                         <p className="text-xs leading-relaxed" style={{ color: secondary }}>{step.desc}</p>
                       </div>
@@ -2139,8 +2208,8 @@ export default function CareersClient({ standalone = true }) {
 
               {activeHireSubTab === "tips" && (
                 <div className="space-y-8">
-                  <div className="text-center max-w-2xl mx-auto">
-                    <span className="text-xs font-semibold tracking-widest uppercase block mb-3" style={{ color: "#10b981" }}>
+                  <div className="text-center max-w-2xl mx-auto space-y-2">
+                    <span className="text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full border inline-block" style={{ color: "#10b981", borderColor: "rgba(16,185,129,0.25)", backgroundColor: "rgba(16,185,129,0.08)" }}>
                       Application Advice
                     </span>
                     <h2 className="text-3xl font-extrabold tracking-tight" style={{ color: text, fontFamily: `-apple-system, BlinkMacSystemFont, 'Inter', sans-serif` }}>
@@ -2150,13 +2219,13 @@ export default function CareersClient({ standalone = true }) {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {[
-                      { icon: Code, title: "Showcase Deployed Work", desc: "Live web apps, GitHub repositories, and Figma links carry 10x more weight than a long bulleted resume." },
-                      { icon: Lightbulb, title: "Highlight Stack Depth", desc: "Focus on technologies you know deeply. We value strong fundamentals over a shallow list of 20 frameworks." },
-                      { icon: MessageSquare, title: "Ask Insightful Questions", desc: "Ask about our system architecture, growth roadmap, and daily engineering rituals." },
+                      { icon: Code, title: "Showcase Deployed Work", desc: "Live web apps, GitHub repositories, and Figma prototypes carry 10x more weight than bullet points." },
+                      { icon: Lightbulb, title: "Highlight Stack Depth", desc: "Focus on technologies you know deeply. We value strong core fundamentals over a shallow list of 20 frameworks." },
+                      { icon: MessageSquare, title: "Ask Insightful Questions", desc: "Ask about our system architecture, performance bottlenecks, and daily engineering rituals." },
                     ].map((card, i) => {
                       const Icon = card.icon;
                       return (
-                        <div key={i} className="p-7 rounded-2xl border space-y-3" style={{ backgroundColor: cardBg, borderColor: border }}>
+                        <div key={i} className="p-7 rounded-2xl border space-y-3 transition-all hover:shadow-lg" style={{ backgroundColor: cardBg, borderColor: border }}>
                           <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: "rgba(16,185,129,0.1)", color: "#10b981" }}>
                             <Icon size={20} />
                           </div>
@@ -2171,8 +2240,8 @@ export default function CareersClient({ standalone = true }) {
 
               {activeHireSubTab === "faq" && (
                 <div className="space-y-8 max-w-3xl mx-auto">
-                  <div className="text-center">
-                    <span className="text-xs font-semibold tracking-widest uppercase block mb-3" style={{ color: "#10b981" }}>
+                  <div className="text-center space-y-2">
+                    <span className="text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full border inline-block" style={{ color: "#10b981", borderColor: "rgba(16,185,129,0.25)", backgroundColor: "rgba(16,185,129,0.08)" }}>
                       Hiring FAQ
                     </span>
                     <h2 className="text-3xl font-extrabold tracking-tight" style={{ color: text, fontFamily: `-apple-system, BlinkMacSystemFont, 'Inter', sans-serif` }}>
@@ -2186,12 +2255,25 @@ export default function CareersClient({ standalone = true }) {
                       { q: "How long does the selection process take?", a: "Our team reviews applications within 3-5 business days. The end-to-end process typically takes 7-10 days." },
                       { q: "Is the practical skill assessment paid?", a: "Short screening tasks (<2 hrs) are unpaid. For extended trial projects or assignments, candidates are fully compensated." },
                       { q: "Are all engineering and design roles remote?", a: "Yes, most of our roles are fully remote-friendly, with optional access to our Bangalore HQ." },
-                    ].map((item, i) => (
-                      <div key={i} className="p-5 rounded-xl border space-y-2" style={{ backgroundColor: cardBg, borderColor: border }}>
-                        <h3 className="text-sm font-bold" style={{ color: text }}>{item.q}</h3>
-                        <p className="text-xs leading-relaxed" style={{ color: secondary }}>{item.a}</p>
-                      </div>
-                    ))}
+                    ].map((item, i) => {
+                      const isOpen = openFaqIndex === i;
+                      return (
+                        <div
+                          key={i}
+                          onClick={() => setOpenFaqIndex(isOpen ? -1 : i)}
+                          className="p-5 rounded-2xl border transition-all cursor-pointer space-y-2"
+                          style={{ backgroundColor: cardBg, borderColor: isOpen ? "#10b981" : border }}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <h3 className="text-sm font-bold" style={{ color: text }}>{item.q}</h3>
+                            <ChevronDown size={16} className={`transition-transform duration-200 shrink-0 ${isOpen ? "rotate-180 text-emerald-500" : ""}`} style={{ color: isOpen ? "#10b981" : secondary }} />
+                          </div>
+                          {isOpen && (
+                            <p className="text-xs leading-relaxed pt-1" style={{ color: secondary }}>{item.a}</p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -2200,13 +2282,73 @@ export default function CareersClient({ standalone = true }) {
 
           {/* ── TAB 6: MY APPLICATIONS ── */}
           {activeTab === "my-applications" && (
-            <div className="p-6 md:p-12 max-w-4xl mx-auto space-y-6">
+            <div className="p-6 md:p-12 max-w-4xl mx-auto space-y-8">
+              {/* Candidate Profile Overview Header */}
+              {user && (
+                <div
+                  className="p-6 md:p-8 rounded-3xl border shadow-sm space-y-6 relative overflow-hidden"
+                  style={{ backgroundColor: cardBg, borderColor: border }}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div
+                        className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold uppercase shadow-inner border"
+                        style={{
+                          backgroundColor: "rgba(16,185,129,0.12)",
+                          color: "#10b981",
+                          borderColor: "rgba(16,185,129,0.25)"
+                        }}
+                      >
+                        {user.username?.charAt(0) || "U"}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h2 className="text-xl font-extrabold" style={{ color: text }}>{user.fullName || user.username}</h2>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                            Active Candidate
+                          </span>
+                        </div>
+                        <p className="text-xs font-medium mt-0.5" style={{ color: secondary }}>{user.email}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setActiveTab("jobs")}
+                      className="px-4 py-2.5 rounded-xl text-xs font-bold text-white transition-opacity hover:opacity-90 cursor-pointer shadow-md shrink-0 self-start sm:self-auto"
+                      style={{ backgroundColor: "#059669" }}
+                    >
+                      Browse Open Jobs
+                    </button>
+                  </div>
+
+                  {/* Summary Metric Counters */}
+                  <div className="grid grid-cols-3 gap-3 pt-2 border-t" style={{ borderColor: border }}>
+                    <div className="p-3.5 rounded-xl text-center" style={{ backgroundColor: isDark ? "#0A0A0A" : "#FAFAFA" }}>
+                      <span className="text-xl font-extrabold block" style={{ color: text }}>{myApplications.length}</span>
+                      <span className="text-[11px] font-medium" style={{ color: secondary }}>Total Applications</span>
+                    </div>
+                    <div className="p-3.5 rounded-xl text-center" style={{ backgroundColor: isDark ? "#0A0A0A" : "#FAFAFA" }}>
+                      <span className="text-xl font-extrabold text-amber-500 block">
+                        {myApplications.filter(a => a.status === "SUBMITTED" || !a.status).length}
+                      </span>
+                      <span className="text-[11px] font-medium" style={{ color: secondary }}>Under Review</span>
+                    </div>
+                    <div className="p-3.5 rounded-xl text-center" style={{ backgroundColor: isDark ? "#0A0A0A" : "#FAFAFA" }}>
+                      <span className="text-xl font-extrabold text-emerald-500 block">
+                        {myApplications.filter(a => a.status === "SHORTLISTED" || a.status === "HIRED").length}
+                      </span>
+                      <span className="text-[11px] font-medium" style={{ color: secondary }}>Shortlisted</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div>
-                <span className="text-xs font-semibold tracking-widest uppercase block mb-2" style={{ color: "#10b981" }}>
-                  Candidate Dashboard
+                <span className="text-xs font-semibold tracking-widest uppercase block mb-1" style={{ color: "#10b981" }}>
+                  Application Status
                 </span>
-                <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: text, fontFamily: `-apple-system, BlinkMacSystemFont, 'Inter', sans-serif` }}>
-                  My Applications
+                <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: text, fontFamily: `-apple-system, BlinkMacSystemFont, 'Inter', sans-serif` }}>
+                  Submitted Applications
                 </h1>
               </div>
 
@@ -2253,34 +2395,51 @@ export default function CareersClient({ standalone = true }) {
                   {myApplications.map((app) => (
                     <div
                       key={app.id}
-                      className="p-6 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-4"
+                      className="p-6 rounded-2xl border space-y-4 transition-all hover:shadow-md"
                       style={{ backgroundColor: cardBg, borderColor: border }}
                     >
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span
-                            className="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase"
-                            style={{ backgroundColor: "rgba(16,185,129,0.1)", color: "#10b981", border: "1px solid rgba(16,185,129,0.2)" }}
-                          >
-                            {app.type}
-                          </span>
-                          <span className="text-xs" style={{ color: secondary }}>Applied on {app.appliedAt}</span>
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span
+                              className="px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase"
+                              style={{ backgroundColor: "rgba(16,185,129,0.1)", color: "#10b981", border: "1px solid rgba(16,185,129,0.2)" }}
+                            >
+                              {app.type}
+                            </span>
+                            <span className="text-xs" style={{ color: secondary }}>Applied on {app.appliedAt}</span>
+                          </div>
+                          <h3 className="text-base font-bold" style={{ color: text }}>{app.jobTitle}</h3>
+                          <p className="text-xs" style={{ color: secondary }}>{app.department} · {app.location}</p>
                         </div>
-                        <h3 className="text-base font-bold" style={{ color: text }}>{app.jobTitle}</h3>
-                        <p className="text-xs" style={{ color: secondary }}>{app.department} · {app.location}</p>
+
+                        <div>
+                          <span
+                            className="px-3.5 py-1.5 rounded-xl text-xs font-bold border inline-flex items-center gap-1.5"
+                            style={{
+                              backgroundColor: app.status === "SHORTLISTED" || app.status === "HIRED" ? "rgba(16,185,129,0.1)" : "rgba(245,158,11,0.1)",
+                              borderColor: app.status === "SHORTLISTED" || app.status === "HIRED" ? "rgba(16,185,129,0.3)" : "rgba(245,158,11,0.3)",
+                              color: app.status === "SHORTLISTED" || app.status === "HIRED" ? "#10b981" : "#f59e0b",
+                            }}
+                          >
+                            <Clock size={13} /> {app.status || "In Review"}
+                          </span>
+                        </div>
                       </div>
 
-                      <div>
-                        <span
-                          className="px-3 py-1.5 rounded-xl text-xs font-semibold border inline-flex items-center gap-1.5"
-                          style={{
-                            backgroundColor: app.status === "SHORTLISTED" || app.status === "HIRED" ? "rgba(16,185,129,0.1)" : "rgba(245,158,11,0.1)",
-                            borderColor: app.status === "SHORTLISTED" || app.status === "HIRED" ? "rgba(16,185,129,0.3)" : "rgba(245,158,11,0.3)",
-                            color: app.status === "SHORTLISTED" || app.status === "HIRED" ? "#10b981" : "#f59e0b",
-                          }}
-                        >
-                          <Clock size={13} /> {app.status || "Submitted"}
-                        </span>
+                      {/* Application Timeline Status Bar */}
+                      <div className="pt-3 border-t" style={{ borderColor: border }}>
+                        <div className="grid grid-cols-4 gap-2 text-center text-[10px] font-bold">
+                          {["Submitted", "Screening", "Interview", "Decision"].map((st, sIdx) => {
+                            const isDone = sIdx === 0 || (app.status === "SHORTLISTED" && sIdx <= 2) || (app.status === "HIRED");
+                            return (
+                              <div key={st} className="space-y-1">
+                                <div className={`h-1.5 rounded-full transition-all ${isDone ? "bg-emerald-500" : (isDark ? "bg-zinc-800" : "bg-zinc-200")}`} />
+                                <span style={{ color: isDone ? "#10b981" : secondary }}>{st}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -2510,6 +2669,73 @@ export default function CareersClient({ standalone = true }) {
           </div>
         </div>
       )}
+
+      {/* Toast Notification */}
+      {showSuccessToast && (
+        <div className="fixed bottom-20 md:bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl border bg-emerald-950/90 border-emerald-500/30 text-emerald-300 shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-bottom-4">
+          <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />
+          <span className="text-xs font-semibold">Application submitted successfully!</span>
+        </div>
+      )}
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t flex items-center justify-around px-1.5 py-2 backdrop-blur-xl bg-opacity-95 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]"
+        style={{
+          backgroundColor: isDark ? "rgba(10, 10, 10, 0.94)" : "rgba(250, 250, 250, 0.94)",
+          borderColor: border,
+        }}
+      >
+        {TOP_TABS.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.key;
+          const shortLabels = {
+            "home": "Home",
+            "jobs": "Jobs",
+            "students": "Ambassadors",
+            "how-we-work": "Culture",
+            "how-we-hire": "Hiring",
+            "my-applications": "Applied",
+          };
+          return (
+            <button
+              key={tab.key}
+              onClick={() => {
+                setActiveTab(tab.key);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className="flex flex-col items-center justify-center gap-1 flex-1 min-w-0 py-1 relative group cursor-pointer transition-all active:scale-95"
+            >
+              <div
+                className="relative w-10 h-7 rounded-xl flex items-center justify-center transition-all"
+                style={{
+                  backgroundColor: isActive ? "rgba(16,185,129,0.15)" : "transparent",
+                  color: isActive ? "#10b981" : secondary,
+                }}
+              >
+                <Icon size={17} />
+                {tab.key === "my-applications" && myApplications.length > 0 && (
+                  <span
+                    className="absolute -top-1 -right-1 px-1 min-w-[15px] h-[15px] rounded-full text-[8px] font-bold text-white flex items-center justify-center"
+                    style={{ backgroundColor: "#10b981" }}
+                  >
+                    {myApplications.length}
+                  </span>
+                )}
+              </div>
+              <span
+                className="text-[9px] text-center leading-none tracking-tight truncate w-full px-0.5 transition-all"
+                style={{
+                  color: isActive ? "#10b981" : secondary,
+                  fontWeight: isActive ? 700 : 500,
+                }}
+              >
+                {shortLabels[tab.key] || tab.label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
 
       {standalone && <Footer />}
     </div>

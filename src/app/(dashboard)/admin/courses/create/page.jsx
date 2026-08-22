@@ -248,8 +248,8 @@ export default function CreateCoursePage() {
             <Input value={form.title} onChange={e => set("title", e.target.value)} placeholder="e.g. Python for Beginners" required />
           </FormField>
 
-          <FormField label="Description" sublabel="Explain what students will learn in this course">
-            <Textarea rows={4} value={form.description} onChange={e => set("description", e.target.value)} placeholder="A comprehensive course covering..." />
+          <FormField label="Description (Markdown supported)" sublabel="Explain what students will learn in this course (supports bold, lists, code, links)">
+            <Textarea rows={4} value={form.description} onChange={e => set("description", e.target.value)} placeholder="A comprehensive course covering... Supports Markdown formatting." />
           </FormField>
 
           <div className="grid grid-cols-2 gap-4">

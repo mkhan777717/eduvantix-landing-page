@@ -9,6 +9,7 @@ import {
   Globe, Building2, ArrowRight, Sparkles, BarChart2, Layers
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { renderMarkdown } from "@/lib/renderMarkdown";
 
 const TYPE_ICONS = { CONCEPT: BookOpen, VIDEO: Play, MCQ: FileQuestion, CODING: Code2, ASSIGNMENT: ClipboardList, TEST: FileText };
 const TYPE_LABELS = { CONCEPT: "Read", VIDEO: "Watch", MCQ: "Quiz", CODING: "Code", ASSIGNMENT: "Submit", TEST: "Test" };
@@ -178,7 +179,9 @@ export default function CourseOverviewPage() {
                 )}
               </div>
               <h1 className="text-3xl font-bold leading-tight" style={{ color: "var(--text-primary)" }}>{course.title}</h1>
-              <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>{course.description}</p>
+              {course.description && (
+                <div className="prose-sm leading-relaxed text-sm" style={{ color: "var(--text-secondary)" }} dangerouslySetInnerHTML={{ __html: renderMarkdown(course.description) }} />
+              )}
             </div>
           </div>
 

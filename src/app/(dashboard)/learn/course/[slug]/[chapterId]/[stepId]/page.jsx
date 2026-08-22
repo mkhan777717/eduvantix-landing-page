@@ -37,9 +37,7 @@ function CommonDoubtsSection({ doubts }) {
             <summary className="px-4 py-3 text-xs font-bold cursor-pointer hover:bg-[var(--bg-hover)] transition-colors flex items-center justify-between" style={{ color: "var(--text-secondary)" }}>
               <span>▶ {d.question}</span>
             </summary>
-            <div className="p-4 border-t border-[var(--border-primary)] bg-[var(--bg-secondary)] text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-              {d.answer}
-            </div>
+            <div className="p-4 border-t border-[var(--border-primary)] bg-[var(--bg-secondary)] text-xs leading-relaxed prose-sm" style={{ color: "var(--text-secondary)" }} dangerouslySetInnerHTML={{ __html: renderMarkdown(d.answer) }} />
           </details>
         ))}
       </div>
@@ -134,7 +132,7 @@ function VideoContent({ step, onWatchProgress }) {
       {step.content && (
         <div className="px-6 md:px-12 py-8 max-w-4xl mx-auto w-full">
           <h3 className="text-sm font-bold mb-3 uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>Notes</h3>
-          <div className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "var(--text-secondary)" }}>{step.content}</div>
+          <div className="prose-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: renderMarkdown(step.content) }} />
         </div>
       )}
     </div>
@@ -182,7 +180,7 @@ function MCQContent({ step, progress, onSubmit }) {
               </span>
             )}
           </div>
-          <p className="text-base font-semibold leading-relaxed" style={{ color: "var(--text-primary)" }}>{step.questionText}</p>
+          <div className="prose-sm text-base font-semibold leading-relaxed" style={{ color: "var(--text-primary)" }} dangerouslySetInnerHTML={{ __html: renderMarkdown(step.questionText) }} />
         </div>
 
         {/* MCQ Options */}
@@ -254,9 +252,9 @@ function MCQContent({ step, progress, onSubmit }) {
               </button>
             </div>
             {(step.explanation || result?.explanation) && (
-              <div className="pt-2 border-t border-[var(--border-primary)] text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+              <div className="pt-2 border-t border-[var(--border-primary)] text-xs leading-relaxed prose-sm" style={{ color: "var(--text-secondary)" }}>
                 <span className="font-bold text-[var(--text-primary)]">Explanation: </span>
-                {result?.explanation || step.explanation}
+                <div className="mt-1" dangerouslySetInnerHTML={{ __html: renderMarkdown(result?.explanation || step.explanation) }} />
               </div>
             )}
           </motion.div>
@@ -500,7 +498,7 @@ function CodingContent({ step, progress, onRunCode, onSubmitCode }) {
         {step.constraints && (
           <div>
             <p className="text-[11px] font-bold uppercase tracking-wider mb-2 text-emerald-400">Constraints</p>
-            <div className="text-xs font-mono p-3.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]" style={{ color: "var(--text-secondary)" }}>{step.constraints}</div>
+            <div className="prose-sm text-xs font-mono p-3.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]" style={{ color: "var(--text-secondary)" }} dangerouslySetInnerHTML={{ __html: renderMarkdown(step.constraints) }} />
           </div>
         )}
 
@@ -509,13 +507,13 @@ function CodingContent({ step, progress, onRunCode, onSubmitCode }) {
             {step.inputFormat && (
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider mb-1 text-[var(--text-muted)]">Input Format</p>
-                <div className="text-xs p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]" style={{ color: "var(--text-secondary)" }}>{step.inputFormat}</div>
+                <div className="prose-sm text-xs p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]" style={{ color: "var(--text-secondary)" }} dangerouslySetInnerHTML={{ __html: renderMarkdown(step.inputFormat) }} />
               </div>
             )}
             {step.outputFormat && (
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider mb-1 text-[var(--text-muted)]">Output Format</p>
-                <div className="text-xs p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]" style={{ color: "var(--text-secondary)" }}>{step.outputFormat}</div>
+                <div className="prose-sm text-xs p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]" style={{ color: "var(--text-secondary)" }} dangerouslySetInnerHTML={{ __html: renderMarkdown(step.outputFormat) }} />
               </div>
             )}
           </div>
@@ -551,9 +549,7 @@ function CodingContent({ step, progress, onRunCode, onSubmitCode }) {
                   <summary className="px-4 py-3 text-xs font-bold cursor-pointer hover:bg-[var(--bg-hover)] transition-colors flex items-center justify-between" style={{ color: "var(--text-secondary)" }}>
                     <span>▶ {d.question}</span>
                   </summary>
-                  <div className="p-4 border-t border-[var(--border-primary)] bg-[var(--bg-secondary)] text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                    {d.answer}
-                  </div>
+                  <div className="p-4 border-t border-[var(--border-primary)] bg-[var(--bg-secondary)] text-xs leading-relaxed prose-sm" style={{ color: "var(--text-secondary)" }} dangerouslySetInnerHTML={{ __html: renderMarkdown(d.answer) }} />
                 </details>
               ))}
             </div>
