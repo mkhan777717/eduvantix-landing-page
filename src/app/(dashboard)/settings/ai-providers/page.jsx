@@ -207,13 +207,6 @@ export default function AIProvidersSettingsPage() {
                                 <span style={{ color: "var(--text-muted)" }}>Models Available:</span>
                                 <span className="font-bold" style={{ color: "var(--text-primary)" }}>{connectedInfo.modelCount || 0}</span>
                               </div>
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {(sp.models || []).map((m, idx) => (
-                                  <span key={idx} className="px-1.5 py-0.5 rounded text-[9px] font-mono border" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-primary)', color: 'var(--text-muted)' }}>
-                                    {m}
-                                  </span>
-                                ))}
-                              </div>
                             </div>
                             
                             <div className="flex gap-2">
