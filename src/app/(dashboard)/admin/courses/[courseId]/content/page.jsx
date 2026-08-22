@@ -328,10 +328,21 @@ function TextareaWithMediaToolbar({ label, value = "", onChange, placeholder, ro
     setModalMode(null);
   };
 
+  const [codeLang, setCodeLang] = useState("python");
+  const [codeSnippet, setCodeSnippet] = useState("");
+
   const handleConfirmVideoUrl = () => {
     if (!videoUrl.trim()) return;
     insertTextAtCursor(`\n![video](${videoUrl.trim()})\n`);
     setVideoUrl("");
+    setModalMode(null);
+  };
+
+  const handleConfirmCodeBlock = () => {
+    const lang = codeLang.trim().toLowerCase() || "python";
+    const snippet = codeSnippet.trim() ? codeSnippet : "// Example code\n";
+    insertTextAtCursor(`\n\`\`\`${lang}\n${snippet}\n\`\`\`\n`);
+    setCodeSnippet("");
     setModalMode(null);
   };
 
@@ -341,7 +352,7 @@ function TextareaWithMediaToolbar({ label, value = "", onChange, placeholder, ro
 
       <div className="flex items-center justify-between">
         {label && <label className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>{label}</label>}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 flex-wrap">
           <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
             className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-[var(--border-primary)] hover:border-[var(--border-accent)] hover:bg-[var(--accent-glow)] text-[var(--text-accent)] transition-all cursor-pointer disabled:opacity-50">
             {uploading ? <RefreshCw size={11} className="animate-spin" /> : <Upload size={11} />}
@@ -356,6 +367,11 @@ function TextareaWithMediaToolbar({ label, value = "", onChange, placeholder, ro
           <button type="button" onClick={() => setModalMode("video")}
             className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-[var(--border-primary)] hover:border-[var(--border-accent)] hover:bg-[var(--accent-glow)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer">
             <Video size={11} /> + Insert Video
+          </button>
+
+          <button type="button" onClick={() => { setCodeSnippet(""); setModalMode("code"); }}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-violet-500/30 bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 transition-all cursor-pointer">
+            <Code2 size={11} /> + Code Block
           </button>
 
           <button type="button" onClick={() => setModalMode("guide")}
@@ -378,7 +394,7 @@ function TextareaWithMediaToolbar({ label, value = "", onChange, placeholder, ro
         style={{ backgroundColor: "var(--bg-input)", color: "var(--text-primary)", fontFamily: mono ? "monospace" : undefined }}
       />
       <div className="text-[10px] text-[var(--text-muted)] flex items-center justify-between">
-        <span>💡 Tip: You can drag & drop or paste (Cmd+V / Ctrl+V) images directly into the box (Max file size: 5MB).</span>
+        <span>💡 Tip: Use `inline code` or ```language for multi-line code blocks. Drag & drop images directly.</span>
       </div>
 
       {/* GitHub Style Custom Modal Dialog (No browser prompts!) */}
@@ -387,6 +403,78 @@ function TextareaWithMediaToolbar({ label, value = "", onChange, placeholder, ro
       )}
 
       <AnimatePresence>
+        {modalMode === "code" && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-lg rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] shadow-2xl p-6 space-y-4"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-[var(--border-primary)]">
+                <h3 className="text-sm font-bold flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+                  <Code2 size={15} className="text-violet-400" />
+                  Insert Formatted Code Block
+                </h3>
+                <button type="button" onClick={() => setModalMode(null)} className="p-1 text-[var(--text-muted)] hover:text-rose-400 transition-colors cursor-pointer">
+                  <X size={14} />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider block mb-1" style={{ color: "var(--text-secondary)" }}>
+                    Programming Language
+                  </label>
+                  <select
+                    value={codeLang}
+                    onChange={e => setCodeLang(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl text-xs outline-none border border-[var(--border-primary)] focus:border-[var(--border-accent)] transition-all cursor-pointer font-semibold"
+                    style={{ backgroundColor: "var(--bg-input)", color: "var(--text-primary)" }}
+                  >
+                    <option value="python">Python (python)</option>
+                    <option value="javascript">JavaScript (javascript / js)</option>
+                    <option value="typescript">TypeScript (typescript / ts)</option>
+                    <option value="cpp">C++ (cpp)</option>
+                    <option value="java">Java (java)</option>
+                    <option value="c">C (c)</option>
+                    <option value="go">Go (go)</option>
+                    <option value="sql">SQL (sql)</option>
+                    <option value="html">HTML (html)</option>
+                    <option value="css">CSS (css)</option>
+                    <option value="json">JSON (json)</option>
+                    <option value="bash">Bash / Shell (bash)</option>
+                    <option value="text">Plain Text (text)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold uppercase tracking-wider block mb-1" style={{ color: "var(--text-secondary)" }}>
+                    Code Snippet (optional - write or paste code)
+                  </label>
+                  <textarea
+                    rows={7}
+                    value={codeSnippet}
+                    onChange={e => setCodeSnippet(e.target.value)}
+                    placeholder={`// Write or paste your ${codeLang} code here...`}
+                    className="w-full px-3.5 py-2.5 rounded-xl text-xs outline-none border border-[var(--border-primary)] focus:border-[var(--border-accent)] transition-all resize-y font-mono"
+                    style={{ backgroundColor: "var(--bg-code)", color: "var(--text-primary)" }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button type="button" onClick={() => setModalMode(null)} className="px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-[var(--border-primary)] hover:bg-[var(--bg-hover)] transition-colors cursor-pointer">
+                    Cancel
+                  </button>
+                  <button type="button" onClick={handleConfirmCodeBlock} className="px-4 py-1.5 rounded-xl text-xs font-bold text-white shadow transition-all cursor-pointer" style={{ background: "var(--accent-gradient)" }}>
+                    Insert Code Block
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
         {(modalMode === "image" || modalMode === "video") && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
             <motion.div
@@ -527,7 +615,7 @@ function VideoEditor({ step, onChange, API_BASE, authHeaders }) {
         )}
       </div>
 
-      <TextareaWithMediaToolbar label="Written Notes (optional)" rows={6} value={step.content || ""} onChange={val => onChange("content", val)} API_BASE={API_BASE} authHeaders={authHeaders} placeholder="Supporting notes, key takeaways, or additional resources..." />
+      <TextareaWithMediaToolbar label="Written Notes (Markdown & Media supported - optional)" rows={6} value={step.content || ""} onChange={val => onChange("content", val)} API_BASE={API_BASE} authHeaders={authHeaders} placeholder="Supporting notes, key takeaways, or additional resources..." />
     </div>
   );
 }
@@ -548,7 +636,7 @@ function MCQEditor({ step, onChange }) {
 
   return (
     <div className="space-y-5">
-      <Textarea label="Question" rows={3} value={step.questionText || ""} onChange={e => onChange("questionText", e.target.value)} placeholder="What is the time complexity of binary search?" />
+      <Textarea label="Question (Markdown supported)" rows={3} value={step.questionText || ""} onChange={e => onChange("questionText", e.target.value)} placeholder="What is the time complexity of binary search? Markdown code: `O(log n)`" />
       <div className="space-y-3">
         <label className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>Answer Options <span className="text-[10px] normal-case font-normal text-emerald-400">(click radio to mark correct)</span></label>
         {options.map((opt, i) => (
@@ -573,7 +661,7 @@ function MCQEditor({ step, onChange }) {
           <Plus size={13} /> Add Option
         </button>
       </div>
-      <Textarea label="Explanation (shown after submission)" rows={3} value={step.explanation || ""} onChange={e => onChange("explanation", e.target.value)} placeholder="The correct answer is... because..." />
+      <Textarea label="Explanation (Markdown supported - shown after submission)" rows={3} value={step.explanation || ""} onChange={e => onChange("explanation", e.target.value)} placeholder="The correct answer is... because..." />
     </div>
   );
 }
@@ -611,10 +699,10 @@ function CodingEditor({ step, onChange, API_BASE, authHeaders }) {
     <div className="space-y-5">
       <TextareaWithMediaToolbar label="Problem Statement (Markdown & Media supported)" rows={6} value={step.problemStatement || ""} onChange={val => onChange("problemStatement", val)} API_BASE={API_BASE} authHeaders={authHeaders} placeholder="Given an array of integers, find the maximum subarray sum..." />
       <div className="grid grid-cols-2 gap-4">
-        <Textarea label="Input Format" rows={3} value={step.inputFormat || ""} onChange={e => onChange("inputFormat", e.target.value)} placeholder="First line: n (array size)&#10;Second line: n space-separated integers" />
-        <Textarea label="Output Format" rows={3} value={step.outputFormat || ""} onChange={e => onChange("outputFormat", e.target.value)} placeholder="Print the maximum subarray sum" />
+        <Textarea label="Input Format (Markdown supported)" rows={3} value={step.inputFormat || ""} onChange={e => onChange("inputFormat", e.target.value)} placeholder="First line: n (array size)&#10;Second line: n space-separated integers" />
+        <Textarea label="Output Format (Markdown supported)" rows={3} value={step.outputFormat || ""} onChange={e => onChange("outputFormat", e.target.value)} placeholder="Print the maximum subarray sum" />
       </div>
-      <Textarea label="Constraints" rows={2} value={step.constraints || ""} onChange={e => onChange("constraints", e.target.value)} placeholder="1 ≤ n ≤ 10^5, -10^4 ≤ arr[i] ≤ 10^4" />
+      <Textarea label="Constraints (Markdown supported)" rows={2} value={step.constraints || ""} onChange={e => onChange("constraints", e.target.value)} placeholder="1 ≤ n ≤ 10^5, -10^4 ≤ arr[i] ≤ 10^4" />
 
       {/* Allowed Languages Checkboxes */}
       <div className="p-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] space-y-3">
@@ -779,7 +867,7 @@ function StepPreview({ step }) {
             {step.content && (
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider mb-3" style={{ color: "var(--text-secondary)" }}>Notes</p>
-                <div className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "var(--text-secondary)" }}>{step.content}</div>
+                <div className="prose-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: renderMarkdown(step.content) }} />
               </div>
             )}
           </div>
@@ -790,9 +878,11 @@ function StepPreview({ step }) {
           <div className="space-y-5">
             <div className="p-5 rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-secondary)]">
               <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "var(--text-muted)" }}>Question</p>
-              <p className="font-semibold leading-relaxed" style={{ color: "var(--text-primary)" }}>
-                {step.questionText || <span className="italic" style={{ color: "var(--text-muted)" }}>No question text</span>}
-              </p>
+              {step.questionText ? (
+                <div className="prose-sm font-semibold leading-relaxed" dangerouslySetInnerHTML={{ __html: renderMarkdown(step.questionText) }} />
+              ) : (
+                <p className="font-semibold leading-relaxed italic" style={{ color: "var(--text-muted)" }}>No question text</p>
+              )}
             </div>
             <div className="space-y-3">
               {(step.mcqOptions || []).map((opt, i) => (
@@ -806,7 +896,7 @@ function StepPreview({ step }) {
             {step.explanation && (
               <div className="p-4 rounded-xl border border-blue-500/20 bg-blue-500/5">
                 <p className="text-[11px] font-bold text-blue-400 mb-1">Explanation (shown after answer):</p>
-                <p className="text-xs" style={{ color: "var(--text-secondary)" }}>{step.explanation}</p>
+                <div className="prose-sm text-xs" dangerouslySetInnerHTML={{ __html: renderMarkdown(step.explanation) }} />
               </div>
             )}
           </div>
@@ -818,13 +908,13 @@ function StepPreview({ step }) {
             {step.problemStatement && (
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>Problem</p>
-                <div className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "var(--text-secondary)" }}>{step.problemStatement}</div>
+                <div className="prose-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: renderMarkdown(step.problemStatement) }} />
               </div>
             )}
             {step.constraints && (
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>Constraints</p>
-                <div className="text-xs font-mono p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]" style={{ color: "var(--text-secondary)" }}>{step.constraints}</div>
+                <div className="prose-sm text-xs font-mono p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]" dangerouslySetInnerHTML={{ __html: renderMarkdown(step.constraints) }} />
               </div>
             )}
             {(step.testCases || []).filter(tc => tc.isSample).map((tc, i) => (
@@ -870,7 +960,7 @@ function StepPreview({ step }) {
             {step.commonDoubts.map((d, i) => (
               <details key={i} className="group">
                 <summary className="text-xs font-semibold px-3 py-2 rounded-lg border border-[var(--border-primary)] cursor-pointer hover:border-[var(--border-accent)] transition-colors list-none" style={{ color: "var(--text-secondary)" }}>❓ {d.question}</summary>
-                <div className="mt-2 px-4 py-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] text-xs" style={{ color: "var(--text-secondary)" }}>{d.answer}</div>
+                <div className="mt-2 px-4 py-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] text-xs prose-sm" dangerouslySetInnerHTML={{ __html: renderMarkdown(d.answer) }} />
               </details>
             ))}
           </div>
@@ -894,20 +984,19 @@ function CommonDoubtsEditor({ doubts = [], onChange }) {
 
   return (
     <div className="space-y-3">
-      <label className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>Common Doubts (FAQ)</label>
+      <label className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>Common Doubts / FAQ (Markdown supported)</label>
       {doubts.map((d, i) => (
         <div key={i} className="p-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] space-y-1">
           <div className="flex justify-between items-start">
             <p className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>Q: {d.question}</p>
             <button type="button" onClick={() => onChange(doubts.filter((_, idx) => idx !== i))} className="text-rose-400 hover:text-rose-300 shrink-0 cursor-pointer"><X size={12} /></button>
           </div>
-          <p className="text-xs" style={{ color: "var(--text-secondary)" }}>A: {d.answer}</p>
+          <div className="text-xs prose-sm" style={{ color: "var(--text-secondary)" }} dangerouslySetInnerHTML={{ __html: renderMarkdown(d.answer) }} />
         </div>
       ))}
       <div className="p-3 rounded-xl border border-dashed border-[var(--border-primary)] space-y-2">
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="Question..." className="w-full bg-transparent outline-none text-xs" style={{ color: "var(--text-primary)" }} />
-        <input value={a} onChange={e => setA(e.target.value)} placeholder="Answer..." className="w-full bg-transparent outline-none text-xs" style={{ color: "var(--text-primary)" }}
-          onKeyDown={e => e.key === "Enter" && add()} />
+        <textarea value={a} onChange={e => setA(e.target.value)} placeholder="Answer (Markdown supported)..." rows={2} className="w-full bg-transparent outline-none text-xs resize-none" style={{ color: "var(--text-primary)" }} />
         <button type="button" onClick={add} className="text-xs font-semibold cursor-pointer flex items-center gap-1" style={{ color: "var(--text-accent)" }}>
           <Plus size={12} /> Add FAQ
         </button>

@@ -130,6 +130,12 @@ marked.use({
       }
       return `<${tag}${startAttr} class="${cls}" style="color:var(--text-secondary)">${body}</${tag}>`;
     },
+
+    // 9. Paragraphs
+    paragraph(token) {
+      const text = this.parser.parseInline(token.tokens || []);
+      return `<p class="leading-relaxed my-2 text-sm" style="color:var(--text-secondary)">${text}</p>`;
+    },
   }
 });
 
