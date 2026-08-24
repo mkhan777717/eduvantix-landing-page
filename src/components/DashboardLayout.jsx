@@ -58,6 +58,10 @@ function DashboardLayoutInner({ children }) {
 
     if (pathname.startsWith("/admin/people")) return "allowedManagePeople";
 
+    if (pathname.startsWith("/academic-setup")) return "allowedAcademicSetup";
+    if (pathname.startsWith("/timetable")) return "allowedTimetable";
+    if (pathname.startsWith("/attendance")) return "allowedAttendance";
+
     if (pathname.startsWith("/admin/arcade")) return "allowedArcade";
     if (pathname.startsWith("/student/games")) return "allowedArcade";
 
@@ -532,7 +536,7 @@ function DashboardLayoutInner({ children }) {
       isSuperAdmin && { label: "Verifications", href: "/admin/verification", icon: ShieldCheck },
       isInstAdmin && { label: "Manage Batches", href: "/admin/batches", icon: Layers, featureFlag: "allowedManageBatches" },
       isInstAdmin && { label: "Manage People", href: "/admin/people", icon: Users, featureFlag: "allowedManagePeople" },
-      isBatchMgr && canShowFeature("allowedManageBatches") && { label: "My Batches", href: "/admin/batch-manager", icon: Layers, featureFlag: "allowedManageBatches" },
+      (isBatchMgr || isInstAdmin) && canShowFeature("allowedManageBatches") && { label: "My Batches", href: "/admin/batch-manager", icon: Layers, featureFlag: "allowedManageBatches" },
       { label: "Discuss Forum", href: "/discuss", icon: MessageSquare },
       { label: "Blogs", href: "/journal", icon: Newspaper },
       (isBatchMgr || isInstAdmin || isMentor) && canShowFeature("allowedAiViva") && { label: "AI Viva", href: "/mentor/viva/questions", icon: Brain, featureFlag: "allowedAiViva" },
@@ -548,10 +552,9 @@ function DashboardLayoutInner({ children }) {
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedGoLive") && { label: "Live Sessions", href: "/admin/live", icon: Radio, featureFlag: "allowedGoLive" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && canShowFeature("allowedArcade") && { label: "Arcade Questions", href: "/admin/arcade", icon: Gamepad2, featureFlag: "allowedArcade" },
       (isSuperAdmin || isInstAdmin || isBatchMgr || isMentor) && { label: "Events", href: "/events/organizer", icon: CalendarDays },
-      isInstAdmin && { label: "Academic Setup", href: "/academic-setup", icon: BookOpen },
-      (isInstAdmin || isBatchMgr) && { label: "Timetable", href: "/timetable", icon: CalendarDays },
-      isInstAdmin && { label: "Attendance", href: "/attendance/admin", icon: CheckCircle2 },
-      isInstAdmin && { label: "Branding", href: "/settings/branding", icon: Palette },
+      isInstAdmin && canShowFeature("allowedAcademicSetup") && { label: "Academic Setup", href: "/academic-setup", icon: BookOpen, featureFlag: "allowedAcademicSetup" },
+      (isInstAdmin || isBatchMgr) && canShowFeature("allowedTimetable") && { label: "Timetable", href: "/timetable", icon: CalendarDays, featureFlag: "allowedTimetable" },
+      isInstAdmin && canShowFeature("allowedAttendance") && { label: "Attendance", href: "/attendance/admin", icon: CheckCircle2, featureFlag: "allowedAttendance" },
 
       !isSuperAdmin && { label: "Share Feedback", href: "/feedback", icon: HeartHandshake },
     ].filter(Boolean);

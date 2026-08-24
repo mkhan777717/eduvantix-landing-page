@@ -32,6 +32,9 @@ export default function InstitutesPage() {
   const [allowedProblems, setAllowedProblems] = useState(true);
   const [allowedGoLive, setAllowedGoLive] = useState(true);
   const [allowedArcade, setAllowedArcade] = useState(true);
+  const [allowedTimetable, setAllowedTimetable] = useState(true);
+  const [allowedAttendance, setAllowedAttendance] = useState(true);
+  const [allowedAcademicSetup, setAllowedAcademicSetup] = useState(true);
   
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState("");
@@ -53,6 +56,9 @@ export default function InstitutesPage() {
   const [editAllowedProblems, setEditAllowedProblems] = useState(true);
   const [editAllowedGoLive, setEditAllowedGoLive] = useState(true);
   const [editAllowedArcade, setEditAllowedArcade] = useState(true);
+  const [editAllowedTimetable, setEditAllowedTimetable] = useState(true);
+  const [editAllowedAttendance, setEditAllowedAttendance] = useState(true);
+  const [editAllowedAcademicSetup, setEditAllowedAcademicSetup] = useState(true);
 
   // Block states
   const [blockLoading, setBlockLoading] = useState(null); // id of institute being blocked
@@ -164,7 +170,8 @@ export default function InstitutesPage() {
           username, email, password, instituteName,
           allowedManageBatches, allowedManagePeople, allowedAiViva, 
           allowedStudyMaterial, allowedContest, allowedProblems, 
-          allowedGoLive, allowedArcade
+          allowedGoLive, allowedArcade,
+          allowedTimetable, allowedAttendance, allowedAcademicSetup
         }),
       });
       const data = await res.json();
@@ -184,6 +191,9 @@ export default function InstitutesPage() {
         setAllowedProblems(true);
         setAllowedGoLive(true);
         setAllowedArcade(true);
+        setAllowedTimetable(true);
+        setAllowedAttendance(true);
+        setAllowedAcademicSetup(true);
         // Reload table
         fetchAdmins();
         // Close modal after delay
@@ -252,6 +262,9 @@ export default function InstitutesPage() {
     setEditAllowedProblems(admin.institute?.allowedProblems !== false);
     setEditAllowedGoLive(admin.institute?.allowedGoLive !== false);
     setEditAllowedArcade(admin.institute?.allowedArcade !== false);
+    setEditAllowedTimetable(admin.institute?.allowedTimetable !== false);
+    setEditAllowedAttendance(admin.institute?.allowedAttendance !== false);
+    setEditAllowedAcademicSetup(admin.institute?.allowedAcademicSetup !== false);
     setModalError("");
     setModalSuccess("");
     setIsEditModalOpen(true);
@@ -290,6 +303,9 @@ export default function InstitutesPage() {
         allowedProblems: editAllowedProblems,
         allowedGoLive: editAllowedGoLive,
         allowedArcade: editAllowedArcade,
+        allowedTimetable: editAllowedTimetable,
+        allowedAttendance: editAllowedAttendance,
+        allowedAcademicSetup: editAllowedAcademicSetup,
       };
       if (editPassword) {
         body.password = editPassword;
@@ -644,6 +660,9 @@ export default function InstitutesPage() {
                       { label: "Problems", state: allowedProblems, setState: setAllowedProblems },
                       { label: "Go Live", state: allowedGoLive, setState: setAllowedGoLive },
                       { label: "Arcade Questions", state: allowedArcade, setState: setAllowedArcade },
+                      { label: "Timetable", state: allowedTimetable, setState: setAllowedTimetable },
+                      { label: "Attendance", state: allowedAttendance, setState: setAllowedAttendance },
+                      { label: "Academic Setup", state: allowedAcademicSetup, setState: setAllowedAcademicSetup },
                     ].map((f, i) => (
                       <div key={i} className="flex items-center justify-between p-2.5 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-primary)] hover:border-emerald-500/20 transition-all select-none">
                         <span className="text-[11px] font-semibold" style={{ color: "var(--text-primary)" }}>{f.label}</span>
@@ -848,6 +867,9 @@ export default function InstitutesPage() {
                       { label: "Problems", state: editAllowedProblems, setState: setEditAllowedProblems },
                       { label: "Go Live", state: editAllowedGoLive, setState: setEditAllowedGoLive },
                       { label: "Arcade Questions", state: editAllowedArcade, setState: setEditAllowedArcade },
+                      { label: "Timetable", state: editAllowedTimetable, setState: setEditAllowedTimetable },
+                      { label: "Attendance", state: editAllowedAttendance, setState: setEditAllowedAttendance },
+                      { label: "Academic Setup", state: editAllowedAcademicSetup, setState: setEditAllowedAcademicSetup },
                     ].map((f, i) => (
                       <div key={i} className="flex items-center justify-between p-2.5 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-primary)] hover:border-emerald-500/20 transition-all select-none">
                         <span className="text-[11px] font-semibold" style={{ color: "var(--text-primary)" }}>{f.label}</span>
