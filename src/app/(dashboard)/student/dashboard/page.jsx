@@ -7,7 +7,7 @@ import {
   Trophy, BookOpen, Terminal, Code,
   ChevronRight, ArrowUpRight, Activity,
   RefreshCw, CheckCircle2, XCircle, Clock, AlertCircle,
-  Flame, Award, TrendingUp, HelpCircle
+  Flame, Award, TrendingUp, HelpCircle, Megaphone, Pin, AlertTriangle, Paperclip
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -41,6 +41,7 @@ export default function StudentDashboard() {
 
   const [submissions, setSubmissions] = useState([]);
   const [contests, setContests] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeBottomTab, setActiveBottomTab] = useState("contests");
@@ -103,6 +104,20 @@ export default function StudentDashboard() {
       }
 
       setContests(backendContests);
+
+      // Fetch recent announcements (only for institute-affiliated students)
+      if (user.instituteId) {
+        try {
+          const annRes = await fetch(`${API_BASE}/api/announcements?limit=3`, { headers, signal: AbortSignal.timeout(10000) });
+          if (annRes.ok) {
+            const annData = await annRes.json();
+            if (annData.success) setAnnouncements(annData.announcements || []);
+          }
+        } catch (e) {
+          console.error("Failed to fetch announcements on dashboard:", e);
+        }
+      }
+
       setLoading(false);
     }
 
@@ -249,7 +264,54 @@ export default function StudentDashboard() {
       bgColor: "bg-slate-500/10",
     },
   ]; return (
-    <div className="space-y-12">
+    <div className="space-y-10">
+      {/* ── Announcements Banner (Only for Institute-Affiliated Students with active notices) ─────────────── */}
+      {user?.instituteId && announcements.length > 0 && (
+        <div className="p-4 sm:p-5 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative overflow-hidden"
+          style={{ backgroundColor: "var(--bg-card)", borderColor: "var(--border-accent)" }}
+        >
+          <div className="flex items-start sm:items-center gap-3.5 min-w-0">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <Megaphone size={18} />
+            </div>
+            <div className="min-w-0 space-y-0.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400">Notice Board</span>
+                {announcements[0].priority === "URGENT" && (
+                  <span className="px-2 py-0.2 rounded-full text-[9px] font-black bg-rose-500/15 text-rose-400 border border-rose-500/30 animate-pulse">
+                    Urgent
+                  </span>
+                )}
+                {announcements[0].batch && (
+                  <span className="text-[10px] font-medium" style={{ color: "var(--text-muted)" }}>
+                    &bull; Batch: {announcements[0].batch.name}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs font-bold truncate" style={{ color: "var(--text-primary)" }}>
+                {announcements[0].title}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0 self-end md:self-auto">
+            {announcements[0].attachments?.length > 0 && (
+              <span className="text-[10px] flex items-center gap-1 font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg">
+                <Paperclip size={11} /> {announcements[0].attachments.length} attachment{announcements[0].attachments.length > 1 ? "s" : ""}
+              </span>
+            )}
+            <button
+              onClick={() => router.push("/student/announcements")}
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border border-[var(--border-primary)] cursor-pointer flex items-center gap-1.5 hover:bg-[var(--bg-hover)]"
+              style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}
+            >
+              <span>View Notices</span>
+              <ChevronRight size={13} />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ── Editorial Header Banner ───────────────── */}
       <div className="flex flex-col lg:flex-row items-stretch justify-between gap-8 border-b pb-12" style={{ borderColor: "var(--border-primary)" }}>
         <div className="space-y-4 max-w-2xl relative z-10 flex-1 flex flex-col justify-center">
