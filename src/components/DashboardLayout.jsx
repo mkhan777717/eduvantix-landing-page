@@ -8,7 +8,7 @@ import {
   Menu, X, ChevronLeft, ChevronRight, BookOpen, ArrowLeftRight,
   Code, Brain, Radio, AlertTriangle, FileText, Gamepad2, FileCheck, Activity, Settings, Paintbrush, Palette,
   ShieldAlert, ShieldCheck, Layers, Users, PlusCircle, List, Bell, BellDot, CheckCircle2, Check, MessageSquare, Crown, HeartHandshake, ClipboardList, Target, Briefcase, CalendarDays, Newspaper, Database,
-  User, Map, Mic, Bot, Zap
+  User, Map, Mic, Bot, Zap, Megaphone
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/context/AuthContext";
@@ -132,6 +132,53 @@ function DashboardLayoutInner({ children }) {
   const isLoginRoute = pathname === "/student" || pathname === "/admin" || pathname === "/mentor";
   const [premiumRequests, setPremiumRequests] = useState([]);
   const [dismissedRequests, setDismissedRequests] = useState([]);
+
+  // Announcements visibility: Institute-affiliated students and institute staff (NOT Super Admin or Global students)
+  const canShowAnnouncements = !isSuperAdmin && (
+    (isStudentSession && isInstituteAffiliated) ||
+    isInstAdmin ||
+    isBatchMgr ||
+    (isMentor && isInstituteAffiliated)
+  );
+
+  const [unreadAnnouncementsCount, setUnreadAnnouncementsCount] = useState(0);
+  const [hasUrgentAnnouncement, setHasUrgentAnnouncement] = useState(false);
+
+  const checkAnnouncements = async () => {
+    if (!canShowAnnouncements || !token) return;
+    try {
+      const headers = {
+        ...(token && !token.startsWith("demo-") && !token.startsWith("local-")
+          ? { Authorization: `Bearer ${token}` }
+          : { "x-bypass-auth": "true", "x-bypass-role": user?.role || "USER" })
+      };
+      const res = await fetch(`${API_BASE}/api/announcements?limit=5`, { headers });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.announcements)) {
+          const lastSeenStr = localStorage.getItem("eduvantix_last_seen_announcement");
+          const lastSeenTime = lastSeenStr ? new Date(lastSeenStr).getTime() : 0;
+          
+          const newAnnouncements = data.announcements.filter(a => new Date(a.createdAt).getTime() > lastSeenTime);
+          setUnreadAnnouncementsCount(newAnnouncements.length);
+          setHasUrgentAnnouncement(newAnnouncements.some(a => a.priority === "URGENT"));
+        }
+      }
+    } catch (e) {
+      console.warn("Could not check announcements badge:", e);
+    }
+  };
+
+  useEffect(() => {
+    if (canShowAnnouncements && user) {
+      checkAnnouncements();
+      if (pathname.includes("/announcements")) {
+        localStorage.setItem("eduvantix_last_seen_announcement", new Date().toISOString());
+        setUnreadAnnouncementsCount(0);
+        setHasUrgentAnnouncement(false);
+      }
+    }
+  }, [canShowAnnouncements, user, pathname]);
 
   const handleDismiss = (id) => {
     setDismissedRequests(prev => {
@@ -850,6 +897,34 @@ function DashboardLayoutInner({ children }) {
             {/* ── Pro / Career Mode Toggle ── */}
             <CareerModeToggle />
 
+            {/* ── Announcements Top-Right Header Button (Only for Institute-affiliated students & Institute staff, NOT Super Admin or Global Students) ── */}
+            {canShowAnnouncements && (
+              <Link
+                href={isStudentSession ? "/student/announcements" : "/admin/announcements"}
+                onClick={() => {
+                  localStorage.setItem("eduvantix_last_seen_announcement", new Date().toISOString());
+                  setUnreadAnnouncementsCount(0);
+                  setHasUrgentAnnouncement(false);
+                }}
+                className={`px-3 py-1.5 rounded-xl transition-all relative cursor-pointer flex items-center gap-2 text-xs font-semibold ${
+                  pathname.includes("/announcements")
+                    ? "bg-[var(--bg-hover)] text-[var(--text-primary)] border border-[var(--border-accent)] shadow-sm"
+                    : "border border-[var(--border-primary)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] hover:border-[var(--border-secondary)]"
+                }`}
+                title="Announcements & Notices"
+              >
+                <Megaphone size={14} className={pathname.includes("/announcements") ? "text-[var(--accent-primary)]" : "text-[var(--text-secondary)]"} />
+                <span className="hidden sm:inline">Announcements</span>
+
+                {/* Blinking indicator when new announcements exist */}
+                {unreadAnnouncementsCount > 0 && (
+                  <span className="relative flex h-2 w-2 ml-0.5">
+                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${hasUrgentAnnouncement ? "bg-rose-400" : "bg-amber-400"}`}></span>
+                    <span className={`relative inline-flex rounded-full h-2 w-2 ${hasUrgentAnnouncement ? "bg-rose-500" : "bg-amber-500"}`}></span>
+                  </span>
+                )}
+              </Link>
+            )}
 
             {/* ── Universal Notification Bell (all roles) ── */}
             {dashboardUser && (
