@@ -108,7 +108,7 @@ export default function LandingForWho() {
             </div>
             <div className="mt-8 pt-6 border-t" style={{ borderColor: border }}>
               <a
-                href="/login"
+                href="https://learn.eduvantix.com"
                 className="inline-flex items-center gap-2 text-sm font-semibold"
                 style={{ color: "#10b981" }}
               >

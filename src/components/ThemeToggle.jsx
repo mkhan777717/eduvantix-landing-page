@@ -1,26 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import useThemeStore from "@/store/useThemeStore";
 
 export default function ThemeToggle() {
   const { isDark, toggleTheme, initTheme } = useThemeStore();
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     initTheme();
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <div
-        className="relative h-9 w-16 rounded-full border"
-        style={{ backgroundColor: "var(--bg-hover)", borderColor: "var(--border-primary)" }}
-      />
-    );
-  }
+  }, [initTheme]);
 
   return (
     <button

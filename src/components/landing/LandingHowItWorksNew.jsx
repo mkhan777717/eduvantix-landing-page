@@ -174,7 +174,7 @@ export default function LandingHowItWorksNew() {
                 maxWidth: "30rem",
               }}
             >
-              The Eduvantix career pathway is automated, competency-driven, and personalized. Every candidate advances through a proven four-stage cycle that transforms foundational knowledge into verified hireability.
+              The eduvantix career pathway is automated, competency-driven, and personalized. Every candidate advances through a proven four-stage cycle that transforms foundational knowledge into verified hireability.
             </motion.p>
 
             {/* Sticky CTA */}
@@ -186,7 +186,7 @@ export default function LandingHowItWorksNew() {
               style={{ marginTop: "2rem" }}
             >
               <a
-                href="/login"
+                href="https://learn.eduvantix.com"
                 className="inline-flex items-center gap-2 text-sm font-semibold transition-transform hover:translate-x-1"
                 style={{ color: "#10b981" }}
               >

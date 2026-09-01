@@ -18,7 +18,7 @@ const PLANS = [
     priceNote: "Free forever",
     popular: false,
     ctaText: "Start Free",
-    ctaHref: "/login",
+    ctaHref: "https://learn.eduvantix.com",
     benefits: [
       "Access to selected learning content",
       "Basic learning paths",
@@ -41,7 +41,7 @@ const PLANS = [
     popular: true,
     badge: "Most Popular",
     ctaText: "Start Premium",
-    ctaHref: "/login?plan=premium",
+    ctaHref: "https://learn.eduvantix.com",
     benefits: [
       "Everything in Free, plus:",
       "Full learning content",
@@ -68,7 +68,7 @@ const PLANS = [
     popular: false,
     badge: "AI Career System",
     ctaText: "Build My Career Path",
-    ctaHref: "/login?plan=pro",
+    ctaHref: "https://learn.eduvantix.com",
     benefits: [
       "Everything in Premium, plus:",
       "AI Resume Analyzer",
@@ -303,7 +303,7 @@ export default function LandingPricingTiers() {
               margin: "1.25rem auto 0",
             }}
           >
-            Start free. Go deeper with Premium. Let Eduvantix Pro personalize your entire career journey.
+            Start free. Go deeper with Premium. Let eduvantix Pro personalize your entire career journey.
           </motion.p>
 
           {/* Plan Switching Control */}
@@ -320,9 +320,8 @@ export default function LandingPricingTiers() {
           >
             <button
               onClick={() => setBillingCycle("monthly")}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                billingCycle === "monthly" ? "shadow-sm" : "hover:opacity-75"
-              }`}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${billingCycle === "monthly" ? "shadow-sm" : "hover:opacity-75"
+                }`}
               style={{
                 backgroundColor: billingCycle === "monthly" ? (isDark ? "#1C1C1C" : "#FFFFFF") : "transparent",
                 color: billingCycle === "monthly" ? text : secondary,
@@ -332,9 +331,8 @@ export default function LandingPricingTiers() {
             </button>
             <button
               onClick={() => setBillingCycle("yearly")}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 ${
-                billingCycle === "yearly" ? "shadow-sm" : "hover:opacity-75"
-              }`}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 ${billingCycle === "yearly" ? "shadow-sm" : "hover:opacity-75"
+                }`}
               style={{
                 backgroundColor: billingCycle === "yearly" ? (isDark ? "#1C1C1C" : "#FFFFFF") : "transparent",
                 color: billingCycle === "yearly" ? text : secondary,
@@ -366,13 +364,12 @@ export default function LandingPricingTiers() {
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.5, delay: idx * 0.08, ease: [0.25, 0.1, 0.25, 1] }}
                 whileHover={{ y: -4, transition: { duration: 0.25 } }}
-                className={`relative rounded-2xl p-7 sm:p-8 flex flex-col justify-between transition-all duration-300 border ${
-                  isPremium
+                className={`relative rounded-2xl p-7 sm:p-8 flex flex-col justify-between transition-all duration-300 border ${isPremium
                     ? "ring-1 ring-emerald-500/40"
                     : isPro
-                    ? "ring-1 ring-blue-500/30"
-                    : ""
-                }`}
+                      ? "ring-1 ring-blue-500/30"
+                      : ""
+                  }`}
                 style={{
                   backgroundColor: cardBg,
                   borderColor: isPremium ? "rgba(16,185,129,0.4)" : isPro ? "rgba(59,130,246,0.3)" : border,
@@ -466,8 +463,8 @@ export default function LandingPricingTiers() {
                                 backgroundColor: isPro
                                   ? "rgba(59,130,246,0.12)"
                                   : isPremium
-                                  ? "rgba(16,185,129,0.12)"
-                                  : "rgba(148,163,184,0.12)",
+                                    ? "rgba(16,185,129,0.12)"
+                                    : "rgba(148,163,184,0.12)",
                                 color: isPro ? "#3b82f6" : isPremium ? "#10b981" : secondary,
                               }}
                             >
@@ -698,8 +695,8 @@ export default function LandingPricingTiers() {
 
                   <form onSubmit={handleProSubmit} className="space-y-4">
                     {[{ label: "Name", key: "name", type: "text", placeholder: "Your full name" },
-                      { label: "Email ID", key: "email", type: "email", placeholder: "you@domain.com" },
-                      { label: "Mobile (with country code)", key: "phone", type: "tel", placeholder: "+91 99999 99999" }]
+                    { label: "Email ID", key: "email", type: "email", placeholder: "you@domain.com" },
+                    { label: "Mobile (with country code)", key: "phone", type: "tel", placeholder: "+91 99999 99999" }]
                       .map(({ label, key, type, placeholder }) => (
                         <div key={key}>
                           <label className="text-[10px] font-bold uppercase tracking-wider block mb-1" style={{ color: isDark ? "#666" : "#888" }}>

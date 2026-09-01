@@ -7,7 +7,7 @@ const STATS = [
   { number: "10,000+", label: "Active Learners", sub: "Building production portfolios" },
   { number: "94%", label: "Placement Rate", sub: "Within 6 months of completion" },
   { number: "100+", label: "Hiring Partners", sub: "Direct candidate requisitions" },
-  { number: "500+", label: "Partner Institutes", sub: "Colleges & bootcamps using Eduvantix" },
+  { number: "500+", label: "Partner Institutes", sub: "Colleges & bootcamps using eduvantix" },
 ];
 
 export default function LandingSocialProof() {

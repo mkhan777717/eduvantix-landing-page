@@ -1,7 +1,5 @@
 import Script from "next/script";
 import "./globals.css";
-import { AuthProvider } from "@/context/AuthContext";
-import { ProProvider } from "@/context/ProContext";
 
 /* ─────────────────────────────────────────────
    MetadataBase — MUST be set so all relative
@@ -13,13 +11,13 @@ export const metadata = {
 
   /* ── Title ─────────────────────────────── */
   title: {
-    default: "Eduvantix — AI-Powered Tech Learning Platform",
-    template: "%s | Eduvantix",
+    default: "eduvantix — AI-Powered Tech Learning Platform",
+    template: "%s | eduvantix",
   },
 
   /* ── Description ────────────────────────── */
   description:
-    "Master AI, Generative AI, Full Stack Development, Machine Learning, DevOps, and more on Eduvantix — India's premier AI-powered EdTech platform with live classes, coding contests, and expert mentorship.",
+    "Master AI, Generative AI, Full Stack Development, Machine Learning, DevOps, and more on eduvantix — India's premier AI-powered EdTech platform with live classes, coding contests, and expert mentorship.",
 
   /* ── Keywords ───────────────────────────── */
   keywords: [
@@ -44,11 +42,11 @@ export const metadata = {
     "Node.js course",
     "Python ML",
     "DatamindX",
-    "Eduvantix",
+    "eduvantix",
   ],
 
   /* ── Authors & Publisher ─────────────────── */
-  authors: [{ name: "Eduvantix Team", url: "https://eduvantix.com" }],
+  authors: [{ name: "eduvantix Team", url: "https://eduvantix.com" }],
   publisher: "DatamindX Technologies Pvt. Ltd.",
   creator: "DatamindX Technologies Pvt. Ltd.",
 
@@ -79,8 +77,8 @@ export const metadata = {
     type: "website",
     locale: "en_IN",
     url: "https://eduvantix.com",
-    siteName: "Eduvantix",
-    title: "Eduvantix — AI-Powered Tech Learning Platform",
+    siteName: "eduvantix",
+    title: "eduvantix — AI-Powered Tech Learning Platform",
     description:
       "Master AI, Full Stack Development, Machine Learning, and more on India's premier EdTech platform with live classes and expert mentorship.",
     images: [
@@ -88,7 +86,7 @@ export const metadata = {
         url: "/logo-black-text.webp",
         width: 1200,
         height: 630,
-        alt: "Eduvantix — AI-Powered Tech Learning Platform",
+        alt: "eduvantix — AI-Powered Tech Learning Platform",
         type: "image/webp",
       },
     ],
@@ -99,7 +97,7 @@ export const metadata = {
     card: "summary_large_image",
     site: "@eduvantix",
     creator: "@eduvantix",
-    title: "Eduvantix — AI-Powered Tech Learning Platform",
+    title: "eduvantix — AI-Powered Tech Learning Platform",
     description:
       "Master AI, Full Stack Development, Machine Learning, and more on India's premier EdTech platform.",
     images: ["/logo-black-text.webp"],
@@ -116,7 +114,7 @@ export const metadata = {
   },
 
   /* ── App & Theme ────────────────────────── */
-  applicationName: "Eduvantix",
+  applicationName: "eduvantix",
   // Note: themeColor and colorScheme are now exported in the viewport object below
 
 
@@ -165,8 +163,8 @@ const globalJsonLd = {
     {
       "@type": "Organization",
       "@id": "https://eduvantix.com/#organization",
-      name: "Eduvantix",
-      alternateName: "Eduvantix by DatamindX",
+      name: "eduvantix",
+      alternateName: "eduvantix by DatamindX",
       url: "https://eduvantix.com",
       logo: {
         "@type": "ImageObject",
@@ -175,7 +173,7 @@ const globalJsonLd = {
         height: 300,
       },
       description:
-        "Eduvantix is an AI-powered EdTech platform by DatamindX Technologies Pvt. Ltd., offering courses in AI, Full Stack Development, Machine Learning, DevOps, and more.",
+        "eduvantix is an AI-powered EdTech platform by DatamindX Technologies Pvt. Ltd., offering courses in AI, Full Stack Development, Machine Learning, DevOps, and more.",
       foundingDate: "2024",
       founder: {
         "@type": "Organization",
@@ -205,7 +203,7 @@ const globalJsonLd = {
     {
       "@type": "EducationalOrganization",
       "@id": "https://eduvantix.com/#educational-org",
-      name: "Eduvantix",
+      name: "eduvantix",
       url: "https://eduvantix.com",
       description:
         "India's premier AI-powered EdTech platform offering live tech courses, coding contests, and expert mentorship for aspiring developers.",
@@ -227,7 +225,7 @@ const globalJsonLd = {
       "@type": "WebSite",
       "@id": "https://eduvantix.com/#website",
       url: "https://eduvantix.com",
-      name: "Eduvantix",
+      name: "eduvantix",
       description:
         "AI-powered EdTech platform with live coding classes, courses, and contests.",
       publisher: { "@id": "https://eduvantix.com/#organization" },
@@ -295,7 +293,7 @@ export default function RootLayout({ children }) {
         <link
           rel="alternate"
           type="application/rss+xml"
-          title="Eduvantix — Latest Courses & Updates"
+          title="eduvantix — Latest Courses & Updates"
           href="https://eduvantix.com/rss.xml"
         />
 
@@ -336,7 +334,7 @@ export default function RootLayout({ children }) {
         style={{ backgroundColor: "var(--bg-primary)", color: "var(--text-primary)" }}
         suppressHydrationWarning={true}
       >
-        <AuthProvider><ProProvider>{children}</ProProvider></AuthProvider>
+        {children}
       </body>
     </html>
   );

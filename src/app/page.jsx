@@ -23,9 +23,9 @@ import LandingFinalCTANew from "@/components/landing/LandingFinalCTANew";
    Full Stack Development, Generative AI, etc.
 ───────────────────────────────────────────── */
 export const metadata = {
-  title: "Eduvantix — From Learning to Getting Hired | AI Career Platform",
+  title: "eduvantix — From Learning to Getting Hired | AI Career Platform",
   description:
-    "Eduvantix is an AI-powered career platform that takes you from zero to hired. Personalized roadmaps, real projects, AI mentorship, and direct employer connections.",
+    "eduvantix is an AI-powered career platform that takes you from zero to hired. Personalized roadmaps, real projects, AI mentorship, and direct employer connections.",
   keywords: [
     "AI courses India",
     "free tech courses online",
@@ -48,7 +48,7 @@ export const metadata = {
     "Node.js course",
     "Python machine learning",
     "DevOps course",
-    "Eduvantix",
+    "eduvantix",
     "DatamindX",
   ],
   alternates: {
@@ -60,24 +60,24 @@ export const metadata = {
   openGraph: {
     type: "website",
     url: "https://eduvantix.com",
-    title: "Eduvantix — From Learning to Getting Hired",
+    title: "eduvantix — From Learning to Getting Hired",
     description:
       "AI-powered career platform with personalized roadmaps, real projects, AI mentorship, and direct employer hiring.",
-    siteName: "Eduvantix",
+    siteName: "eduvantix",
     locale: "en_IN",
     images: [
       {
         url: "/logo-black-text.webp",
         width: 1200,
         height: 630,
-        alt: "Eduvantix — AI Career Platform",
+        alt: "eduvantix — AI Career Platform",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
     site: "@eduvantix",
-    title: "Eduvantix — From Learning to Getting Hired",
+    title: "eduvantix — From Learning to Getting Hired",
     description:
       "AI-powered career platform with personalized roadmaps, real projects, AI mentorship, and direct employer hiring.",
     images: ["/logo-black-text.webp"],
@@ -105,10 +105,10 @@ export default function Home() {
         {/* S6: Individual Pricing Tiers (Free / Premium / Pro) */}
         <LandingPricingTiers />
 
-        {/* S7: Eduvantix Pro Experience (AI Career Journey) */}
+        {/* S7: eduvantix Pro Experience (AI Career Journey) */}
         <LandingProExperience />
 
-        {/* S8: Eduvantix for Institutes — teaser CTA to /institutes */}
+        {/* S8: eduvantix for Institutes — teaser CTA to /institutes */}
         <LandingInstituteTeaser />
 
         {/* S9: For Students & Institutes */}

@@ -6,7 +6,7 @@ import useThemeStore from "@/store/useThemeStore";
 
 const TESTIMONIALS = [
   {
-    quote: "Eduvantix completely replaced my resume with proof. When I interviewed at Swiggy, they asked about my verified Eduvantix projects instead of standard LeetCode questions.",
+    quote: "eduvantix completely replaced my resume with proof. When I interviewed at Swiggy, they asked about my verified eduvantix projects instead of standard LeetCode questions.",
     author: "Rohan Sharma",
     role: "Full Stack Engineer",
     company: "Swiggy",
@@ -38,7 +38,7 @@ const TESTIMONIALS = [
     initials: "PN",
   },
   {
-    quote: "Eduvantix gave our bootcamp a full operating system. Attendance, coding labs, exams, and placement tracking — all in one dashboard.",
+    quote: "eduvantix gave our bootcamp a full operating system. Attendance, coding labs, exams, and placement tracking — all in one dashboard.",
     author: "Rajiv Menon",
     role: "Director of Academics",
     company: "TechBridge Academy",

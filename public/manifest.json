@@ -1,6 +1,6 @@
 {
-  "name": "Eduvantix",
-  "short_name": "Eduvantix",
+  "name": "eduvantix",
+  "short_name": "eduvantix",
   "description": "AI-Powered Tech Learning Platform",
   "start_url": "/",
   "display": "standalone",

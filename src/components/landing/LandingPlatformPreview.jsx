@@ -81,10 +81,10 @@ export default function LandingPlatformPreview() {
               <div className="px-3 py-2 mb-3 flex items-center gap-2.5">
                 <img
                   src="/logo.webp"
-                  alt="Eduvantix Logo"
+                  alt="eduvantix Logo"
                   className="h-5 w-5 object-contain rounded-md shrink-0"
                 />
-                <span className="text-sm font-bold tracking-tight" style={{ color: "#FFFFFF" }}>Eduvantix OS</span>
+                <span className="text-sm font-bold tracking-tight" style={{ color: "#FFFFFF" }}>eduvantix OS</span>
               </div>
               {["Overview", "My Roadmap", "Projects", "Portfolio", "Resume", "Interviews", "Job Board"].map((item, i) => (
                 <div

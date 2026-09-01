@@ -35,7 +35,7 @@ export default function LandingComparisonNew() {
             className="text-xs font-semibold tracking-widest uppercase"
             style={{ color: "#10b981" }}
           >
-            Why Eduvantix
+            Why eduvantix
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 14 }}
@@ -68,7 +68,7 @@ export default function LandingComparisonNew() {
           <div className="grid grid-cols-12 p-4 text-xs font-bold uppercase tracking-wider border-b" style={{ borderColor: border, color: secondary }}>
             <div className="col-span-4 sm:col-span-4">Capability</div>
             <div className="col-span-4 sm:col-span-4 text-center">Traditional LMS</div>
-            <div className="col-span-4 sm:col-span-4 text-center font-bold" style={{ color: "#10b981" }}>Eduvantix OS</div>
+            <div className="col-span-4 sm:col-span-4 text-center font-bold" style={{ color: "#10b981" }}>eduvantix OS</div>
           </div>
 
           <div className="divide-y" style={{ borderColor: border }}>

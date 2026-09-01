@@ -49,7 +49,7 @@ export default function LandingInstituteTeaser() {
                   className="text-xs font-semibold tracking-widest uppercase"
                   style={{ color: "#10b981" }}
                 >
-                  Eduvantix for Institutions
+                  eduvantix for Institutions
                 </span>
                 <h2
                   className="mt-3"
@@ -101,7 +101,7 @@ export default function LandingInstituteTeaser() {
                   }}
                 >
                   <Building2 size={16} />
-                  Explore Eduvantix for Institutions
+                  Explore eduvantix for Institutions
                   <ArrowRight size={15} />
                 </Link>
               </div>

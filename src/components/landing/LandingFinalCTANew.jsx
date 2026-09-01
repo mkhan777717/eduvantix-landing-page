@@ -84,7 +84,7 @@ export default function LandingFinalCTANew() {
             marginTop: "1.5rem",
           }}
         >
-          Whether you&apos;re starting your own journey or building a better learning ecosystem for your institute, Eduvantix brings everything together.
+          Whether you&apos;re starting your own journey or building a better learning ecosystem for your institute, eduvantix brings everything together.
         </motion.p>
 
         {/* 3 Clear Action Buttons */}
@@ -96,7 +96,7 @@ export default function LandingFinalCTANew() {
           className="flex flex-wrap items-center justify-center gap-3.5 mt-10"
         >
           <Link
-            href="/login"
+            href="https://learn.eduvantix.com"
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-85 active:scale-95 shadow-sm"
             style={{ backgroundColor: "#059669", color: "#FFFFFF" }}
           >
@@ -126,7 +126,7 @@ export default function LandingFinalCTANew() {
               border: `1.5px solid ${border}`,
             }}
           >
-            Partner With Eduvantix
+            Partner With eduvantix
           </a>
         </motion.div>
       </div>

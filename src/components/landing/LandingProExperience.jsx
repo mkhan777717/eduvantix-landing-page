@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FileText, Sparkles, UserCheck, AlertTriangle, Target, Map,
   BookOpen, Code2, CheckCircle2, Mic2, Briefcase, Award,
-  ArrowRight, ChevronRight, Check
+  ArrowRight, Check
 } from "lucide-react";
 import useThemeStore from "@/store/useThemeStore";
 
@@ -19,7 +19,7 @@ const PRO_STEPS = [
     headline: "Automated Resume Parsing & ATS Audit",
     metric: "12 skills identified",
     metricHighlight: "94% ATS Score",
-    description: "Eduvantix Pro reads your current resume, projects, and work history to construct a foundational data model of your background.",
+    description: "eduvantix Pro reads your current resume, projects, and work history to construct a foundational data model of your background.",
     preview: {
       title: "Extracted Skill Baseline",
       tags: ["React.js", "Node.js", "TypeScript", "Tailwind CSS", "REST APIs", "PostgreSQL"],
@@ -264,7 +264,7 @@ export default function LandingProExperience() {
               className="text-xs font-semibold tracking-widest uppercase"
               style={{ color: "#10b981" }}
             >
-              Eduvantix Pro Experience
+              eduvantix Pro Experience
             </span>
           </motion.div>
 
@@ -298,7 +298,7 @@ export default function LandingProExperience() {
               marginTop: "1.25rem",
             }}
           >
-            Eduvantix Pro understands where you are, identifies what's missing, and continuously builds the path toward where you want to go.
+            eduvantix Pro understands where you are, identifies what&apos;s missing, and continuously builds the path toward where you want to go.
           </motion.p>
         </div>
 
@@ -313,9 +313,8 @@ export default function LandingProExperience() {
                 <button
                   key={step.id}
                   onClick={() => setActiveStepIndex(idx)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all duration-200 border ${
-                    isActive ? "shadow-sm" : "hover:opacity-85"
-                  }`}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all duration-200 border ${isActive ? "shadow-sm" : "hover:opacity-85"
+                    }`}
                   style={{
                     backgroundColor: isActive
                       ? (isDark ? "#0D0D0D" : "#FFFFFF")
@@ -323,8 +322,8 @@ export default function LandingProExperience() {
                     borderColor: isActive
                       ? "#10b981"
                       : isPast
-                      ? "rgba(16,185,129,0.25)"
-                      : border,
+                        ? "rgba(16,185,129,0.25)"
+                        : border,
                     color: isActive ? text : secondary,
                   }}
                 >
@@ -334,15 +333,15 @@ export default function LandingProExperience() {
                       backgroundColor: isActive
                         ? "#10b981"
                         : isPast
-                        ? "rgba(16,185,129,0.18)"
-                        : isDark
-                        ? "#1C1C1C"
-                        : "#EBEBEB",
+                          ? "rgba(16,185,129,0.18)"
+                          : isDark
+                            ? "#1C1C1C"
+                            : "#EBEBEB",
                       color: isActive
                         ? "#FFFFFF"
                         : isPast
-                        ? "#10b981"
-                        : secondary,
+                          ? "#10b981"
+                          : secondary,
                     }}
                   >
                     {step.step}

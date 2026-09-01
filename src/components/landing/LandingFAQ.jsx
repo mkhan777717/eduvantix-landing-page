@@ -7,24 +7,24 @@ import useThemeStore from "@/store/useThemeStore";
 
 const FAQS = [
   {
-    q: "How does Eduvantix differ from traditional video learning platforms?",
-    a: "Eduvantix is an AI Career Platform, not a course seller. Instead of watching pre-recorded videos passively, Eduvantix evaluates your skills, builds a custom roadmap, guides your coding practice in-browser, generates real-world projects, builds an ATS-ready resume, conducts AI mock interviews, and connects you directly with hiring partners.",
+    q: "How does eduvantix differ from traditional video learning platforms?",
+    a: "eduvantix is an AI Career Platform, not a course seller. Instead of watching pre-recorded videos passively, eduvantix evaluates your skills, builds a custom roadmap, guides your coding practice in-browser, generates real-world projects, builds an ATS-ready resume, conducts AI mock interviews, and connects you directly with hiring partners.",
   },
   {
-    q: "Who is Eduvantix designed for?",
-    a: "Eduvantix is built for students and career switchers wanting verified engineering jobs, as well as colleges and EdTech institutes seeking an all-in-one SaaS OS for managing cohorts, analytics, and placements.",
+    q: "Who is eduvantix designed for?",
+    a: "eduvantix is built for students and career switchers wanting verified engineering jobs, as well as colleges and EdTech institutes seeking an all-in-one SaaS OS for managing cohorts, analytics, and placements.",
   },
   {
     q: "Are the projects verified by employers?",
-    a: "Yes. Every project completed on Eduvantix is code-evaluated, proctored, and cryptographically verified on your automated portfolio website so hiring managers know your code is authentic.",
+    a: "Yes. Every project completed on eduvantix is code-evaluated, proctored, and cryptographically verified on your automated portfolio website so hiring managers know your code is authentic.",
   },
   {
     q: "How does the AI Mock Interview system work?",
     a: "The AI conducts real-time technical and behavioral interviews based on your target role. It evaluates your problem-solving approach, code efficiency, and verbal articulation, providing immediate scoring and improvement points.",
   },
   {
-    q: "Can educational institutes integrate Eduvantix into their curriculum?",
-    a: "Yes. Eduvantix offers an Institutional SaaS layer allowing universities and bootcamps to manage student batches, track skill diagnostics, issue digital certificates, and connect students to top corporate recruiters.",
+    q: "Can educational institutes integrate eduvantix into their curriculum?",
+    a: "Yes. eduvantix offers an Institutional SaaS layer allowing universities and bootcamps to manage student batches, track skill diagnostics, issue digital certificates, and connect students to top corporate recruiters.",
   },
   {
     q: "Is there a free trial or free tier available?",

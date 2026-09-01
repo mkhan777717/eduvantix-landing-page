@@ -5,18 +5,6 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import useThemeStore from "@/store/useThemeStore";
 
-const JOURNEY = [
-  { num: "01", label: "Skill Assessment" },
-  { num: "02", label: "AI Roadmap" },
-  { num: "03", label: "Learning Path" },
-  { num: "04", label: "Real Projects" },
-  { num: "05", label: "Portfolio" },
-  { num: "06", label: "Resume" },
-  { num: "07", label: "Mock Interviews" },
-  { num: "08", label: "Internship" },
-  { num: "09", label: "Job Offer" },
-];
-
 const STATS = [
   { value: "10,000+", label: "Active Students" },
   { value: "500+", label: "Partner Institutes" },
@@ -36,7 +24,6 @@ export default function LandingHeroNew() {
   const text = isDark ? "#FFFFFF" : "#111111";
   const secondary = isDark ? "#888888" : "#666666";
   const border = isDark ? "#1C1C1C" : "#ECECEC";
-  const cardBg = isDark ? "#0A0A0A" : "#F9F9F9";
 
   return (
     <section
@@ -82,7 +69,7 @@ export default function LandingHeroNew() {
             marginTop: "1.75rem",
           }}
         >
-          Eduvantix is an AI-powered career platform that takes you from zero to hired.
+          eduvantix is an AI-powered career platform that takes you from zero to hired.
           Personalized roadmaps, real projects, AI mentorship, and direct employer connections
           — all in one place.
         </motion.p>
@@ -94,7 +81,7 @@ export default function LandingHeroNew() {
           style={{ marginTop: "2.25rem" }}
         >
           <Link
-            href="/login"
+            href="https://learn.eduvantix.com"
             className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:opacity-85 active:scale-95"
             style={{ backgroundColor: "#059669", color: "#FFFFFF" }}
           >
