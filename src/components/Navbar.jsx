@@ -13,7 +13,7 @@ export default function Navbar() {
           <img src="/logo-white-text.webp" alt="eduvantix Logo" className="hidden h-7 w-auto object-contain dark:block" />
         </Link>
         <div className="flex items-center gap-3">
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
           <a href="https://learn.eduvantix.com" className="hidden items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-transform hover:-translate-y-0.5 sm:inline-flex" style={{ background: "var(--accent-gradient)" }}>
             <span>Sign In</span>
             <ArrowRight size={14} />
