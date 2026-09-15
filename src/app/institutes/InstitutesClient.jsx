@@ -16,7 +16,6 @@ import {
   Mail, Phone, MessageSquare, Send, Loader2, X
 } from "lucide-react";
 import { getApiBase } from "@/utils/api";
-import Lenis from "lenis";
 import useThemeStore from "@/store/useThemeStore";
 import FeatureScrollStack from "@/components/FeatureScrollStack";
 import useReducedMotion from "@/customHooks/useReducedMotion";
