@@ -13,6 +13,28 @@ const nextConfig = {
      Applied to every page response. These headers improve Lighthouse
      security score and prevent common web vulnerabilities.
   ─────────────────────────────────────────────────────────────────────── */
+  /* ── Careers lives on the app, not here ──────────────────────────────
+     The careers page needs a signed-in user to apply, and auth lives on
+     learn.eduvantix.com — localStorage is per-origin, so a token issued
+     there is unreadable on this domain. The app's own /careers page is
+     already the declared canonical, so send everything to it rather than
+     keeping a second copy that can never complete an application.
+  ─────────────────────────────────────────────────────────────────────── */
+  async redirects() {
+    return [
+      {
+        source: "/careers",
+        destination: "https://learn.eduvantix.com/careers",
+        permanent: true,
+      },
+      {
+        source: "/careers/:path*",
+        destination: "https://learn.eduvantix.com/careers/:path*",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {

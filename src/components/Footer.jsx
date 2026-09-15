@@ -8,7 +8,7 @@ const footerLinks = [
     title: "Company",
     links: [
       { name: "About eduvantix", href: "/about" },
-      { name: "Careers", href: "/careers" },
+      { name: "Careers", href: "https://learn.eduvantix.com/careers" },
     ],
   }
 ];

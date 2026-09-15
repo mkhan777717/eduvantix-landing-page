@@ -123,13 +123,17 @@ export default function About() {
           <div className="text-center mb-20">
             <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 text-[var(--text-primary)] uppercase">
               About{" "}
-              <span
-                style={{
-                  color: "transparent",
-                  WebkitTextStroke: "1px var(--text-primary)",
-                }}
-              >
-                eduvantix
+              <span className="inline-block whitespace-nowrap">
+                <img
+                  src="/logo-black-wordmark.webp"
+                  alt="eduvantix"
+                  className="inline-block h-9 md:h-14 w-auto object-contain align-baseline dark:hidden"
+                />
+                <img
+                  src="/logo-white-wordmark.webp"
+                  alt="eduvantix"
+                  className="hidden h-9 md:h-14 w-auto object-contain align-baseline dark:inline-block"
+                />
               </span>
             </h1>
             <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">

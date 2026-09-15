@@ -22,6 +22,7 @@ import useReducedMotion from "@/customHooks/useReducedMotion";
 import TiltCard from "@/components/TitleCard";
 import { EASE_OUT_EXPO, SPRING_CONFIG, SPRING_SNAPPY } from "@/utils/constants";
 import ParticleCursor from "@/components/ParticleCursor";
+import Lenis from "lenis";
 
 // ─── Data ─────────────────────────────────────────────────────────────
 const INSTITUTE_ROLES = [
