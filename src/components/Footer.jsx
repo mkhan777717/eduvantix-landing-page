@@ -81,14 +81,13 @@ export default function Footer() {
         {/* Large */}
         <div className="mb-16 overflow-hidden">
           <div
-            className="text-[clamp(4rem,10vw,9rem)] font-black tracking-[-0.06em] leading-none select-none uppercase w-full transition-colors duration-700"
+            className="text-[clamp(1.8rem,8.5vw,9rem)] font-black tracking-normal md:tracking-[0.25em] leading-none select-none uppercase w-full transition-colors duration-700 whitespace-nowrap"
             style={{
               color: isVisible
                 ? (typeof window !== "undefined" && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
                   ? "var(--accent-gradient)"
                   : "#000")
                 : "var(--border-card)",
-              letterSpacing: "0.4em",
               transitionDelay: isVisible ? "0.5s" : "0s",
             }}
           >
