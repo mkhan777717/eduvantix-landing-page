@@ -584,6 +584,21 @@ html.theme-dark .live-chat-sidebar-fullscreen {
   transform: translateY(0);
 }
 
+.footer-reveal .mb-16.overflow-hidden > div {
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .footer-reveal .mb-16.overflow-hidden > div {
+    font-size: clamp(2.2rem, 11vw, 4.5rem) !important;
+    letter-spacing: clamp(0.08em, 1.5vw, 0.35em) !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    margin-right: -0.15em !important;
+  }
+}
+
+
 @media (prefers-reduced-motion: reduce) {
   .footer-reveal {
     transition: opacity 0.4s ease, transform 0.4s ease;
