@@ -120,23 +120,20 @@ export default function About() {
           </nav>
 
           {/* Hero Section */}
-          <div className="text-center mb-20">
-            <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 text-[var(--text-primary)] uppercase">
+          <div className="text-center mb-16 md:mb-20">
+            {/* Eyebrow Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase bg-[#059669]/10 text-[#059669] border border-[#059669]/20 mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#059669] animate-pulse" />
+              Our Mission & Story
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-[var(--text-primary)] mb-6 leading-tight">
               About{" "}
-              <span className="inline-block whitespace-nowrap">
-                <img
-                  src="/logo-black-wordmark.webp"
-                  alt="eduvantix"
-                  className="inline-block h-9 md:h-14 w-auto object-contain align-baseline dark:hidden"
-                />
-                <img
-                  src="/logo-white-wordmark.webp"
-                  alt="eduvantix"
-                  className="hidden h-9 md:h-14 w-auto object-contain align-baseline dark:inline-block"
-                />
+              <span className="bg-gradient-to-r from-[#059669] via-[#10b981] to-[#047857] bg-clip-text text-transparent">
+                eduvantix
               </span>
             </h1>
-            <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed text-[var(--text-secondary)]">
               We are redefining technology education through immersive,
               project-based learning. Built by developers, for the next
               generation of engineers.
