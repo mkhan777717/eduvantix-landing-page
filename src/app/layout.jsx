@@ -107,10 +107,11 @@ export const metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon.ico", type: "image/x-icon" },
+      { url: "/favicon.png", type: "image/png" },
+      { url: "/logo.webp", type: "image/webp" },
     ],
     shortcut: "/favicon.ico",
-    apple: [{ url: "/favicon.ico", sizes: "180x180", type: "image/x-icon" }],
+    apple: [{ url: "/logo.webp", sizes: "180x180", type: "image/webp" }],
   },
 
   /* ── App & Theme ────────────────────────── */
@@ -286,8 +287,9 @@ export default function RootLayout({ children }) {
 
         {/* ── Favicon ──────────────────────── */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-        <link rel="apple-touch-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="icon" type="image/webp" href="/logo.webp" />
+        <link rel="apple-touch-icon" href="/logo.webp" />
 
         {/* ── RSS Feed ─────────────────────── */}
         <link
