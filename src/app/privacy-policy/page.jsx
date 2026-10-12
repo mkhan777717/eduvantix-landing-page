@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { SUPPORT_PHONE_DISPLAY } from "@/utils/constants";
 
 /* ─────────────────────────────────────────────
    Privacy Policy Metadata
@@ -232,7 +233,7 @@ export default function PrivacyPolicy() {
               <ul className="list-none space-y-1 font-medium">
                 <li><strong>Eduvantix</strong> (a product of DatamindX Technologies Pvt. Ltd.)</li>
                 <li>Email: <a href="mailto:hello@eduvantix.com" className="underline text-[var(--text-primary)]">hello@eduvantix.com</a></li>
-                <li>Phone: +91 9205454717</li>
+                <li>Phone: {SUPPORT_PHONE_DISPLAY}</li>
                 <li>Website: <a href="https://eduvantix.com" className="underline text-[var(--text-primary)]">https://eduvantix.com</a></li>
               </ul>
             </section>

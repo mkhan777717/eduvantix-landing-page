@@ -1,5 +1,6 @@
 import Script from "next/script";
 import "./globals.css";
+import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton";
 
 /* ─────────────────────────────────────────────
    MetadataBase — MUST be set so all relative
@@ -337,6 +338,7 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning={true}
       >
         {children}
+        <WhatsAppFloatingButton />
       </body>
     </html>
   );
