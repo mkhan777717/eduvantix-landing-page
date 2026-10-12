@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { SUPPORT_PHONE_DISPLAY, WHATSAPP_PHONE_NUMBER } from "@/utils/constants";
 
 const footerLinks = [
   {
@@ -104,8 +105,8 @@ export default function Footer() {
               Engineering precision meets high-end creative design.
             </p>
             <div className="space-y-1.5 pt-1">
-              <a href="tel:9205454717" className="block text-sm transition-colors hover:text-[var(--text-primary)]" style={{ color: "var(--text-secondary)" }}>
-                +91 9205454717
+              <a href={`tel:${WHATSAPP_PHONE_NUMBER}`} className="block text-sm transition-colors hover:text-[var(--text-primary)]" style={{ color: "var(--text-secondary)" }}>
+                {SUPPORT_PHONE_DISPLAY}
               </a>
               <a href="mailto:hello@eduvantix.com" className="block text-sm transition-colors hover:text-[var(--text-primary)]" style={{ color: "var(--text-secondary)" }}>
                 hello@eduvantix.com
